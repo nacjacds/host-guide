@@ -1,0 +1,45 @@
+{
+  "name": "whatsapp-bot",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "whatsapp-inbound",
+        "httpMethod": "POST",
+        "responseMode": "lastNode"
+      },
+      "name": "YCloud Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.APP_URL }}/api/whatsapp/webhook",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "whatsappInboundMessage",
+              "value": "={{ $json }}"
+            }
+          ]
+        }
+      },
+      "name": "Forward to Next.js API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0]
+    }
+  ],
+  "connections": {
+    "YCloud Webhook": {
+      "main": [[{ "node": "Forward to Next.js API", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "meta": {
+    "instanceId": "placeholder"
+  }
+}
