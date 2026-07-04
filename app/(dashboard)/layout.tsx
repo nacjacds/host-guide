@@ -16,6 +16,8 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  const emailNotConfirmed = !user.email_confirmed_at;
+
   return (
     <div className="flex min-h-screen">
       <aside className="w-56 shrink-0 border-r p-4">
@@ -28,7 +30,15 @@ export default async function DashboardLayout({
           </Link>
         </nav>
       </aside>
-      <main className="flex-1 p-6">{children}</main>
+      <main className="flex-1 p-6">
+        {emailNotConfirmed && (
+          <div className="mb-6 rounded-lg border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-900 dark:border-yellow-900 dark:bg-yellow-950 dark:text-yellow-200">
+            Todavía no has confirmado tu email ({user.email}). Revisa tu bandeja de
+            entrada y confirma tu cuenta para poder publicar tu guía.
+          </div>
+        )}
+        {children}
+      </main>
     </div>
   );
 }

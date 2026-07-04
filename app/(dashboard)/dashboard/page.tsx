@@ -20,7 +20,9 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Mis propiedades</h1>
-        <Button render={<Link href="/properties/new" />}>Nueva propiedad</Button>
+        <Button nativeButton={false} render={<Link href="/properties/new" />}>
+          Nueva propiedad
+        </Button>
       </div>
 
       {!properties?.length && (

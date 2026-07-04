@@ -11,8 +11,14 @@ export default function Home() {
         integrado.
       </p>
       <div className="flex gap-4">
-        <Button render={<Link href="/register" />}>Empezar gratis</Button>
-        <Button variant="outline" render={<Link href="/login" />}>
+        <Button nativeButton={false} render={<Link href="/register" />}>
+          Empezar gratis
+        </Button>
+        <Button
+          variant="outline"
+          nativeButton={false}
+          render={<Link href="/login" />}
+        >
           Iniciar sesión
         </Button>
       </div>

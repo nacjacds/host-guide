@@ -10,6 +10,7 @@ export function ContactButtons({ property }: { property: Property }) {
     <div className="flex justify-center gap-3 p-6">
       <Button
         style={{ backgroundColor: property.accent_color }}
+        nativeButton={false}
         render={<a href={whatsappHref} target="_blank" rel="noopener noreferrer" />}
       >
         Contactar por WhatsApp

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,32 +10,58 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export default function RegisterPage() {
-  const router = useRouter();
   const supabase = createClient();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName } },
-    });
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: fullName } },
+      });
 
-    setLoading(false);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
 
-    if (error) {
-      toast.error(error.message);
-      return;
+      setRegistered(true);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error de red");
+    } finally {
+      setLoading(false);
     }
+  }
 
-    router.push("/dashboard");
-    router.refresh();
+  if (registered) {
+    return (
+      <div className="flex min-h-screen items-center justify-center p-6">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle>Revisa tu email</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Te hemos enviado un enlace de confirmación a <strong>{email}</strong>.
+              Ábrelo para confirmar tu cuenta antes de iniciar sesión.
+            </p>
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              <Link href="/login" className="underline">
+                Ir a iniciar sesión
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (

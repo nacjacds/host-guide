@@ -18,12 +18,15 @@ export function AIGenerateButton({ propertyId }: { propertyId: string }) {
         body: JSON.stringify({ propertyId }),
       });
 
-      if (!response.ok) throw new Error("Error al generar contenido");
+      if (!response.ok) {
+        const { error } = await response.json().catch(() => ({ error: null }));
+        throw new Error(error ?? "Error al generar contenido");
+      }
 
       toast.success("Contenido generado con IA");
       router.refresh();
-    } catch {
-      toast.error("No se pudo generar el contenido");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo generar el contenido");
     } finally {
       setLoading(false);
     }

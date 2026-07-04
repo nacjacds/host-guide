@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export default function NewPropertyPage() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,21 +16,27 @@ export default function NewPropertyPage() {
     e.preventDefault();
     setLoading(true);
 
-    const response = await fetch("/api/properties", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, address }),
-    });
+    try {
+      const response = await fetch("/api/properties", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, address }),
+      });
 
-    setLoading(false);
+      if (!response.ok) {
+        const { error } = await response.json().catch(() => ({ error: null }));
+        toast.error(error ?? "No se pudo crear la propiedad");
+        setLoading(false);
+        return;
+      }
 
-    if (!response.ok) {
-      toast.error("No se pudo crear la propiedad");
-      return;
+      const { property } = await response.json();
+      toast.success("Propiedad creada");
+      window.location.href = `/properties/${property.id}/edit`;
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error de red");
+      setLoading(false);
     }
-
-    const { property } = await response.json();
-    router.push(`/properties/${property.id}/edit`);
   }
 
   return (

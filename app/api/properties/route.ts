@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { slugifyPropertyName } from "@/lib/utils";
+import type { User } from "@supabase/supabase-js";
 
 const PLAN_LIMITS = { free: 1, basic: 3, pro: Infinity } as const;
 
@@ -9,6 +10,30 @@ const createPropertySchema = z.object({
   name: z.string().min(1).max(120),
   address: z.string().min(1).max(255),
 });
+
+// Profiles are normally created by the on_auth_user_created DB trigger.
+// This is a fallback for accounts that predate the trigger (or any other
+// gap), since profiles has no authenticated INSERT policy — a missing row
+// here would otherwise block property creation with a FK violation.
+async function ensureProfile(user: User) {
+  const serviceClient = createServiceRoleClient();
+  const { data: profile } = await serviceClient
+    .from("profiles")
+    .select("plan")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (profile) return profile;
+
+  const { data: created, error } = await serviceClient
+    .from("profiles")
+    .insert({ id: user.id, full_name: user.user_metadata?.full_name ?? null })
+    .select("plan")
+    .single();
+
+  if (error) throw error;
+  return created;
+}
 
 export async function GET() {
   const supabase = await createClient();
@@ -48,11 +73,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.message }, { status: 400 });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("plan")
-    .eq("id", user.id)
-    .single();
+  let profile;
+  try {
+    profile = await ensureProfile(user);
+  } catch {
+    return NextResponse.json(
+      { error: "No se pudo preparar tu perfil de anfitrión" },
+      { status: 500 }
+    );
+  }
 
   const { count } = await supabase
     .from("properties")

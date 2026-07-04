@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AIGenerateButton } from "@/components/editor/AIGenerateButton";
+import { PropertyEditor } from "@/components/editor/PropertyEditor";
 
 export default async function EditPropertyPage({
   params,
@@ -18,11 +19,14 @@ export default async function EditPropertyPage({
 
   if (!property) notFound();
 
-  const { data: blocks } = await supabase
-    .from("guide_blocks")
-    .select("*")
-    .eq("property_id", id)
-    .order("order_index");
+  const [{ data: blocks }, { data: recommendations }] = await Promise.all([
+    supabase.from("guide_blocks").select("*").eq("property_id", id).order("order_index"),
+    supabase
+      .from("recommendations")
+      .select("*")
+      .eq("property_id", id)
+      .order("order_index"),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -31,9 +35,11 @@ export default async function EditPropertyPage({
         <AIGenerateButton propertyId={property.id} />
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        {blocks?.length ?? 0} bloques de contenido
-      </p>
+      <PropertyEditor
+        propertyId={property.id}
+        initialBlocks={blocks ?? []}
+        initialRecommendations={recommendations ?? []}
+      />
     </div>
   );
 }
