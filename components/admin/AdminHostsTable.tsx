@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -8,8 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { PLANS, PLAN_ORDER, type PlanId } from "@/lib/plans";
+import { isSuperAdmin } from "@/lib/admin";
 
 export interface AdminHostRow {
   id: string;
@@ -20,8 +23,11 @@ export interface AdminHostRow {
 }
 
 function HostRow({ host }: { host: AdminHostRow }) {
+  const router = useRouter();
   const [plan, setPlan] = useState<PlanId>(host.plan);
   const [saving, setSaving] = useState(false);
+  const [impersonating, setImpersonating] = useState(false);
+  const impersonatingRef = useRef(false);
 
   async function handlePlanChange(value: string | null) {
     if (!value || value === plan) return;
@@ -49,6 +55,39 @@ function HostRow({ host }: { host: AdminHostRow }) {
     }
   }
 
+  async function handleImpersonate() {
+    if (
+      !window.confirm(
+        `¿Entrar como ${host.email}? Verás su panel exactamente como lo ve él, hasta que pulses "Volver a admin".`
+      )
+    ) {
+      return;
+    }
+    if (impersonatingRef.current) return;
+    impersonatingRef.current = true;
+
+    setImpersonating(true);
+    try {
+      const response = await fetch("/api/admin/impersonate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: host.id }),
+      });
+      if (!response.ok) {
+        const { error } = await response.json().catch(() => ({ error: null }));
+        toast.error(error ?? "No se pudo impersonar a este usuario");
+        return;
+      }
+      router.push("/dashboard");
+      router.refresh();
+    } catch {
+      toast.error("Error de red");
+    } finally {
+      setImpersonating(false);
+      impersonatingRef.current = false;
+    }
+  }
+
   return (
     <tr className="border-b border-border last:border-0">
       <td className="py-2 pr-4 text-sm">{host.email}</td>
@@ -67,8 +106,20 @@ function HostRow({ host }: { host: AdminHostRow }) {
         </Select>
       </td>
       <td className="py-2 pr-4 text-sm">{host.propertyCount}</td>
-      <td className="py-2 text-sm text-muted-foreground">
+      <td className="py-2 pr-4 text-sm text-muted-foreground">
         {new Date(host.createdAt).toLocaleDateString("es-ES")}
+      </td>
+      <td className="py-2 text-sm">
+        {!isSuperAdmin(host.email) && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleImpersonate}
+            disabled={impersonating}
+          >
+            {impersonating ? "Entrando..." : "Entrar como este usuario"}
+          </Button>
+        )}
       </td>
     </tr>
   );
@@ -87,7 +138,8 @@ export function AdminHostsTable({ hosts }: { hosts: AdminHostRow[] }) {
             <th className="py-2 pr-4 font-medium">Email</th>
             <th className="py-2 pr-4 font-medium">Plan</th>
             <th className="py-2 pr-4 font-medium">Propiedades</th>
-            <th className="py-2 font-medium">Registro</th>
+            <th className="py-2 pr-4 font-medium">Registro</th>
+            <th className="py-2 font-medium">Acciones</th>
           </tr>
         </thead>
         <tbody>
