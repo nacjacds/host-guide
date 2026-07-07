@@ -1,5 +1,6 @@
-export type Plan = "free" | "basic" | "pro";
+export type Plan = "free" | "starter" | "pro" | "agency";
 export type HostTone = "friendly" | "formal";
+export type AnalyticsEventType = "guide_opened" | "section_viewed" | "whatsapp_clicked";
 export type BlockType =
   | "wifi"
   | "checkin"
@@ -7,7 +8,27 @@ export type BlockType =
   | "rules"
   | "parking"
   | "appliances"
-  | "custom";
+  | "custom"
+  | "emergencias"
+  | "pool"
+  | "restaurants"
+  | "drinks"
+  | "nightlife"
+  | "attractions";
+
+export type PriceLevel = "€" | "€€" | "€€€";
+
+export interface PlaceEntry {
+  id: string;
+  name: string;
+  description: string;
+  address: string;
+  distance_meters: number | null;
+  maps_url: string;
+  google_place_id: string | null;
+  cuisine_type?: string;
+  price_level?: PriceLevel | null;
+}
 export type RecommendationCategory =
   | "restaurant"
   | "bar"
@@ -20,6 +41,14 @@ export interface BotMessage {
   role: "user" | "assistant";
   content: string;
   timestamp: string;
+}
+
+export interface BlockImage {
+  url: string;
+  alt: string;
+  width: number;
+  height: number;
+  caption: string;
 }
 
 export interface Database {
@@ -64,6 +93,8 @@ export interface Database {
           host_tone: HostTone;
           language: string;
           whatsapp_number: string | null;
+          welcome_message: string | null;
+          airbnb_url: string | null;
           is_published: boolean;
           created_at: string;
           updated_at: string;
@@ -79,6 +110,8 @@ export interface Database {
           host_tone?: HostTone;
           language?: string;
           whatsapp_number?: string | null;
+          welcome_message?: string | null;
+          airbnb_url?: string | null;
           is_published?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -94,6 +127,8 @@ export interface Database {
           host_tone?: HostTone;
           language?: string;
           whatsapp_number?: string | null;
+          welcome_message?: string | null;
+          airbnb_url?: string | null;
           is_published?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -108,6 +143,7 @@ export interface Database {
           title: string | null;
           icon: string | null;
           content: Record<string, unknown>;
+          images: BlockImage[];
           order_index: number;
           is_visible: boolean;
           created_at: string;
@@ -119,6 +155,7 @@ export interface Database {
           title?: string | null;
           icon?: string | null;
           content: Record<string, unknown>;
+          images?: BlockImage[];
           order_index?: number;
           is_visible?: boolean;
           created_at?: string;
@@ -130,6 +167,7 @@ export interface Database {
           title?: string | null;
           icon?: string | null;
           content?: Record<string, unknown>;
+          images?: BlockImage[];
           order_index?: number;
           is_visible?: boolean;
           created_at?: string;
@@ -214,6 +252,90 @@ export interface Database {
         };
         Relationships: [];
       };
+      translations_cache: {
+        Row: {
+          id: string;
+          source_text_hash: string;
+          source_lang: string;
+          target_lang: string;
+          translated_text: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          source_text_hash: string;
+          source_lang?: string;
+          target_lang: string;
+          translated_text: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          source_text_hash?: string;
+          source_lang?: string;
+          target_lang?: string;
+          translated_text?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      guest_messages: {
+        Row: {
+          id: string;
+          property_id: string;
+          name: string | null;
+          country: string | null;
+          message: string;
+          rating: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          property_id: string;
+          name?: string | null;
+          country?: string | null;
+          message: string;
+          rating: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          property_id?: string;
+          name?: string | null;
+          country?: string | null;
+          message?: string;
+          rating?: number;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      analytics_events: {
+        Row: {
+          id: string;
+          property_id: string;
+          event_type: AnalyticsEventType;
+          section: string | null;
+          country: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          property_id: string;
+          event_type: AnalyticsEventType;
+          section?: string | null;
+          country?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          property_id?: string;
+          event_type?: AnalyticsEventType;
+          section?: string | null;
+          country?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -225,3 +347,5 @@ export type Property = Database["public"]["Tables"]["properties"]["Row"];
 export type GuideBlock = Database["public"]["Tables"]["guide_blocks"]["Row"];
 export type Recommendation = Database["public"]["Tables"]["recommendations"]["Row"];
 export type BotConversation = Database["public"]["Tables"]["bot_conversations"]["Row"];
+export type GuestMessage = Database["public"]["Tables"]["guest_messages"]["Row"];
+export type AnalyticsEvent = Database["public"]["Tables"]["analytics_events"]["Row"];

@@ -136,7 +136,7 @@ profiles (
   id uuid PRIMARY KEY REFERENCES auth.users,
   full_name text,
   phone text,
-  plan text DEFAULT 'free',        -- 'free' | 'basic' | 'pro'
+  plan text DEFAULT 'free',        -- 'free' | 'starter' | 'pro' | 'agency' (ver lib/plans.ts)
   stripe_customer_id text,
   created_at timestamptz DEFAULT now()
 )
@@ -405,18 +405,22 @@ Ver sección "Sistema de traducciones" arriba — usa `claude-haiku-4-5-20251001
 
 ---
 
-## Planes y límites
+## Modelo de negocio
 
-| Feature | Free | Basic (9€/mes) | Pro (24€/mes) |
-|---------|------|----------------|---------------|
-| Propiedades | 1 | 3 | Ilimitadas |
-| Bloques de contenido | 5 | Ilimitados | Ilimitados |
-| Recomendaciones IA | ❌ | ✅ | ✅ |
-| Generación de contenido IA | ❌ | ✅ | ✅ |
-| Bot WhatsApp | ❌ | ❌ | ✅ |
-| QR descargable | ✅ | ✅ | ✅ |
-| Multiidioma | ❌ | ES + EN | Ilimitado |
-| Soporte | Email | Email | Prioritario |
+**`lib/plans.ts` es la fuente única de verdad** para precios, límites y guards de cada plan — no hardcodear estos valores en ningún otro sitio (páginas, componentes, endpoints). `types/index.ts` define `Plan = "free" | "starter" | "pro" | "agency"`, y `profiles.plan` está restringido a esos 4 valores por constraint en BD.
+
+| Plan | Precio | Propiedades | IA (contenido/recomendaciones) | Estadísticas | Marca blanca |
+|------|--------|--------------|------------------------------|--------------|--------------|
+| Free | 0€/mes | 1 | ❌ | ❌ | ❌ |
+| Starter | 4€/mes | 3 | ✅ | ❌ | ❌ |
+| Pro | 12€/mes | 10 | ✅ | ✅ | ❌ |
+| Agency | 29€/mes | 30 | ✅ | ✅ | ✅ |
+
+- `getPlan(planId)` / `planPropertyLimit(planId)` en `lib/plans.ts` — usado por `/api/properties` (POST) para bloquear la creación de propiedades por encima del límite del plan, y por el modal "Cambiar de plan" (`ChangePlanDialog.tsx`) y `/account` para mostrar precio y features.
+- Los guards `aiEnabled` / `analyticsEnabled` / `whiteLabel` de `lib/plans.ts` describen qué debería estar disponible por plan; **todavía no hay enforcement de estos guards en el código** (p. ej. no se oculta el botón "Generar con IA" en plan Free) — son la fuente de verdad para cuando se implemente esa restricción.
+- **Cambio de plan:** los anfitriones ven sus opciones y contactan por email desde `/account` (sin Stripe todavía — el botón de planes superiores abre un `mailto:` a `ignajac@gmail.com`). El único lugar que efectivamente *cambia* `profiles.plan` hoy es el panel de superadmin.
+- **Panel de superadmin** (`/admin`, `lib/admin.ts`): acceso restringido al email `ignajac@gmail.com` (redirige a `/login` para cualquier otro usuario, autenticado o no). Lista todos los anfitriones (email vía `auth.admin.listUsers()`, plan, nº de propiedades, fecha de registro), permite cambiar el plan de cualquier anfitrión con un select (`PATCH /api/admin/profiles/[id]/plan`, revalida el email en el servidor además de en la página), y muestra estadísticas globales (anfitriones, propiedades totales, publicadas vs borrador).
+- Cuando Stripe esté conectado de verdad: `getPriceToPlan()` en `app/api/stripe/webhook/route.ts` ya mapea `STRIPE_PRICE_STARTER` / `STRIPE_PRICE_PRO` / `STRIPE_PRICE_AGENCY` a cada plan — solo falta rellenar esas env vars y probar el flujo de checkout.
 
 ---
 

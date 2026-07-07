@@ -4,6 +4,7 @@ import type { HostTone } from "@/types";
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const MODEL = "claude-sonnet-4-6";
+const TRANSLATION_MODEL = "claude-haiku-4-5-20251001";
 
 function extractJson<T>(text: string): T {
   const match = text.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
@@ -93,6 +94,21 @@ Devuelve SOLO un JSON array:
 
   const text = message.content[0].type === "text" ? message.content[0].text : "";
   return extractJson<RecommendationDraft[]>(text);
+}
+
+export async function translateText(text: string, targetLanguage: string): Promise<string> {
+  const message = await anthropic.messages.create({
+    model: TRANSLATION_MODEL,
+    max_tokens: 300,
+    messages: [
+      {
+        role: "user",
+        content: `Translate this short guide text into ${targetLanguage}. Return ONLY the translated text, with no quotes and no explanation:\n\n${text}`,
+      },
+    ],
+  });
+
+  return message.content[0].type === "text" ? message.content[0].text.trim() : text;
 }
 
 export async function askBot(systemPrompt: string, userMessage: string) {

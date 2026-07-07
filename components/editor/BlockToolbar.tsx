@@ -12,7 +12,29 @@ const BLOCK_TYPE_LABELS: Record<BlockType, string> = {
   rules: "Normas",
   parking: "Parking",
   appliances: "Electrodomésticos",
+  pool: "Piscina",
+  restaurants: "Dónde comer",
+  drinks: "Copas y bares",
+  nightlife: "Ocio nocturno",
+  attractions: "Qué visitar",
   custom: "Personalizado",
+  emergencias: "Emergencias",
+};
+
+const BLOCK_TYPE_ICONS: Record<BlockType, string> = {
+  wifi: "📶",
+  checkin: "🔑",
+  checkout: "🚪",
+  rules: "📋",
+  parking: "🅿️",
+  appliances: "🔌",
+  pool: "🏊",
+  restaurants: "🍽️",
+  drinks: "🍷",
+  nightlife: "🎵",
+  attractions: "🏛️",
+  custom: "📄",
+  emergencias: "🆘",
 };
 
 export function BlockToolbar({
@@ -49,7 +71,7 @@ export function BlockToolbar({
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1.5">
       {(Object.keys(BLOCK_TYPE_LABELS) as BlockType[]).map((type) => (
         <Button
           key={type}
@@ -58,7 +80,8 @@ export function BlockToolbar({
           disabled={creatingType !== null}
           onClick={() => handleCreate(type)}
         >
-          {creatingType === type ? "Añadiendo..." : `+ ${BLOCK_TYPE_LABELS[type]}`}
+          <span aria-hidden>{BLOCK_TYPE_ICONS[type]}</span>
+          {creatingType === type ? "Añadiendo..." : BLOCK_TYPE_LABELS[type]}
         </Button>
       ))}
     </div>

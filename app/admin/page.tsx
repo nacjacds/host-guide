@@ -1,0 +1,107 @@
+import { redirect } from "next/navigation";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { isSuperAdmin } from "@/lib/admin";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AdminHostsTable, type AdminHostRow } from "@/components/admin/AdminHostsTable";
+import type { PlanId } from "@/lib/plans";
+
+export default async function AdminPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!isSuperAdmin(user?.email)) {
+    redirect("/login");
+  }
+
+  const serviceClient = createServiceRoleClient();
+
+  const [{ data: profiles }, { data: usersList }, { data: properties }] = await Promise.all([
+    serviceClient
+      .from("profiles")
+      .select("id, plan, created_at")
+      .order("created_at", { ascending: false }),
+    serviceClient.auth.admin.listUsers({ perPage: 1000 }),
+    serviceClient.from("properties").select("id, host_id, is_published"),
+  ]);
+
+  const emailById = new Map(usersList?.users.map((u) => [u.id, u.email ?? "—"]) ?? []);
+  const propertiesByHost = new Map<string, { total: number; published: number }>();
+
+  for (const property of properties ?? []) {
+    const entry = propertiesByHost.get(property.host_id) ?? { total: 0, published: 0 };
+    entry.total += 1;
+    if (property.is_published) entry.published += 1;
+    propertiesByHost.set(property.host_id, entry);
+  }
+
+  const hosts: AdminHostRow[] = (profiles ?? []).map((profile) => ({
+    id: profile.id,
+    email: emailById.get(profile.id) ?? "—",
+    plan: profile.plan as PlanId,
+    propertyCount: propertiesByHost.get(profile.id)?.total ?? 0,
+    createdAt: profile.created_at,
+  }));
+
+  const totalHosts = hosts.length;
+  const totalProperties = properties?.length ?? 0;
+  const totalPublished = properties?.filter((p) => p.is_published).length ?? 0;
+  const totalDraft = totalProperties - totalPublished;
+
+  return (
+    <div className="mx-auto max-w-4xl space-y-6 p-6">
+      <h1 className="text-2xl font-semibold">Panel de administración</h1>
+
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Anfitriones
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{totalHosts}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Propiedades
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{totalProperties}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Guías publicadas
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{totalPublished}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Borrador</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{totalDraft}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Anfitriones</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AdminHostsTable hosts={hosts} />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { PropertyCard } from "@/components/dashboard/PropertyCard";
+import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -16,40 +16,28 @@ export default async function DashboardPage() {
     .eq("host_id", user!.id)
     .order("created_at", { ascending: false });
 
+  const hasProperties = Boolean(properties?.length);
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Mis propiedades</h1>
-        <Button nativeButton={false} render={<Link href="/properties/new" />}>
-          Nueva propiedad
-        </Button>
-      </div>
-
-      {!properties?.length && (
-        <p className="text-muted-foreground">
-          Todavía no tienes propiedades. Crea la primera para generar tu guía digital.
-        </p>
+      {hasProperties && (
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold">Mis propiedades</h1>
+          <Button nativeButton={false} render={<Link href="/properties/new" />}>
+            Nueva propiedad
+          </Button>
+        </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {properties?.map((property) => (
-          <Link key={property.id} href={`/properties/${property.id}/edit`}>
-            <Card className="transition-shadow hover:shadow-md">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between text-base">
-                  {property.name}
-                  <Badge variant={property.is_published ? "default" : "secondary"}>
-                    {property.is_published ? "Publicada" : "Borrador"}
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">{property.address}</p>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      {hasProperties ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {properties!.map((property) => (
+            <PropertyCard key={property.id} property={property} />
+          ))}
+        </div>
+      ) : (
+        <OnboardingWizard />
+      )}
     </div>
   );
 }

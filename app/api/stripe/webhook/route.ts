@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 
-function getPriceToPlan(): Record<string, "basic" | "pro"> {
+function getPriceToPlan(): Record<string, "starter" | "pro" | "agency"> {
   return {
-    [process.env.STRIPE_PRICE_BASIC ?? ""]: "basic",
+    [process.env.STRIPE_PRICE_STARTER ?? ""]: "starter",
     [process.env.STRIPE_PRICE_PRO ?? ""]: "pro",
+    [process.env.STRIPE_PRICE_AGENCY ?? ""]: "agency",
   };
 }
 

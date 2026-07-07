@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { slugifyPropertyName } from "@/lib/utils";
+import { planPropertyLimit } from "@/lib/plans";
 import type { User } from "@supabase/supabase-js";
-
-const PLAN_LIMITS = { free: 1, basic: 3, pro: Infinity } as const;
 
 const createPropertySchema = z.object({
   name: z.string().min(1).max(120),
@@ -88,7 +87,7 @@ export async function POST(request: NextRequest) {
     .select("id", { count: "exact", head: true })
     .eq("host_id", user.id);
 
-  const limit = PLAN_LIMITS[profile?.plan ?? "free"];
+  const limit = planPropertyLimit(profile?.plan);
   if ((count ?? 0) >= limit) {
     return NextResponse.json(
       { error: "Has alcanzado el límite de propiedades de tu plan" },

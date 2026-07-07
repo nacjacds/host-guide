@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AIGenerateButton } from "@/components/editor/AIGenerateButton";
 import { PropertyEditor } from "@/components/editor/PropertyEditor";
+import { PropertyNav } from "@/components/editor/PropertyNav";
 
 export default async function EditPropertyPage({
   params,
@@ -35,8 +36,10 @@ export default async function EditPropertyPage({
         <AIGenerateButton propertyId={property.id} />
       </div>
 
+      <PropertyNav propertyId={id} active="edit" />
+
       <PropertyEditor
-        propertyId={property.id}
+        property={property}
         initialBlocks={blocks ?? []}
         initialRecommendations={recommendations ?? []}
       />

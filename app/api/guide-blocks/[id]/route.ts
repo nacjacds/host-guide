@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { blockImageStoragePath } from "@/lib/utils";
+
+const blockImageSchema = z.object({
+  url: z.string().url(),
+  alt: z.string(),
+  width: z.number().int(),
+  height: z.number().int(),
+  caption: z.string().max(120),
+});
 
 const updateBlockSchema = z.object({
   title: z.string().max(120).nullable().optional(),
   icon: z.string().max(16).nullable().optional(),
   content: z.record(z.string(), z.unknown()).optional(),
+  images: z.array(blockImageSchema).max(3).optional(),
   is_visible: z.boolean().optional(),
   order_index: z.number().int().optional(),
 });
@@ -57,10 +67,23 @@ export async function DELETE(
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
+  const { data: existing } = await supabase
+    .from("guide_blocks")
+    .select("images")
+    .eq("id", id)
+    .single();
+
   const { error } = await supabase.from("guide_blocks").delete().eq("id", id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (existing?.images?.length) {
+    const paths = existing.images.map((img) => blockImageStoragePath(img.url)).filter(Boolean);
+    if (paths.length) {
+      await supabase.storage.from("block-images").remove(paths as string[]);
+    }
   }
 
   return NextResponse.json({ ok: true });

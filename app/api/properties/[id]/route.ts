@@ -9,6 +9,8 @@ const updatePropertySchema = z.object({
   host_tone: z.enum(["friendly", "formal"]).optional(),
   language: z.string().min(2).max(5).optional(),
   whatsapp_number: z.string().max(20).nullable().optional(),
+  welcome_message: z.string().max(500).nullable().optional(),
+  airbnb_url: z.string().max(500).nullable().optional(),
   is_published: z.boolean().optional(),
 });
 
