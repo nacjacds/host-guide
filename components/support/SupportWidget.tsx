@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Bug, Lightbulb, HelpCircle, ChevronLeft, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +31,19 @@ export function SupportWidget() {
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const widgetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (widgetRef.current && !widgetRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        reset();
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
 
   function reset() {
     setStep("menu");
@@ -100,7 +113,7 @@ export function SupportWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 left-6 z-40">
+    <div ref={widgetRef} className="fixed bottom-6 left-6 z-40">
       {open && (
         <div className="mb-3 w-80 rounded-2xl border border-border bg-card p-4 shadow-lg">
           {step === "menu" && (
