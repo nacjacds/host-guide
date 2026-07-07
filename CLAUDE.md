@@ -1,4 +1,7 @@
-# CLAUDE.md — Guía Digital Huéspedes (nombre por definir)
+# CLAUDE.md — WelcoKit
+
+- **Dominio:** welcokit.com
+- **Repositorio:** https://github.com/nacjacds/welcokit
 
 ## Visión del producto
 
@@ -26,7 +29,7 @@ Web app SaaS para anfitriones de alojamientos turísticos (Airbnb, Vrbo, Booking
 - **WhatsApp:** YCloud (WhatsApp Business API) + n8n para workflows
 - **Iconos:** Lucide React (line-style, sin emojis en la guía pública)
 - **Tipografía:** Playfair Display (serif, títulos) vía `next/font/google` + Inter (sans, cuerpo)
-- **Deploy:** Vercel (frontend) + OVH VPS con EasyPanel (n8n self-hosted en ia.neurodatos.com)
+- **Deploy:** Vercel (frontend, dominio welcokit.com) + OVH VPS con EasyPanel (n8n self-hosted en ia.neurodatos.com)
 - **Pagos:** Stripe (suscripciones mensuales)
 - **Email transaccional:** Resend
 

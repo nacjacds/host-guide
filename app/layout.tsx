@@ -12,9 +12,8 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Guía Digital Huéspedes",
-  description:
-    "Guías digitales para huéspedes con recomendaciones locales generadas por IA y asistente de WhatsApp.",
+  title: "WelcoKit",
+  description: "La guía digital inteligente para tus huéspedes",
 };
 
 export default function RootLayout({

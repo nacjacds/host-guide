@@ -2,6 +2,7 @@ import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { GuideLocaleProvider } from "@/components/guide/GuideLocaleProvider";
 import { GuideTransition } from "@/components/guide/GuideTransition";
 import { WhatsAppFab } from "@/components/guide/WhatsAppFab";
+import { GuideFooter } from "@/components/guide/GuideFooter";
 
 export default async function GuideLayout({
   children,
@@ -39,6 +40,7 @@ export default async function GuideLayout({
   return (
     <GuideLocaleProvider propertyId={property?.id ?? ""}>
       <GuideTransition>{children}</GuideTransition>
+      <GuideFooter />
       {property && <WhatsAppFab whatsappNumber={whatsappNumber} />}
     </GuideLocaleProvider>
   );

@@ -3,7 +3,7 @@ import { SUPERADMIN_EMAIL } from "@/lib/admin";
 import { formatCheckinDate } from "@/lib/booking-message";
 import type { GuestLanguage, SupportTicketType } from "@/types";
 
-const FROM = process.env.RESEND_FROM_EMAIL ?? "Guía Digital Huéspedes <onboarding@resend.dev>";
+const FROM = process.env.RESEND_FROM_EMAIL ?? "WelcoKit <onboarding@resend.dev>";
 
 const TICKET_TYPE_LABELS: Record<SupportTicketType, string> = {
   bug: "Reporte de problema",
@@ -36,6 +36,7 @@ export async function sendGuestMessageNotification(params: {
       <blockquote style="border-left: 3px solid #e5e5e5; margin: 0; padding-left: 12px; color: #333;">
         ${params.message}
       </blockquote>
+      <p style="margin-top: 24px; font-size: 12px; color: #a8a29e;">WelcoKit</p>
     `,
   });
 }
@@ -123,6 +124,7 @@ export async function sendBookingWelcomeEmail(params: {
           <p style="margin-top: 24px; font-size: 13px; color: #78716c;">
             ${copy.qrHint}
           </p>
+          <p style="margin-top: 16px; font-size: 12px; color: #a8a29e;">WelcoKit</p>
         </div>
       </div>
     `,
@@ -162,6 +164,7 @@ export async function sendSupportTicketNotification(params: {
           ? `<p><a href="${params.screenshotUrl}">Ver captura de pantalla</a></p>`
           : ""
       }
+      <p style="margin-top: 24px; font-size: 12px; color: #a8a29e;">WelcoKit</p>
     `,
   });
 }
