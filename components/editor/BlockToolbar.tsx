@@ -71,7 +71,7 @@ export function BlockToolbar({
   }
 
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
       {(Object.keys(BLOCK_TYPE_LABELS) as BlockType[]).map((type) => (
         <Button
           key={type}
@@ -79,6 +79,7 @@ export function BlockToolbar({
           size="sm"
           disabled={creatingType !== null}
           onClick={() => handleCreate(type)}
+          className="shrink-0"
         >
           <span aria-hidden>{BLOCK_TYPE_ICONS[type]}</span>
           {creatingType === type ? "Añadiendo..." : BLOCK_TYPE_LABELS[type]}

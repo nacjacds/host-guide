@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { BlockEditor } from "./BlockEditor";
 import { BlockToolbar } from "./BlockToolbar";
 import { RecommendationsBlock } from "./blocks/RecommendationsBlock";
@@ -147,60 +148,83 @@ export function PropertyEditor({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-      <div className="space-y-4 lg:col-span-2">
-        <div className="sticky top-0 z-10 -mx-1 flex items-center justify-between gap-3 bg-background/95 px-1 py-3 backdrop-blur-sm">
-          <BlockToolbar propertyId={property.id} onCreated={handleBlockCreated} />
+    <>
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-6 lg:grid-cols-3",
+          dirtyIds.size > 0 && "pb-20 md:pb-0"
+        )}
+      >
+        <div className="space-y-4 lg:col-span-2">
+          <div className="sticky top-0 z-10 -mx-1 flex items-center justify-between gap-3 bg-background/95 px-1 py-3 backdrop-blur-sm">
+            <div className="min-w-0 flex-1">
+              <BlockToolbar propertyId={property.id} onCreated={handleBlockCreated} />
+            </div>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={handleSaveAll}
+              disabled={dirtyIds.size === 0 || savingAll}
+              className="hidden shrink-0 md:inline-flex"
+            >
+              {savingAll ? "Guardando..." : `Guardar todo${dirtyIds.size ? ` (${dirtyIds.size})` : ""}`}
+            </Button>
+          </div>
+
+          <div className="space-y-3">
+            {blocks.map((block) => (
+              <BlockEditor
+                key={block.id}
+                block={block}
+                dirty={dirtyIds.has(block.id)}
+                saving={savingIds.has(block.id)}
+                defaultOpen={newBlockIds.has(block.id)}
+                onChange={(patch) => handleBlockChange(block.id, patch)}
+                onSynced={(patch) => handleBlockSynced(block.id, patch)}
+                onSave={() => handleSaveOne(block.id)}
+                onDeleted={handleBlockDeleted}
+              />
+            ))}
+            {blocks.length === 0 && (
+              <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
+                Añade tu primer bloque con los botones de arriba.
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <PublishPanel property={property} />
+
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-sm font-medium text-muted-foreground">Recomendaciones</h2>
+              <AddRecommendationDialog
+                propertyId={property.id}
+                onCreated={handleRecommendationCreated}
+              />
+            </div>
+            <RecommendationsBlock
+              recommendations={recommendations}
+              onChanged={handleRecommendationChanged}
+            />
+          </div>
+        </div>
+      </div>
+
+      {dirtyIds.size > 0 && (
+        <div className="fixed right-0 bottom-0 left-20 z-20 border-t border-l border-border bg-background/95 p-3 backdrop-blur-sm md:hidden">
           <Button
             size="sm"
             variant="secondary"
             onClick={handleSaveAll}
-            disabled={dirtyIds.size === 0 || savingAll}
-            className="shrink-0"
+            disabled={savingAll}
+            className="w-full"
           >
-            {savingAll ? "Guardando..." : `Guardar todo${dirtyIds.size ? ` (${dirtyIds.size})` : ""}`}
+            {savingAll ? "Guardando..." : `Guardar todo (${dirtyIds.size})`}
           </Button>
         </div>
-
-        <div className="space-y-3">
-          {blocks.map((block) => (
-            <BlockEditor
-              key={block.id}
-              block={block}
-              dirty={dirtyIds.has(block.id)}
-              saving={savingIds.has(block.id)}
-              defaultOpen={newBlockIds.has(block.id)}
-              onChange={(patch) => handleBlockChange(block.id, patch)}
-              onSynced={(patch) => handleBlockSynced(block.id, patch)}
-              onSave={() => handleSaveOne(block.id)}
-              onDeleted={handleBlockDeleted}
-            />
-          ))}
-          {blocks.length === 0 && (
-            <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
-              Añade tu primer bloque con los botones de arriba.
-            </p>
-          )}
-        </div>
-      </div>
-
-      <div className="space-y-6">
-        <PublishPanel property={property} />
-
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-sm font-medium text-muted-foreground">Recomendaciones</h2>
-            <AddRecommendationDialog
-              propertyId={property.id}
-              onCreated={handleRecommendationCreated}
-            />
-          </div>
-          <RecommendationsBlock
-            recommendations={recommendations}
-            onChanged={handleRecommendationChanged}
-          />
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }
