@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { AvatarUpload } from "./AvatarUpload";
 import { toast } from "sonner";
 import type { Profile } from "@/types";
 
@@ -47,6 +48,7 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <AvatarUpload initialAvatarUrl={profile?.avatar_url ?? null} fullName={fullName} />
           <div>
             <Label htmlFor="full_name">Nombre completo</Label>
             <Input

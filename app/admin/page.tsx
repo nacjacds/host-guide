@@ -3,6 +3,7 @@ import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { isSuperAdmin } from "@/lib/admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminHostsTable, type AdminHostRow } from "@/components/admin/AdminHostsTable";
+import { AdminTicketsSection, type AdminTicketRow } from "@/components/admin/AdminTicketsSection";
 import type { PlanId } from "@/lib/plans";
 
 export default async function AdminPage() {
@@ -17,14 +18,19 @@ export default async function AdminPage() {
 
   const serviceClient = createServiceRoleClient();
 
-  const [{ data: profiles }, { data: usersList }, { data: properties }] = await Promise.all([
-    serviceClient
-      .from("profiles")
-      .select("id, plan, created_at")
-      .order("created_at", { ascending: false }),
-    serviceClient.auth.admin.listUsers({ perPage: 1000 }),
-    serviceClient.from("properties").select("id, host_id, is_published"),
-  ]);
+  const [{ data: profiles }, { data: usersList }, { data: properties }, { data: tickets }] =
+    await Promise.all([
+      serviceClient
+        .from("profiles")
+        .select("id, plan, created_at")
+        .order("created_at", { ascending: false }),
+      serviceClient.auth.admin.listUsers({ perPage: 1000 }),
+      serviceClient.from("properties").select("id, host_id, is_published"),
+      serviceClient
+        .from("support_tickets")
+        .select("*")
+        .order("created_at", { ascending: false }),
+    ]);
 
   const emailById = new Map(usersList?.users.map((u) => [u.id, u.email ?? "—"]) ?? []);
   const propertiesByHost = new Map<string, { total: number; published: number }>();
@@ -48,6 +54,17 @@ export default async function AdminPage() {
   const totalProperties = properties?.length ?? 0;
   const totalPublished = properties?.filter((p) => p.is_published).length ?? 0;
   const totalDraft = totalProperties - totalPublished;
+
+  const ticketRows: AdminTicketRow[] = (tickets ?? []).map((ticket) => ({
+    id: ticket.id,
+    email: emailById.get(ticket.user_id) ?? "—",
+    type: ticket.type,
+    subject: ticket.subject,
+    description: ticket.description,
+    screenshotUrl: ticket.screenshot_url,
+    status: ticket.status,
+    createdAt: ticket.created_at,
+  }));
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-6">
@@ -100,6 +117,15 @@ export default async function AdminPage() {
         </CardHeader>
         <CardContent>
           <AdminHostsTable hosts={hosts} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Soporte</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AdminTicketsSection tickets={ticketRows} />
         </CardContent>
       </Card>
     </div>

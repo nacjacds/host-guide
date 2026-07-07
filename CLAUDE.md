@@ -135,7 +135,8 @@ Web app SaaS para anfitriones de alojamientos turísticos (Airbnb, Vrbo, Booking
 profiles (
   id uuid PRIMARY KEY REFERENCES auth.users,
   full_name text,
-  phone text,
+  phone text,                      -- usado también como fallback del botón WhatsApp de la guía
+  avatar_url text,                 -- bucket avatars, 200x200 webp, con cache-busting ?v=timestamp
   plan text DEFAULT 'free',        -- 'free' | 'starter' | 'pro' | 'agency' (ver lib/plans.ts)
   stripe_customer_id text,
   created_at timestamptz DEFAULT now()
@@ -215,6 +216,18 @@ translations_cache (
   created_at timestamptz DEFAULT now()
 )
 -- UNIQUE (source_text_hash, target_lang) — la caché es global entre anfitriones
+
+-- Tickets de soporte in-app (widget flotante del dashboard, ver "Sistema de soporte")
+support_tickets (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  type text NOT NULL,              -- 'bug' | 'feature_request' | 'question'
+  subject text NOT NULL,
+  description text NOT NULL,
+  screenshot_url text,             -- bucket support-screenshots, opcional
+  status text NOT NULL DEFAULT 'open', -- 'open' | 'closed'
+  created_at timestamptz DEFAULT now()
+)
 ```
 
 ### Bloques de "lista de lugares" (restaurants, drinks, nightlife, attractions)
@@ -260,7 +273,8 @@ En la guía pública las cards se ordenan por `distance_meters` ascendente (los 
 - **Navegación por páginas separadas:** `/guide/[slug]` (hero + grid de tiles) → `/guide/[slug]/[type]` (una página por tipo de bloque) y `/guide/[slug]/recomendaciones`. Cada página de sección tiene su propio `BackToGuideButton` al final además del botón "Volver" del header.
 - **Header de sección** (`GuideSectionHeader.tsx`): sticky, compacto en móvil (solo icono + nombre del alojamiento), usa `cover_image_url` como fondo con gradiente oscuro si existe, o `accent_color` sólido si no.
 - **Idioma:** `GuideLocaleProvider` guarda ES/EN en `localStorage` (`guide-locale`) y expone `propertyId` en el mismo contexto para el rate limiting de traducciones.
-- **Botón de WhatsApp:** `WhatsAppFab.tsx` — pill flotante verde (#25D366) con icono `MessageCircle`, solo se renderiza si `properties.whatsapp_number` está relleno. Enlaza a `https://wa.me/{whatsapp_number}`.
+- **Botón de WhatsApp:** `WhatsAppFab.tsx` — pill flotante verde (#25D366) con icono `MessageCircle`. Se resuelve en `app/guide/[slug]/layout.tsx`: usa `properties.whatsapp_number` si está relleno, y si no, hace fallback a `profiles.phone` del `host_id` de la propiedad (vía `createServiceRoleClient()`, porque `profiles` no tiene policy de SELECT pública). Solo se renderiza si alguno de los dos valores existe. Enlaza a `https://wa.me/{numero}`.
+- **Avatar del anfitrión en el mensaje de bienvenida:** `WelcomeMessage.tsx` muestra un `Avatar` circular de 48px junto a "Hola, soy {nombre}" usando `profiles.avatar_url` (con fallback a iniciales). El lookup de `profiles` en `app/guide/[slug]/page.tsx` también usa `createServiceRoleClient()` por el mismo motivo de RLS.
 - **WiFi con QR de conexión automática:** `WifiPanel.tsx` genera en el cliente (librería `qrcode`) un QR con el payload `WIFI:T:WPA;S:{red};P:{contraseña};;` (200×200px). Solo se muestra si hay red **y** contraseña rellenas — una red sin contraseña no genera QR.
 - **Estado "ya estoy conectado":** se guarda en `localStorage` con key `wifi_connected_{property_id}` para persistir entre recargas; incluye enlace "Cambiar red" que borra la key.
 
@@ -272,6 +286,8 @@ En la guía pública las cards se ordenan por `distance_meters` ascendente (los 
 |---|---|---|---|
 | `block-images` | Imágenes por bloque de contenido (hasta 3 por bloque) | 2MB, máx. 1200px de ancho | Reescaladas y convertidas a WebP con `sharp` |
 | `cover-images` | Imagen de portada del hero (`properties.cover_image_url`) | 3MB, solo JPG | Reescalada a máx. 1920px de ancho, calidad 80% con `sharp` |
+| `avatars` | Foto de perfil del anfitrión (`profiles.avatar_url`) | 1MB, JPG/PNG/WebP | Recortada a 200×200 centrada (`fit: cover`) y convertida a WebP con `sharp` |
+| `support-screenshots` | Captura opcional adjunta a un ticket de soporte | 2MB, JPG/PNG/WebP | Sin reprocesar — solo se valida que sea una imagen decodificable |
 
 Estructura común de imagen (campo `images` de `guide_blocks`, tipo `BlockImage[]`):
 
@@ -279,7 +295,18 @@ Estructura común de imagen (campo `images` de `guide_blocks`, tipo `BlockImage[
 { url: string, alt: string, width: number, height: number, caption: string }
 ```
 
-Ambos buckets son públicos para lectura (URL directa), pero insert/update/delete están protegidos por RLS en `storage.objects` comprobando que el primer segmento de la ruta (`property_id`) pertenece al `host_id` autenticado.
+Todos los buckets son públicos para lectura (URL directa). Para `block-images`/`cover-images`, insert/update/delete están protegidos por RLS en `storage.objects` comprobando que el primer segmento de la ruta (`property_id`) pertenece al `host_id` autenticado. Para `avatars`/`support-screenshots`, el path es `{user_id}/...` y la política compara directamente contra `auth.uid()` (sin join a otra tabla).
+
+---
+
+## Sistema de soporte in-app
+
+- **Widget flotante** (`SupportWidget.tsx`): botón "?" en la esquina inferior izquierda del **dashboard únicamente** (nunca en la guía pública). Al pulsarlo abre un panel con 3 opciones que preseleccionan el `type` del ticket: "Reportar un problema" (`bug`), "Sugerir una mejora" (`feature_request`), "Tengo una pregunta" (`question`).
+- **Formulario:** asunto (máx. 100 caracteres), descripción (máx. 1000, con contador), captura de pantalla opcional (JPG/PNG/WebP, máx. 2MB). Envío como `multipart/form-data` a `POST /api/support/tickets`.
+- **Backend:** el endpoint valida con Zod, sube la captura al bucket `support-screenshots` en `{user_id}/{timestamp}.{ext}`, e inserta el ticket con el cliente autenticado normal (cubierto por la policy `support_tickets_insert_own`). No existe ninguna policy de RLS anon/pública en `support_tickets` — el único acceso de lectura fuera del propio dueño es el panel admin, que usa `createServiceRoleClient()` protegido por `isSuperAdmin()`, siguiendo el mismo patrón defensivo que `guest_messages`/`bot_conversations`.
+- **Notificación:** al crear el ticket se envía un email a `ignajac@gmail.com` vía Resend (`sendSupportTicketNotification` en `lib/email.ts`) con tipo, asunto, descripción y enlace a la captura si existe. El envío está en un try/catch best-effort — un fallo de Resend nunca bloquea la creación del ticket (mismo patrón lazy-init que el resto de emails transaccionales: si falta `RESEND_API_KEY` la función retorna sin lanzar error).
+- **Confirmación al anfitrión:** tras el envío, el widget muestra "Hemos recibido tu mensaje, te responderemos en 24h" sin cerrar automáticamente el panel.
+- **Panel superadmin (`/admin`):** sección "Soporte" (`AdminTicketsSection.tsx`) con filtros por tipo y estado, y botón "Marcar como resuelto" por ticket (`PATCH /api/admin/tickets/[id]`, actualiza `status` a `closed`). El link "Admin" del sidebar del dashboard muestra un badge con el recuento de tickets `open` (`(dashboard)/layout.tsx`, contado con el service-role client, solo visible para `isSuperAdmin`).
 
 ---
 

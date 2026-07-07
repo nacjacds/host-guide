@@ -23,3 +23,17 @@ export function coverImageStoragePath(url: string): string | null {
   if (index === -1) return null
   return decodeURIComponent(url.slice(index + marker.length).split("?")[0])
 }
+
+export function avatarStoragePath(url: string): string | null {
+  const marker = "/object/public/avatars/"
+  const index = url.indexOf(marker)
+  if (index === -1) return null
+  return decodeURIComponent(url.slice(index + marker.length).split("?")[0])
+}
+
+export function getInitials(name: string | null | undefined): string {
+  if (!name?.trim()) return "?"
+  const parts = name.trim().split(/\s+/)
+  const initials = parts.length === 1 ? parts[0].slice(0, 2) : parts[0][0] + parts[1][0]
+  return initials.toUpperCase()
+}

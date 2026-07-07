@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { HeroSection } from "@/components/guide/HeroSection";
 import { WelcomeMessage } from "@/components/guide/WelcomeMessage";
 import { TileGrid } from "@/components/guide/TileGrid";
@@ -23,6 +23,12 @@ export default async function GuidePage({
 
   if (!property) notFound();
 
+  // profiles has no public/anon RLS select policy (only "own profile" for
+  // authenticated users), so a real anonymous guest can't read the host's
+  // name/avatar through the regular client — use service role here, it's
+  // only exposing display data the host already made public in their guide.
+  const serviceClient = createServiceRoleClient();
+
   const [{ data: blocks }, { data: recommendations }, { data: host }] = await Promise.all([
     supabase
       .from("guide_blocks")
@@ -34,7 +40,11 @@ export default async function GuidePage({
       .select("*")
       .eq("property_id", property.id)
       .order("order_index"),
-    supabase.from("profiles").select("full_name").eq("id", property.host_id).single(),
+    serviceClient
+      .from("profiles")
+      .select("full_name, avatar_url")
+      .eq("id", property.host_id)
+      .single(),
   ]);
 
   await logAnalyticsEvent(property.id, "guide_opened");
@@ -43,7 +53,11 @@ export default async function GuidePage({
     <div className="mx-auto max-w-2xl pb-24">
       <HeroSection property={property} />
       {property.welcome_message && (
-        <WelcomeMessage message={property.welcome_message} hostName={host?.full_name ?? null} />
+        <WelcomeMessage
+          message={property.welcome_message}
+          hostName={host?.full_name ?? null}
+          hostAvatarUrl={host?.avatar_url ?? null}
+        />
       )}
       <TileGrid
         slug={slug}

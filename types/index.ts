@@ -1,6 +1,8 @@
 export type Plan = "free" | "starter" | "pro" | "agency";
 export type HostTone = "friendly" | "formal";
 export type AnalyticsEventType = "guide_opened" | "section_viewed" | "whatsapp_clicked";
+export type SupportTicketType = "bug" | "feature_request" | "question";
+export type SupportTicketStatus = "open" | "closed";
 export type BlockType =
   | "wifi"
   | "checkin"
@@ -59,6 +61,7 @@ export interface Database {
           id: string;
           full_name: string | null;
           phone: string | null;
+          avatar_url: string | null;
           plan: Plan;
           stripe_customer_id: string | null;
           created_at: string;
@@ -67,6 +70,7 @@ export interface Database {
           id: string;
           full_name?: string | null;
           phone?: string | null;
+          avatar_url?: string | null;
           plan?: Plan;
           stripe_customer_id?: string | null;
           created_at?: string;
@@ -75,6 +79,7 @@ export interface Database {
           id?: string;
           full_name?: string | null;
           phone?: string | null;
+          avatar_url?: string | null;
           plan?: Plan;
           stripe_customer_id?: string | null;
           created_at?: string;
@@ -336,6 +341,39 @@ export interface Database {
         };
         Relationships: [];
       };
+      support_tickets: {
+        Row: {
+          id: string;
+          user_id: string;
+          type: SupportTicketType;
+          subject: string;
+          description: string;
+          screenshot_url: string | null;
+          status: SupportTicketStatus;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          type: SupportTicketType;
+          subject: string;
+          description: string;
+          screenshot_url?: string | null;
+          status?: SupportTicketStatus;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          type?: SupportTicketType;
+          subject?: string;
+          description?: string;
+          screenshot_url?: string | null;
+          status?: SupportTicketStatus;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -349,3 +387,4 @@ export type Recommendation = Database["public"]["Tables"]["recommendations"]["Ro
 export type BotConversation = Database["public"]["Tables"]["bot_conversations"]["Row"];
 export type GuestMessage = Database["public"]["Tables"]["guest_messages"]["Row"];
 export type AnalyticsEvent = Database["public"]["Tables"]["analytics_events"]["Row"];
+export type SupportTicket = Database["public"]["Tables"]["support_tickets"]["Row"];
