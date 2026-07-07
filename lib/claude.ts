@@ -99,11 +99,11 @@ Devuelve SOLO un JSON array:
 export async function translateText(text: string, targetLanguage: string): Promise<string> {
   const message = await anthropic.messages.create({
     model: TRANSLATION_MODEL,
-    max_tokens: 300,
+    max_tokens: 1024,
     messages: [
       {
         role: "user",
-        content: `Translate this short guide text into ${targetLanguage}. Return ONLY the translated text, with no quotes and no explanation:\n\n${text}`,
+        content: `Translate this guide text into ${targetLanguage}. Return ONLY the translated text, with no quotes and no explanation:\n\n${text}`,
       },
     ],
   });

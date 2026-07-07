@@ -43,7 +43,9 @@ export function EmergencyPanel({ block }: { block: GuideBlock }) {
           </a>
         </div>
       ))}
-      {content.notes && <p className="pt-2 text-sm text-destructive/90">{content.notes}</p>}
+      {content.notes && (
+        <p className="pt-2 text-sm whitespace-pre-wrap text-destructive/90">{content.notes}</p>
+      )}
     </div>
   );
 }

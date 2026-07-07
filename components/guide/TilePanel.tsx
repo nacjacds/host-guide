@@ -24,12 +24,12 @@ export function TilePanel({
                     color={accentColor}
                     className="mt-0.5 shrink-0"
                   />
-                  <span>{String(item)}</span>
+                  <span className="whitespace-pre-wrap">{String(item)}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-muted-foreground">{String(value)}</p>
+            <p className="text-sm whitespace-pre-wrap text-muted-foreground">{String(value)}</p>
           )}
         </div>
       ))}

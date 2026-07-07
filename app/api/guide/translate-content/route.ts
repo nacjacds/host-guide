@@ -5,7 +5,7 @@ import { translateText } from "@/lib/claude";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 
 const translateSchema = z.object({
-  text: z.string().min(1).max(1000),
+  text: z.string().min(1).max(3000),
   propertyId: z.string().uuid().optional(),
 });
 

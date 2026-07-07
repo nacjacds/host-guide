@@ -9,6 +9,7 @@ import { BlockTitle } from "@/components/guide/BlockTitle";
 import { BackToGuideButton } from "@/components/guide/BackToGuideButton";
 import { SectionHeading } from "@/components/guide/SectionHeading";
 import { WifiPanel } from "@/components/guide/WifiPanel";
+import { CheckinPanel } from "@/components/guide/CheckinPanel";
 import { BLOCK_ICONS } from "@/lib/guide-icons";
 import { logAnalyticsEvent } from "@/lib/analytics";
 import type { BlockType } from "@/types";
@@ -81,6 +82,7 @@ export default async function GuideBlockPage({
         {blocks.map((block) => {
           const isEmergency = block.type === "emergencias";
           const isWifi = block.type === "wifi";
+          const isCheckin = block.type === "checkin";
           const isPlaceList = PLACE_LIST_TYPES.includes(block.type);
           return (
             <div key={block.id}>
@@ -101,6 +103,8 @@ export default async function GuideBlockPage({
                     accentColor={property.accent_color}
                     propertyId={property.id}
                   />
+                ) : isCheckin ? (
+                  <CheckinPanel block={block} />
                 ) : isPlaceList ? (
                   <PlaceListPanel
                     places={(block.content as unknown as PlaceListContent).places ?? []}
