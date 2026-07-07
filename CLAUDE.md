@@ -48,6 +48,7 @@ Web app SaaS para anfitriones de alojamientos turísticos (Airbnb, Vrbo, Booking
 │   │   │   └── [id]/
 │   │   │       ├── edit/       # Editor de guía por bloques
 │   │   │       └── settings/   # Config WhatsApp, color, idioma
+│   │   ├── bookings/            # Reservas del anfitrión + compartir guía
 │   │   └── account/            # Plan, facturación, perfil
 │   ├── guide/
 │   │   └── [slug]/             # Guía pública del huésped (sin auth)
@@ -56,6 +57,7 @@ Web app SaaS para anfitriones de alojamientos turísticos (Airbnb, Vrbo, Booking
 │   │       ├── [type]/         # Página de sección por tipo de bloque
 │   │       └── recomendaciones/
 │   └── api/
+│       ├── bookings/               # Crear reserva + email de bienvenida automático
 │       ├── properties/
 │       │   └── [id]/
 │       │       ├── blocks/         # Crear bloques (defaults por tipo)
@@ -93,7 +95,7 @@ Web app SaaS para anfitriones de alojamientos turísticos (Airbnb, Vrbo, Booking
 │   ├── editor/                 # Componentes del editor del anfitrión
 │   │   ├── BlockEditor.tsx
 │   │   ├── BlockToolbar.tsx        # Botones para crear cada tipo de bloque
-│   │   ├── PublishPanel.tsx        # Publicar, imagen de portada, número de WhatsApp, QR
+│   │   ├── PublishPanel.tsx        # Publicar, imagen de portada, número de WhatsApp, QR, compartir guía
 │   │   ├── blocks/
 │   │   │   ├── WifiBlock.tsx
 │   │   │   ├── CheckinBlock.tsx
@@ -103,6 +105,11 @@ Web app SaaS para anfitriones de alojamientos turísticos (Airbnb, Vrbo, Booking
 │   │   │   ├── RecommendationsBlock.tsx
 │   │   │   └── CustomBlock.tsx
 │   │   └── AIGenerateButton.tsx
+│   ├── dashboard/
+│   │   ├── ShareGuideDialog.tsx    # Panel compartir: mensaje copiable + enlace + QR (reservas y editor)
+│   │   └── bookings/
+│   │       ├── NewBookingDialog.tsx
+│   │       └── BookingsList.tsx
 │   └── ui/                     # Componentes genéricos (shadcn/ui)
 ├── lib/
 │   ├── supabase/
@@ -112,7 +119,8 @@ Web app SaaS para anfitriones de alojamientos turísticos (Airbnb, Vrbo, Booking
 │   ├── google-places.ts        # Cliente Google Places API
 │   ├── guide-i18n.ts           # Diccionario ES/EN + getBlockTitle()
 │   ├── guide-icons.tsx         # Mapeo BlockType → icono Lucide
-│   ├── qr.ts                   # QR de la URL pública de la guía
+│   ├── booking-message.ts      # Plantilla del mensaje de bienvenida (compartido cliente/servidor)
+│   ├── qr.ts                   # QR de la URL pública de la guía (data URL para UI, Buffer para adjuntos de email)
 │   ├── whatsapp/
 │   │   ├── ycloud.ts           # Cliente YCloud
 │   │   └── bot.ts              # Lógica del bot — build prompt + llamada Claude
@@ -228,6 +236,22 @@ support_tickets (
   status text NOT NULL DEFAULT 'open', -- 'open' | 'closed'
   created_at timestamptz DEFAULT now()
 )
+
+-- Reservas de huéspedes (ver "Sistema de reservas y compartir guía")
+bookings (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  property_id uuid NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
+  host_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  guest_name text NOT NULL,
+  guest_email text,
+  guest_phone text,
+  checkin_date date NOT NULL,
+  checkout_date date NOT NULL,
+  status text NOT NULL DEFAULT 'pending', -- 'pending' | 'active' | 'completed'
+  auto_email_enabled boolean NOT NULL DEFAULT true,
+  welcome_email_sent_at timestamptz,       -- null hasta que el envío automático tiene éxito
+  created_at timestamptz DEFAULT now()
+)
 ```
 
 ### Bloques de "lista de lugares" (restaurants, drinks, nightlife, attractions)
@@ -307,6 +331,21 @@ Todos los buckets son públicos para lectura (URL directa). Para `block-images`/
 - **Notificación:** al crear el ticket se envía un email a `ignajac@gmail.com` vía Resend (`sendSupportTicketNotification` en `lib/email.ts`) con tipo, asunto, descripción y enlace a la captura si existe. El envío está en un try/catch best-effort — un fallo de Resend nunca bloquea la creación del ticket (mismo patrón lazy-init que el resto de emails transaccionales: si falta `RESEND_API_KEY` la función retorna sin lanzar error).
 - **Confirmación al anfitrión:** tras el envío, el widget muestra "Hemos recibido tu mensaje, te responderemos en 24h" sin cerrar automáticamente el panel.
 - **Panel superadmin (`/admin`):** sección "Soporte" (`AdminTicketsSection.tsx`) con filtros por tipo y estado, y botón "Marcar como resuelto" por ticket (`PATCH /api/admin/tickets/[id]`, actualiza `status` a `closed`). El link "Admin" del sidebar del dashboard muestra un badge con el recuento de tickets `open` (`(dashboard)/layout.tsx`, contado con el service-role client, solo visible para `isSuperAdmin`).
+
+---
+
+## Sistema de reservas y compartir guía
+
+- **`/bookings`** (nueva sección "Reservas" en el sidebar/drawer del anfitrión): lista todas las reservas del anfitrión agrupadas visualmente por huésped/propiedad/fechas/estado, con botón "Nueva reserva" (`NewBookingDialog.tsx`) que abre un formulario (propiedad, nombre, email y teléfono opcionales, fechas de check-in/check-out, toggle "Enviar email de bienvenida automáticamente") y hace `POST /api/bookings`.
+- **RLS de `bookings`:** al igual que `support_tickets`, se crea/lee/actualiza siempre por el propio anfitrión autenticado (`host_id = auth.uid()`) — no hay acceso anónimo, así que no aplica el patrón defensivo de service-role-only usado en `guest_messages`.
+- **Concepto "mensaje de bienvenida compartible":** `lib/booking-message.ts` centraliza la plantilla (usada tanto en el cliente para el texto copiable como en el servidor para el email), con este formato exacto:
+  > ¡Hola {nombre}! Te esperamos el {fecha checkin} a partir de las {hora checkin}. Aquí tienes toda la información para tu estancia en {nombre propiedad}: {enlace guía}. ¡Cualquier duda escríbeme!
+
+  La hora de check-in se lee del bloque `checkin` de esa propiedad (`content.time`) — si la propiedad no tiene bloque `checkin`, la cláusula "a partir de las..." simplemente se omite.
+- **`ShareGuideDialog.tsx`** (componente reutilizable, `components/dashboard/`): panel con el mensaje copiable (botón "Copiar mensaje" → `navigator.clipboard`, con feedback "¡Copiado!" 2s), enlace directo a la guía, y QR descargable (reutiliza `GET /api/properties/[id]/qr`, ya existente para el editor). Se usa en dos contextos:
+  1. **Por reserva**, desde `/bookings` — con `guest` relleno (nombre + fecha), muestra mensaje + enlace + QR.
+  2. **Genérico**, desde el botón "Compartir guía" del panel de Publicación del editor (`PublishPanel.tsx`) — con `guest={null}`, solo muestra enlace + QR (sin mensaje personalizado, ya que no hay huésped ni fecha).
+- **Envío automático por email:** al crear una reserva con email y con el toggle activado, `POST /api/bookings` genera el QR como `Buffer` (`generateGuideQrCodeBuffer` en `lib/qr.ts`) y llama a `sendBookingWelcomeEmail` (`lib/email.ts`) — email con foto de portada, nombre del huésped, fechas de check-in/check-out y botón CTA "Ver mi guía", con el QR como adjunto (`qr-guia.png`). Envío best-effort en un try/catch: si falla (o falta `RESEND_API_KEY`), la reserva se crea igualmente y `welcome_email_sent_at` queda en `null`. Si tiene éxito, se guarda el timestamp y la lista de reservas muestra "Email enviado".
 
 ---
 

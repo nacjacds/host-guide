@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { ShareGuideDialog } from "@/components/dashboard/ShareGuideDialog";
 import { toast } from "sonner";
 import type { Property } from "@/types";
 
@@ -180,6 +181,16 @@ export function PublishPanel({ property }: { property: Property }) {
           </p>
         )}
 
+        <ShareGuideDialog
+          propertyId={property.id}
+          propertyName={property.name}
+          guideUrl={guideUrl}
+          guest={null}
+          triggerLabel="Compartir guía"
+          triggerVariant="secondary"
+          triggerClassName="w-full"
+        />
+
         <div className="space-y-2">
           <Label>Imagen de portada</Label>
           {coverUrl ? (
@@ -192,6 +203,7 @@ export function PublishPanel({ property }: { property: Property }) {
               />
               <div className="flex gap-2">
                 <Button
+                  type="button"
                   variant="outline"
                   size="sm"
                   className="flex-1"
@@ -201,6 +213,7 @@ export function PublishPanel({ property }: { property: Property }) {
                   {uploadingCover ? "Subiendo..." : "Cambiar"}
                 </Button>
                 <Button
+                  type="button"
                   variant="ghost"
                   size="sm"
                   onClick={handleRemoveCover}
@@ -212,6 +225,7 @@ export function PublishPanel({ property }: { property: Property }) {
             </div>
           ) : (
             <Button
+              type="button"
               variant="outline"
               size="sm"
               className="w-full"

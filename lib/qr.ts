@@ -1,8 +1,19 @@
 import QRCode from "qrcode";
 
+export function getGuideUrl(slug: string): string {
+  return `${process.env.NEXT_PUBLIC_APP_URL}/guide/${slug}`;
+}
+
 export async function generateGuideQrCode(slug: string): Promise<string> {
-  const url = `${process.env.NEXT_PUBLIC_APP_URL}/guide/${slug}`;
-  return QRCode.toDataURL(url, {
+  return QRCode.toDataURL(getGuideUrl(slug), {
+    width: 512,
+    margin: 2,
+    color: { dark: "#000000", light: "#ffffff" },
+  });
+}
+
+export async function generateGuideQrCodeBuffer(slug: string): Promise<Buffer> {
+  return QRCode.toBuffer(getGuideUrl(slug), {
     width: 512,
     margin: 2,
     color: { dark: "#000000", light: "#ffffff" },

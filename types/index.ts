@@ -3,6 +3,7 @@ export type HostTone = "friendly" | "formal";
 export type AnalyticsEventType = "guide_opened" | "section_viewed" | "whatsapp_clicked";
 export type SupportTicketType = "bug" | "feature_request" | "question";
 export type SupportTicketStatus = "open" | "closed";
+export type BookingStatus = "pending" | "active" | "completed";
 export type BlockType =
   | "wifi"
   | "checkin"
@@ -374,6 +375,51 @@ export interface Database {
         };
         Relationships: [];
       };
+      bookings: {
+        Row: {
+          id: string;
+          property_id: string;
+          host_id: string;
+          guest_name: string;
+          guest_email: string | null;
+          guest_phone: string | null;
+          checkin_date: string;
+          checkout_date: string;
+          status: BookingStatus;
+          auto_email_enabled: boolean;
+          welcome_email_sent_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          property_id: string;
+          host_id: string;
+          guest_name: string;
+          guest_email?: string | null;
+          guest_phone?: string | null;
+          checkin_date: string;
+          checkout_date: string;
+          status?: BookingStatus;
+          auto_email_enabled?: boolean;
+          welcome_email_sent_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          property_id?: string;
+          host_id?: string;
+          guest_name?: string;
+          guest_email?: string | null;
+          guest_phone?: string | null;
+          checkin_date?: string;
+          checkout_date?: string;
+          status?: BookingStatus;
+          auto_email_enabled?: boolean;
+          welcome_email_sent_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -388,3 +434,4 @@ export type BotConversation = Database["public"]["Tables"]["bot_conversations"][
 export type GuestMessage = Database["public"]["Tables"]["guest_messages"]["Row"];
 export type AnalyticsEvent = Database["public"]["Tables"]["analytics_events"]["Row"];
 export type SupportTicket = Database["public"]["Tables"]["support_tickets"]["Row"];
+export type Booking = Database["public"]["Tables"]["bookings"]["Row"];

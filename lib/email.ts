@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { SUPERADMIN_EMAIL } from "@/lib/admin";
+import { formatCheckinDateEs } from "@/lib/booking-message";
 import type { SupportTicketType } from "@/types";
 
 const FROM = process.env.RESEND_FROM_EMAIL ?? "Guía Digital Huéspedes <onboarding@resend.dev>";
@@ -36,6 +37,64 @@ export async function sendGuestMessageNotification(params: {
         ${params.message}
       </blockquote>
     `,
+  });
+}
+
+export async function sendBookingWelcomeEmail(params: {
+  guestEmail: string;
+  guestName: string;
+  propertyName: string;
+  coverImageUrl: string | null;
+  checkinDate: string;
+  checkoutDate: string;
+  checkinTime: string | null;
+  guideUrl: string;
+  qrCodeBuffer: Buffer;
+}) {
+  if (!process.env.RESEND_API_KEY) return;
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const checkinLabel = formatCheckinDateEs(params.checkinDate);
+  const checkoutLabel = formatCheckinDateEs(params.checkoutDate);
+  const timeClause = params.checkinTime ? ` a partir de las ${params.checkinTime}` : "";
+
+  await resend.emails.send({
+    from: FROM,
+    to: [params.guestEmail],
+    subject: `Tu guía digital para ${params.propertyName}`,
+    html: `
+      <div style="max-width: 480px; margin: 0 auto; font-family: sans-serif;">
+        ${
+          params.coverImageUrl
+            ? `<img src="${params.coverImageUrl}" alt="${params.propertyName}" style="width: 100%; border-radius: 12px 12px 0 0; display: block;" />`
+            : ""
+        }
+        <div style="padding: 24px; background: #fff8f1; border-radius: ${
+          params.coverImageUrl ? "0 0 12px 12px" : "12px"
+        };">
+          <h1 style="font-size: 20px; color: #7c2d12; margin: 0 0 12px;">¡Hola ${params.guestName}!</h1>
+          <p style="font-size: 15px; color: #44403c; margin: 0 0 8px;">
+            Te esperamos el <strong>${checkinLabel}${timeClause}</strong> en <strong>${params.propertyName}</strong>.
+          </p>
+          <p style="font-size: 15px; color: #44403c; margin: 0 0 16px;">Salida: ${checkoutLabel}</p>
+          <a
+            href="${params.guideUrl}"
+            style="display: inline-block; padding: 12px 24px; background: #c2410c; color: #ffffff; border-radius: 8px; text-decoration: none; font-weight: 600;"
+          >
+            Ver mi guía
+          </a>
+          <p style="margin-top: 24px; font-size: 13px; color: #78716c;">
+            También puedes escanear el código QR adjunto para acceder desde el móvil.
+          </p>
+        </div>
+      </div>
+    `,
+    attachments: [
+      {
+        filename: "qr-guia.png",
+        content: params.qrCodeBuffer,
+      },
+    ],
   });
 }
 
