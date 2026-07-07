@@ -13,6 +13,7 @@ const createBookingSchema = z
     checkin_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     checkout_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     auto_email_enabled: z.boolean().optional(),
+    guest_language: z.enum(["es", "en"]).optional(),
   })
   .refine((data) => data.checkout_date > data.checkin_date, {
     message: "La fecha de salida debe ser posterior a la de entrada",
@@ -48,6 +49,7 @@ export async function POST(request: NextRequest) {
 
   const autoEmailEnabled = data.auto_email_enabled ?? true;
   const guestEmail = data.guest_email || null;
+  const guestLanguage = data.guest_language ?? "es";
 
   const { data: booking, error: insertError } = await supabase
     .from("bookings")
@@ -60,6 +62,7 @@ export async function POST(request: NextRequest) {
       checkin_date: data.checkin_date,
       checkout_date: data.checkout_date,
       auto_email_enabled: autoEmailEnabled,
+      guest_language: guestLanguage,
     })
     .select()
     .single();
@@ -92,6 +95,7 @@ export async function POST(request: NextRequest) {
         checkinTime,
         guideUrl,
         qrCodeBuffer,
+        language: guestLanguage,
       });
 
       await supabase

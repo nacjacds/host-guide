@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ShareGuideDialog } from "@/components/dashboard/ShareGuideDialog";
 import { NewBookingDialog } from "./NewBookingDialog";
-import type { Booking, BookingStatus } from "@/types";
+import type { Booking, BookingStatus, GuestLanguage } from "@/types";
 
 export interface BookingRow {
   id: string;
@@ -13,6 +13,7 @@ export interface BookingRow {
   guideUrl: string;
   checkinTime: string | null;
   guestName: string;
+  guestLanguage: GuestLanguage;
   checkinDate: string;
   checkoutDate: string;
   status: BookingStatus;
@@ -65,6 +66,7 @@ export function BookingsList({
         guideUrl: property.guideUrl,
         checkinTime: property.checkinTime,
         guestName: booking.guest_name,
+        guestLanguage: booking.guest_language,
         checkinDate: booking.checkin_date,
         checkoutDate: booking.checkout_date,
         status: booking.status,
@@ -120,6 +122,7 @@ export function BookingsList({
                   name: row.guestName,
                   checkinDate: row.checkinDate,
                   checkinTime: row.checkinTime,
+                  language: row.guestLanguage,
                 }}
                 triggerClassName="shrink-0"
               />

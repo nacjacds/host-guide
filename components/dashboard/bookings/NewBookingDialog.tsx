@@ -20,7 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import type { Booking } from "@/types";
+import { suggestGuestLanguage } from "@/lib/guest-language";
+import type { Booking, GuestLanguage } from "@/types";
 
 interface PropertyOption {
   id: string;
@@ -42,7 +43,13 @@ export function NewBookingDialog({
   const [checkinDate, setCheckinDate] = useState("");
   const [checkoutDate, setCheckoutDate] = useState("");
   const [autoEmailEnabled, setAutoEmailEnabled] = useState(true);
+  const [guestLanguage, setGuestLanguage] = useState<GuestLanguage>("es");
   const [saving, setSaving] = useState(false);
+
+  function handlePhoneChange(value: string) {
+    setGuestPhone(value);
+    setGuestLanguage(suggestGuestLanguage(value));
+  }
 
   function reset() {
     setPropertyId(properties[0]?.id ?? "");
@@ -52,6 +59,7 @@ export function NewBookingDialog({
     setCheckinDate("");
     setCheckoutDate("");
     setAutoEmailEnabled(true);
+    setGuestLanguage("es");
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -74,6 +82,7 @@ export function NewBookingDialog({
           checkin_date: checkinDate,
           checkout_date: checkoutDate,
           auto_email_enabled: autoEmailEnabled,
+          guest_language: guestLanguage,
         }),
       });
 
@@ -149,9 +158,29 @@ export function NewBookingDialog({
             <Input
               id="guest-phone"
               value={guestPhone}
-              onChange={(e) => setGuestPhone(e.target.value)}
+              onChange={(e) => handlePhoneChange(e.target.value)}
               placeholder="+34 600 000 000"
             />
+          </div>
+          <div>
+            <Label htmlFor="guest-language">Idioma del huésped</Label>
+            <Select
+              value={guestLanguage}
+              onValueChange={(v) => v && setGuestLanguage(v as GuestLanguage)}
+            >
+              <SelectTrigger id="guest-language" className="w-full">
+                <SelectValue>
+                  {(value: GuestLanguage) => (value === "en" ? "English" : "Español")}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="es">Español</SelectItem>
+                <SelectItem value="en">English</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Se sugiere automáticamente según el prefijo del teléfono — puedes cambiarlo.
+            </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>

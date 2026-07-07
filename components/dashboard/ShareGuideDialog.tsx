@@ -11,11 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { buildBookingWelcomeMessage } from "@/lib/booking-message";
+import type { GuestLanguage } from "@/types";
 
 export interface ShareGuideGuest {
   name: string;
   checkinDate: string;
   checkinTime: string | null;
+  language: GuestLanguage;
 }
 
 export function ShareGuideDialog({
@@ -49,6 +51,7 @@ export function ShareGuideDialog({
         checkinTime: guest.checkinTime,
         propertyName,
         guideUrl,
+        language: guest.language,
       })
     : null;
 

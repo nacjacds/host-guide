@@ -4,6 +4,7 @@ export type AnalyticsEventType = "guide_opened" | "section_viewed" | "whatsapp_c
 export type SupportTicketType = "bug" | "feature_request" | "question";
 export type SupportTicketStatus = "open" | "closed";
 export type BookingStatus = "pending" | "active" | "completed";
+export type GuestLanguage = "es" | "en";
 export type BlockType =
   | "wifi"
   | "checkin"
@@ -388,6 +389,7 @@ export interface Database {
           status: BookingStatus;
           auto_email_enabled: boolean;
           welcome_email_sent_at: string | null;
+          guest_language: GuestLanguage;
           created_at: string;
         };
         Insert: {
@@ -402,6 +404,7 @@ export interface Database {
           status?: BookingStatus;
           auto_email_enabled?: boolean;
           welcome_email_sent_at?: string | null;
+          guest_language?: GuestLanguage;
           created_at?: string;
         };
         Update: {
@@ -416,6 +419,7 @@ export interface Database {
           status?: BookingStatus;
           auto_email_enabled?: boolean;
           welcome_email_sent_at?: string | null;
+          guest_language?: GuestLanguage;
           created_at?: string;
         };
         Relationships: [];

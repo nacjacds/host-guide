@@ -58,6 +58,7 @@ export default async function BookingsPage() {
       guideUrl: propertiesById[booking.property_id].guideUrl,
       checkinTime: propertiesById[booking.property_id].checkinTime,
       guestName: booking.guest_name,
+      guestLanguage: booking.guest_language,
       checkinDate: booking.checkin_date,
       checkoutDate: booking.checkout_date,
       status: booking.status,
