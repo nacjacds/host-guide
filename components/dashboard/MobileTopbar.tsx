@@ -13,16 +13,18 @@ export interface NavLinkItem {
   badge?: number;
 }
 
+export type NavLinkGroup = NavLinkItem[];
+
 export function MobileTopbar({
   fullName,
   email,
   avatarUrl,
-  navLinks,
+  navGroups,
 }: {
   fullName: string | null;
   email: string;
   avatarUrl: string | null;
-  navLinks: NavLinkItem[];
+  navGroups: NavLinkGroup[];
 }) {
   const [open, setOpen] = useState(false);
 
@@ -53,28 +55,35 @@ export function MobileTopbar({
         </button>
         <DialogContent
           showCloseButton={false}
-          className="top-0 left-0 h-dvh max-h-dvh w-72 max-w-[85vw] translate-x-0 translate-y-0 overflow-y-auto rounded-none border-r border-sidebar-border bg-sidebar p-4 text-sidebar-foreground ring-0 sm:max-w-[85vw] data-open:slide-in-from-left data-open:zoom-in-100 data-closed:slide-out-to-left data-closed:zoom-out-100"
+          className="top-0 left-0 flex h-dvh max-h-dvh w-72 max-w-[85vw] translate-x-0 translate-y-0 flex-col gap-0 overflow-y-auto rounded-none border-r border-sidebar-border bg-sidebar p-4 text-sidebar-foreground ring-0 sm:max-w-[85vw] data-open:slide-in-from-left data-open:zoom-in-100 data-closed:slide-out-to-left data-closed:zoom-out-100"
         >
           <DialogTitle className="sr-only">Menú de navegación</DialogTitle>
-          <div className="mb-4 px-3 py-2">
+          <div className="px-3 py-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-white.svg" alt="WelcoKit" height="28" />
+            <img src="/logo.svg" alt="WelcoKit" height="40" className="h-10 w-auto" />
           </div>
-          <nav className="flex flex-col gap-2 text-sm">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="flex items-center justify-between rounded px-3 py-2 hover:bg-sidebar-accent"
-              >
-                {link.label}
-                {link.badge ? (
-                  <span className="flex size-5 items-center justify-center rounded-full bg-destructive text-[11px] font-medium text-white">
-                    {link.badge}
-                  </span>
-                ) : null}
-              </Link>
+          <nav className="mt-8 flex flex-col text-sm">
+            {navGroups.map((group, groupIndex) => (
+              <div key={groupIndex}>
+                {groupIndex > 0 && <hr className="my-3 border-[#DDD8CC]" />}
+                <div className="flex flex-col gap-2">
+                  {group.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center justify-between rounded px-3 py-2 hover:bg-sidebar-accent"
+                    >
+                      {link.label}
+                      {link.badge ? (
+                        <span className="flex size-5 items-center justify-center rounded-full bg-destructive text-[11px] font-medium text-white">
+                          {link.badge}
+                        </span>
+                      ) : null}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
           </nav>
         </DialogContent>

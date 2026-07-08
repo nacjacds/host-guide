@@ -8,7 +8,7 @@ import { isSuperAdmin } from "@/lib/admin";
 import { SupportWidget } from "@/components/support/SupportWidget";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 import { decodeImpersonationToken, IMPERSONATION_COOKIE_NAME } from "@/lib/impersonation";
-import { MobileTopbar, type NavLinkItem } from "@/components/dashboard/MobileTopbar";
+import { MobileTopbar, type NavLinkGroup } from "@/components/dashboard/MobileTopbar";
 
 export default async function DashboardLayout({
   children,
@@ -49,12 +49,14 @@ export default async function DashboardLayout({
     openTicketCount = count ?? 0;
   }
 
-  const navLinks: NavLinkItem[] = [
-    { href: "/dashboard", label: "Propiedades" },
-    { href: "/bookings", label: "Reservas" },
-    { href: "/account", label: "Mi cuenta" },
+  const navGroups: NavLinkGroup[] = [
+    [
+      { href: "/dashboard", label: "Propiedades" },
+      { href: "/bookings", label: "Reservas" },
+    ],
+    [{ href: "/account", label: "Mi cuenta" }],
     ...(isAdmin
-      ? [{ href: "/admin", label: "Admin", badge: openTicketCount > 0 ? openTicketCount : undefined }]
+      ? [[{ href: "/admin", label: "Admin", badge: openTicketCount > 0 ? openTicketCount : undefined }]]
       : []),
   ];
 
@@ -67,41 +69,48 @@ export default async function DashboardLayout({
         fullName={profile?.full_name ?? null}
         email={user.email ?? ""}
         avatarUrl={profile?.avatar_url ?? null}
-        navLinks={navLinks}
+        navGroups={navGroups}
       />
       <div className="flex flex-1">
         <aside className="hidden w-56 shrink-0 border-r border-sidebar-border bg-sidebar p-4 text-sidebar-foreground md:block">
-          <div className="mb-4 px-3 py-2">
+          <div className="space-y-2 px-3 py-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-white.svg" alt="WelcoKit" height="28" />
+            <img src="/logo.svg" alt="WelcoKit" height="40" className="h-10 w-auto" />
+            <div className="flex items-center gap-2">
+              <Avatar className="size-8">
+                {profile?.avatar_url && (
+                  <AvatarImage src={profile.avatar_url} alt={profile.full_name ?? ""} />
+                )}
+                <AvatarFallback className="text-xs font-medium">
+                  {getInitials(profile?.full_name)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="truncate text-sm font-medium">
+                {profile?.full_name ?? user.email}
+              </span>
+            </div>
           </div>
-          <div className="mb-4 flex items-center gap-2 px-3 py-2">
-            <Avatar className="size-8">
-              {profile?.avatar_url && (
-                <AvatarImage src={profile.avatar_url} alt={profile.full_name ?? ""} />
-              )}
-              <AvatarFallback className="text-xs font-medium">
-                {getInitials(profile?.full_name)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="truncate text-sm font-medium">
-              {profile?.full_name ?? user.email}
-            </span>
-          </div>
-          <nav className="flex flex-col gap-2 text-sm">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="flex items-center justify-between rounded px-3 py-2 hover:bg-sidebar-accent"
-              >
-                {link.label}
-                {link.badge ? (
-                  <span className="flex size-5 items-center justify-center rounded-full bg-destructive text-[11px] font-medium text-white">
-                    {link.badge}
-                  </span>
-                ) : null}
-              </Link>
+          <nav className="mt-8 flex flex-col text-sm">
+            {navGroups.map((group, groupIndex) => (
+              <div key={groupIndex}>
+                {groupIndex > 0 && <hr className="my-3 border-[#DDD8CC]" />}
+                <div className="flex flex-col gap-2">
+                  {group.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="flex items-center justify-between rounded px-3 py-2 hover:bg-sidebar-accent"
+                    >
+                      {link.label}
+                      {link.badge ? (
+                        <span className="flex size-5 items-center justify-center rounded-full bg-destructive text-[11px] font-medium text-white">
+                          {link.badge}
+                        </span>
+                      ) : null}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
           </nav>
         </aside>
