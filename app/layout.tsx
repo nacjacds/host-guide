@@ -12,8 +12,21 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "WelcoKit",
-  description: "La guía digital inteligente para tus huéspedes",
+  title: "WelcoKit — Todo lo que tus huéspedes necesitan saber, en un solo lugar",
+  description:
+    "Crea guías digitales inteligentes para tus huéspedes. Con IA, multiidioma, QR WiFi y más.",
+  openGraph: {
+    title: "WelcoKit",
+    description: "Todo lo que tus huéspedes necesitan saber, en un solo lugar",
+    url: "https://welcokit.com",
+    siteName: "WelcoKit",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "WelcoKit",
+    description: "Todo lo que tus huéspedes necesitan saber, en un solo lugar",
+  },
 };
 
 export default function RootLayout({

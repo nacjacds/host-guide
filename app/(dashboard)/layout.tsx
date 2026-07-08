@@ -71,6 +71,10 @@ export default async function DashboardLayout({
       />
       <div className="flex flex-1">
         <aside className="hidden w-56 shrink-0 border-r border-sidebar-border bg-sidebar p-4 text-sidebar-foreground md:block">
+          <div className="mb-4 px-3 py-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-white.svg" alt="WelcoKit" height="28" />
+          </div>
           <div className="mb-4 flex items-center gap-2 px-3 py-2">
             <Avatar className="size-8">
               {profile?.avatar_url && (

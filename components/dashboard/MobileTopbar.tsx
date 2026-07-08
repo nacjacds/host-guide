@@ -56,6 +56,10 @@ export function MobileTopbar({
           className="top-0 left-0 h-dvh max-h-dvh w-72 max-w-[85vw] translate-x-0 translate-y-0 overflow-y-auto rounded-none border-r border-sidebar-border bg-sidebar p-4 text-sidebar-foreground ring-0 sm:max-w-[85vw] data-open:slide-in-from-left data-open:zoom-in-100 data-closed:slide-out-to-left data-closed:zoom-out-100"
         >
           <DialogTitle className="sr-only">Menú de navegación</DialogTitle>
+          <div className="mb-4 px-3 py-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-white.svg" alt="WelcoKit" height="28" />
+          </div>
           <nav className="flex flex-col gap-2 text-sm">
             {navLinks.map((link) => (
               <Link
