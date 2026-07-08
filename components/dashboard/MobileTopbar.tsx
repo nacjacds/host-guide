@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { getInitials } from "@/lib/utils";
+import { cn, getInitials, isActiveNavLink } from "@/lib/utils";
 
 export interface NavLinkItem {
   href: string;
@@ -27,6 +28,7 @@ export function MobileTopbar({
   navGroups: NavLinkGroup[];
 }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <div className="flex items-center justify-between border-b border-sidebar-border bg-sidebar px-4 py-3 text-sidebar-foreground md:hidden">
@@ -58,30 +60,42 @@ export function MobileTopbar({
           className="top-0 left-0 flex h-dvh max-h-dvh w-72 max-w-[85vw] translate-x-0 translate-y-0 flex-col gap-0 overflow-y-auto rounded-none border-r border-sidebar-border bg-sidebar p-4 text-sidebar-foreground ring-0 sm:max-w-[85vw] data-open:slide-in-from-left data-open:zoom-in-100 data-closed:slide-out-to-left data-closed:zoom-out-100"
         >
           <DialogTitle className="sr-only">Menú de navegación</DialogTitle>
-          <div className="px-3 py-2">
+          <div className="mb-6 px-3 py-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="WelcoKit" height="40" className="h-10 w-auto" />
+            <img src="/logo.svg" alt="WelcoKit" height="56" className="mx-auto h-14 w-auto" />
           </div>
           <nav className="mt-8 flex flex-col text-sm">
             {navGroups.map((group, groupIndex) => (
               <div key={groupIndex}>
                 {groupIndex > 0 && <hr className="my-3 border-[#DDD8CC]" />}
                 <div className="flex flex-col gap-2">
-                  {group.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setOpen(false)}
-                      className="flex items-center justify-between rounded px-3 py-2 hover:bg-sidebar-accent"
-                    >
-                      {link.label}
-                      {link.badge ? (
-                        <span className="flex size-5 items-center justify-center rounded-full bg-destructive text-[11px] font-medium text-white">
-                          {link.badge}
-                        </span>
-                      ) : null}
-                    </Link>
-                  ))}
+                  {group.map((link, linkIndex) => {
+                    const active = isActiveNavLink(pathname, link.href);
+                    return (
+                      <div key={link.href}>
+                        {groupIndex === 0 && linkIndex === 1 && (
+                          <hr className="my-2 border-[#DDD8CC]" />
+                        )}
+                        <Link
+                          href={link.href}
+                          onClick={() => setOpen(false)}
+                          className={cn(
+                            "flex items-center justify-between rounded-lg border-l-[3px] border-transparent px-3 py-2 transition-colors",
+                            active
+                              ? "border-[#1A1A18] bg-[#E8D5B0] text-[#1A1A18]"
+                              : "hover:bg-sidebar-accent"
+                          )}
+                        >
+                          {link.label}
+                          {link.badge ? (
+                            <span className="flex size-5 items-center justify-center rounded-full bg-destructive text-[11px] font-medium text-white">
+                              {link.badge}
+                            </span>
+                          ) : null}
+                        </Link>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}

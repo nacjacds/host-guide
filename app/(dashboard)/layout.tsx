@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
@@ -9,6 +8,7 @@ import { SupportWidget } from "@/components/support/SupportWidget";
 import { ImpersonationBanner } from "@/components/admin/ImpersonationBanner";
 import { decodeImpersonationToken, IMPERSONATION_COOKIE_NAME } from "@/lib/impersonation";
 import { MobileTopbar, type NavLinkGroup } from "@/components/dashboard/MobileTopbar";
+import { SidebarNav } from "@/components/dashboard/SidebarNav";
 
 export default async function DashboardLayout({
   children,
@@ -75,8 +75,13 @@ export default async function DashboardLayout({
         <aside className="hidden w-56 shrink-0 border-r border-sidebar-border bg-sidebar p-4 text-sidebar-foreground md:block">
           <div className="space-y-2 px-3 py-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="WelcoKit" height="40" className="h-10 w-auto" />
-            <div className="flex items-center gap-2">
+            <img
+              src="/logo.svg"
+              alt="WelcoKit"
+              style={{ width: "200px", height: "auto" }}
+              className="mx-auto max-w-full"
+            />
+            <div className="mb-6 flex items-center gap-2">
               <Avatar className="size-8">
                 {profile?.avatar_url && (
                   <AvatarImage src={profile.avatar_url} alt={profile.full_name ?? ""} />
@@ -90,29 +95,7 @@ export default async function DashboardLayout({
               </span>
             </div>
           </div>
-          <nav className="mt-8 flex flex-col text-sm">
-            {navGroups.map((group, groupIndex) => (
-              <div key={groupIndex}>
-                {groupIndex > 0 && <hr className="my-3 border-[#DDD8CC]" />}
-                <div className="flex flex-col gap-2">
-                  {group.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="flex items-center justify-between rounded px-3 py-2 hover:bg-sidebar-accent"
-                    >
-                      {link.label}
-                      {link.badge ? (
-                        <span className="flex size-5 items-center justify-center rounded-full bg-destructive text-[11px] font-medium text-white">
-                          {link.badge}
-                        </span>
-                      ) : null}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </nav>
+          <SidebarNav navGroups={navGroups} />
         </aside>
         <main className="flex-1 p-4 md:p-6">
           {emailNotConfirmed && (

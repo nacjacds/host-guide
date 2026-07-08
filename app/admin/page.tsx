@@ -68,7 +68,16 @@ export default async function AdminPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-6">
-      <h1 className="text-2xl font-semibold">Panel de administración</h1>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/logo.svg"
+        alt="WelcoKit"
+        style={{ width: "200px", height: "auto" }}
+        className="mx-auto mb-4"
+      />
+      <h1 className="mb-8 text-center text-2xl font-semibold text-[#1A1A18]">
+        Panel de administración
+      </h1>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <Card>

@@ -37,3 +37,7 @@ export function getInitials(name: string | null | undefined): string {
   const initials = parts.length === 1 ? parts[0].slice(0, 2) : parts[0][0] + parts[1][0]
   return initials.toUpperCase()
 }
+
+export function isActiveNavLink(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`)
+}
