@@ -95,6 +95,65 @@ Devuelve SOLO un JSON array:
   return extractJson<RecommendationDraft[]>(text);
 }
 
+export interface RecommendationCandidate {
+  place_id: string;
+  name: string;
+  rating: number;
+  user_ratings_total: number;
+  types: string[];
+}
+
+const CURATION_CATEGORY_GUIDANCE: Record<string, string> = {
+  restaurants:
+    "Prioriza comida auténtica local y buen ambiente por encima de cadenas turísticas o sitios genéricos para turistas. Usa el rating y el tipo de establecimiento como señal, no solo la popularidad.",
+  nightlife:
+    "Prioriza bares y locales con ambiente auténtico local por encima de cadenas turísticas o sitios genéricos para turistas. Usa el rating y el tipo de establecimiento como señal, no solo la popularidad.",
+  attractions: "Prioriza lugares realmente representativos de la zona, con buena valoración.",
+  beaches: "Prioriza playas con buena valoración y accesibilidad.",
+  nature: "Prioriza parques y espacios naturales con buena valoración.",
+};
+
+// Selects and orders up to `limit` place_ids from real Google Places
+// candidates — Claude must not invent or modify any factual data, only
+// choose and rank from the list it's given.
+export async function curateRecommendations(params: {
+  propertyName: string;
+  address: string;
+  category: string;
+  candidates: RecommendationCandidate[];
+  limit?: number;
+}): Promise<string[]> {
+  const limit = params.limit ?? 10;
+  const guidance = CURATION_CATEGORY_GUIDANCE[params.category] ?? "";
+
+  const prompt = `
+Eres el asistente de ${params.propertyName}, un alojamiento en ${params.address}.
+
+Estos son los lugares candidatos de la categoría "${params.category}" cerca del alojamiento
+(datos reales de Google Places — nombre, rating, número de reseñas, tipos):
+${JSON.stringify(params.candidates, null, 2)}
+
+Selecciona un máximo de ${limit} lugares y ordénalos de mejor a peor recomendación para un
+huésped turístico. ${guidance}
+
+No inventes ni modifiques ningún dato. Solo elige y ordena place_id de la lista proporcionada.
+
+Devuelve SOLO un JSON array de place_id en el orden de recomendación:
+["place_id_1", "place_id_2", ...]
+`;
+
+  const message = await anthropic.messages.create({
+    model: MODEL,
+    max_tokens: 1024,
+    messages: [{ role: "user", content: prompt }],
+  });
+
+  const text = message.content[0].type === "text" ? message.content[0].text : "";
+  const ids = extractJson<string[]>(text);
+  const validIds = new Set(params.candidates.map((c) => c.place_id));
+  return ids.filter((id) => validIds.has(id)).slice(0, limit);
+}
+
 export interface PlaceSuggestion {
   name: string;
   description: string;
@@ -103,9 +162,6 @@ export interface PlaceSuggestion {
 }
 
 const PLACE_CATEGORY_LABELS: Record<string, string> = {
-  restaurants: "un restaurante o sitio para comer",
-  nightlife: "un bar o local de ocio nocturno",
-  attractions: "una atracción turística o lugar de interés",
   parking: "un parking o aparcamiento",
 };
 

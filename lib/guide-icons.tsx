@@ -8,10 +8,7 @@ import {
   Waves,
   ShieldAlert,
   FileText,
-  UtensilsCrossed,
   Wine,
-  Music,
-  Landmark,
   type LucideIcon,
 } from "lucide-react";
 import type { BlockType } from "@/types";
@@ -26,8 +23,5 @@ export const BLOCK_ICONS: Record<BlockType, LucideIcon> = {
   pool: Waves,
   emergencias: ShieldAlert,
   custom: FileText,
-  restaurants: UtensilsCrossed,
   drinks: Wine,
-  nightlife: Music,
-  attractions: Landmark,
 };

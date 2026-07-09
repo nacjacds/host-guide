@@ -15,10 +15,7 @@ const BLOCK_TYPE_LABELS: Record<BlockType, string> = {
   parking: "Parking",
   appliances: "Electrodomésticos",
   pool: "Piscina",
-  restaurants: "Dónde comer",
   drinks: "Copas y bares",
-  nightlife: "Ocio nocturno",
-  attractions: "Qué visitar",
   custom: "Personalizado",
   emergencias: "Emergencias",
 };
@@ -31,17 +28,17 @@ const BLOCK_TYPE_ICONS: Record<BlockType, string> = {
   parking: "🅿️",
   appliances: "🔌",
   pool: "🏊",
-  restaurants: "🍽️",
   drinks: "🍷",
-  nightlife: "🎵",
-  attractions: "🏛️",
   custom: "📄",
   emergencias: "🆘",
 };
 
 // "drinks" is intentionally excluded here — hosts no longer create new
 // drinks blocks from the toolbar, but existing ones keep working (the type
-// stays valid in BLOCK_TYPE_LABELS/ICONS and everywhere else).
+// stays valid in BLOCK_TYPE_LABELS/ICONS and everywhere else). "Dónde
+// comer"/"Ocio nocturno"/"Qué visitar" moved to the AI-curated local
+// recommendations engine (see PropertyRecommendationsSection) and are no
+// longer toolbar-creatable guide_blocks.
 const TOOLBAR_TYPES: BlockType[] = [
   "wifi",
   "checkin",
@@ -50,9 +47,6 @@ const TOOLBAR_TYPES: BlockType[] = [
   "parking",
   "appliances",
   "pool",
-  "restaurants",
-  "nightlife",
-  "attractions",
   "custom",
   "emergencias",
 ];

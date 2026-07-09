@@ -13,7 +13,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PlaceImageUploader } from "./PlaceImageUploader";
-import { AIPlaceGenerateButton } from "./AIPlaceGenerateButton";
 import type { BlockImage, BlockType, PlaceEntry, PriceLevel } from "@/types";
 
 export interface PlaceListContent {
@@ -21,7 +20,6 @@ export interface PlaceListContent {
 }
 
 const PRICE_LEVELS: PriceLevel[] = ["€", "€€", "€€€"];
-const AI_GENERATE_TYPES = new Set<BlockType>(["restaurants", "nightlife", "attractions"]);
 
 function emptyPlace(): PlaceEntry {
   return {
@@ -47,8 +45,7 @@ export function PlaceListBlock({
   onChange: (content: PlaceListContent) => void;
 }) {
   const places = content.places ?? [];
-  const showCuisine = blockType === "restaurants";
-  const showPrice = blockType === "restaurants" || blockType === "drinks";
+  const showPrice = blockType === "drinks";
   const [skippedImageIds, setSkippedImageIds] = useState<Set<string>>(new Set());
 
   function updatePlace(index: number, patch: Partial<PlaceEntry>) {
@@ -130,40 +127,28 @@ export function PlaceListBlock({
             />
           </div>
 
-          {(showCuisine || showPrice) && (
+          {showPrice && (
             <div className="grid grid-cols-2 gap-2">
-              {showCuisine && (
-                <div>
-                  <Label>Tipo de cocina</Label>
-                  <Input
-                    value={place.cuisine_type ?? ""}
-                    onChange={(e) => updatePlace(i, { cuisine_type: e.target.value })}
-                    placeholder="Mariscos, Tapas..."
-                  />
-                </div>
-              )}
-              {showPrice && (
-                <div>
-                  <Label>Precio</Label>
-                  <Select
-                    value={place.price_level ?? ""}
-                    onValueChange={(value) =>
-                      updatePlace(i, { price_level: (value || null) as PriceLevel | null })
-                    }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Sin definir" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PRICE_LEVELS.map((level) => (
-                        <SelectItem key={level} value={level}>
-                          {level}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+              <div>
+                <Label>Precio</Label>
+                <Select
+                  value={place.price_level ?? ""}
+                  onValueChange={(value) =>
+                    updatePlace(i, { price_level: (value || null) as PriceLevel | null })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Sin definir" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PRICE_LEVELS.map((level) => (
+                      <SelectItem key={level} value={level}>
+                        {level}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           )}
 
@@ -204,13 +189,6 @@ export function PlaceListBlock({
         <Button variant="secondary" size="sm" onClick={addPlace}>
           + Añadir lugar
         </Button>
-      )}
-
-      {AI_GENERATE_TYPES.has(blockType) && (
-        <AIPlaceGenerateButton
-          blockId={blockId}
-          onGenerated={(place) => onChange({ places: [...places, place] })}
-        />
       )}
     </div>
   );

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { triggerWelcomeMessageTranslation } from "@/lib/translations/trigger";
+import { geocodeAddress } from "@/lib/google-places";
 
 const updatePropertySchema = z.object({
   name: z.string().min(1).max(120).optional(),
@@ -57,9 +58,21 @@ export async function PATCH(
     return NextResponse.json({ error: parsed.error.message }, { status: 400 });
   }
 
+  const updateData: typeof parsed.data & { lat?: number | null; lng?: number | null } = {
+    ...parsed.data,
+  };
+
+  // Re-geocode whenever the address changes — local recommendation search
+  // and distance calculations depend on having up-to-date coordinates.
+  if (parsed.data.address !== undefined) {
+    const coords = await geocodeAddress(parsed.data.address);
+    updateData.lat = coords?.lat ?? null;
+    updateData.lng = coords?.lng ?? null;
+  }
+
   const { data: property, error } = await supabase
     .from("properties")
-    .update(parsed.data)
+    .update(updateData)
     .eq("id", id)
     .eq("host_id", user.id)
     .select()

@@ -8,6 +8,11 @@ export interface PlanDefinition {
   aiEnabled: boolean;
   analyticsEnabled: boolean;
   whiteLabel: boolean;
+  // Monthly cap on manual "Regenerar recomendaciones" clicks, shared across
+  // every property the host owns (not per-property) — protects against
+  // uncontrolled Google Places + Claude spend. Scheduled/cron regenerations
+  // and any future initial-generation-on-creation are exempt.
+  monthlyRecommendationRegenerations: number;
   features: string[];
 }
 
@@ -20,6 +25,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     aiEnabled: false,
     analyticsEnabled: false,
     whiteLabel: false,
+    monthlyRecommendationRegenerations: 1,
     features: ["1 propiedad", "Bloques de contenido manuales", "QR descargable"],
   },
   starter: {
@@ -30,6 +36,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     aiEnabled: true,
     analyticsEnabled: false,
     whiteLabel: false,
+    monthlyRecommendationRegenerations: 3,
     features: ["3 propiedades", "Generación de contenido con IA", "Recomendaciones IA", "QR descargable"],
   },
   pro: {
@@ -40,6 +47,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     aiEnabled: true,
     analyticsEnabled: true,
     whiteLabel: false,
+    monthlyRecommendationRegenerations: 10,
     features: ["10 propiedades", "Todo lo de Starter", "Estadísticas de visitas", "Bot de WhatsApp"],
   },
   agency: {
@@ -50,6 +58,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     aiEnabled: true,
     analyticsEnabled: true,
     whiteLabel: true,
+    monthlyRecommendationRegenerations: 25,
     features: ["30 propiedades", "Todo lo de Pro", "Marca blanca", "Soporte prioritario"],
   },
 };
@@ -62,4 +71,22 @@ export function getPlan(planId: string | null | undefined): PlanDefinition {
 
 export function planPropertyLimit(planId: string | null | undefined): number {
   return getPlan(planId).maxProperties;
+}
+
+export function planRecommendationRegenerationLimit(planId: string | null | undefined): number {
+  return getPlan(planId).monthlyRecommendationRegenerations;
+}
+
+// The next plan tier with a higher manual-regeneration quota than the
+// current one, if any — powers the "Mejorar plan" link shown when a host
+// hits their monthly limit.
+export function nextPlanWithMoreRegenerations(planId: string | null | undefined): PlanDefinition | null {
+  const current = getPlan(planId);
+  const currentIndex = PLAN_ORDER.indexOf(current.id);
+  for (const id of PLAN_ORDER.slice(currentIndex + 1)) {
+    if (PLANS[id].monthlyRecommendationRegenerations > current.monthlyRecommendationRegenerations) {
+      return PLANS[id];
+    }
+  }
+  return null;
 }

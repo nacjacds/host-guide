@@ -9,7 +9,7 @@ const requestSchema = z.object({
   blockId: z.string().uuid(),
 });
 
-const CACHEABLE_TYPES = new Set(["restaurants", "nightlife", "attractions", "parking"]);
+const CACHEABLE_TYPES = new Set(["parking"]);
 
 function hashKey(parts: string[]): string {
   return createHash("md5").update(parts.join("|")).digest("hex");

@@ -6,14 +6,7 @@ import { generateRecommendationDescriptions } from "@/lib/claude";
 
 const requestSchema = z.object({
   propertyId: z.string().uuid(),
-  category: z.enum([
-    "restaurant",
-    "bar",
-    "supermarket",
-    "pharmacy",
-    "transport",
-    "activity",
-  ]),
+  category: z.enum(["supermarket", "pharmacy", "transport"]),
   guestProfile: z.string().max(280).default("huéspedes turísticos"),
 });
 

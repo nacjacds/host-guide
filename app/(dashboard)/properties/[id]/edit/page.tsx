@@ -24,5 +24,17 @@ export default async function EditPropertyPage({
     .eq("property_id", id)
     .order("order_index");
 
-  return <PropertyEditor property={property} initialBlocks={blocks ?? []} />;
+  const { data: recommendations } = await supabase
+    .from("property_recommendations")
+    .select("*")
+    .eq("property_id", id)
+    .order("display_order");
+
+  return (
+    <PropertyEditor
+      property={property}
+      initialBlocks={blocks ?? []}
+      initialRecommendations={recommendations ?? []}
+    />
+  );
 }

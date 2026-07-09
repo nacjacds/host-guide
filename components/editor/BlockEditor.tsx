@@ -21,7 +21,7 @@ import { AIPlaceGenerateButton } from "./blocks/AIPlaceGenerateButton";
 import { BlockImageUploader } from "./blocks/BlockImageUploader";
 import type { BlockImage, GuideBlock } from "@/types";
 
-const PLACE_LIST_TYPES = ["restaurants", "drinks", "nightlife", "attractions"] as const;
+const PLACE_LIST_TYPES = ["drinks"] as const;
 
 function summarizeBlock(block: GuideBlock): string {
   const content = block.content as Record<string, unknown>;
@@ -52,10 +52,7 @@ function summarizeBlock(block: GuideBlock): string {
       const c = content as unknown as EmergencyContent;
       return c.general ? `Emergencias: ${c.general}` : "Sin configurar";
     }
-    case "restaurants":
-    case "drinks":
-    case "nightlife":
-    case "attractions": {
+    case "drinks": {
       const c = content as unknown as PlaceListContent;
       const count = c.places?.length ?? 0;
       return count === 0 ? "Sin lugares" : `${count} lugar${count === 1 ? "" : "es"}`;

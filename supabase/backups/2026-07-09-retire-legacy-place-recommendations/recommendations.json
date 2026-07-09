@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1200a07c-6e9b-4fc2-bb68-3aa24c006a1d",
+    "property_id": "1aa8a746-fabe-4659-afa6-b0dce952928d",
+    "category": "restaurant",
+    "name": "Bar Canarias",
+    "description": "Hay buenos espetos.",
+    "address": "C/ Prueba 8, 29620 Torremolinos",
+    "google_place_id": null,
+    "rating": null,
+    "distance_meters": null,
+    "maps_url": null,
+    "is_ai_generated": false,
+    "is_visible": true,
+    "order_index": 0,
+    "created_at": "2026-07-05T05:45:51.76471+00:00"
+  }
+]

@@ -50,10 +50,7 @@ export function extractTranslatable(
       return { fields: { notes } };
     }
 
-    case "restaurants":
-    case "drinks":
-    case "nightlife":
-    case "attractions": {
+    case "drinks": {
       const places = content.places;
       if (!Array.isArray(places) || places.length === 0) return null;
       const descriptions: Record<string, string> = {};
@@ -110,10 +107,7 @@ export function mergeTranslatedContent(
       return typeof notes === "string" ? { ...content, notes } : content;
     }
 
-    case "restaurants":
-    case "drinks":
-    case "nightlife":
-    case "attractions": {
+    case "drinks": {
       const descriptions = translatedFields.places_description;
       const places = content.places;
       if (!descriptions || typeof descriptions !== "object" || !Array.isArray(places)) {

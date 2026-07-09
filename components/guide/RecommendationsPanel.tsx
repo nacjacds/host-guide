@@ -7,12 +7,9 @@ import type { Recommendation, RecommendationCategory } from "@/types";
 import type { GuideTranslationKey } from "@/lib/guide-i18n";
 
 const CATEGORY_KEY: Record<RecommendationCategory, GuideTranslationKey> = {
-  restaurant: "category_restaurant",
-  bar: "category_bar",
   supermarket: "category_supermarket",
   pharmacy: "category_pharmacy",
   transport: "category_transport",
-  activity: "category_activity",
 };
 
 export function RecommendationsPanel({

@@ -23,7 +23,8 @@ import { BlockEditor } from "./BlockEditor";
 import { BlockToolbar } from "./BlockToolbar";
 import { PublishPanel } from "./PublishPanel";
 import { AirbnbImportPanel } from "./AirbnbImportPanel";
-import type { GuideBlock, Property } from "@/types";
+import { PropertyRecommendationsSection } from "./PropertyRecommendationsSection";
+import type { GuideBlock, Property, PropertyRecommendation } from "@/types";
 
 async function saveBlock(block: GuideBlock) {
   const response = await fetch(`/api/guide-blocks/${block.id}`, {
@@ -42,9 +43,11 @@ async function saveBlock(block: GuideBlock) {
 export function PropertyEditor({
   property,
   initialBlocks,
+  initialRecommendations,
 }: {
   property: Property;
   initialBlocks: GuideBlock[];
+  initialRecommendations: PropertyRecommendation[];
 }) {
   const [blocks, setBlocks] = useState(initialBlocks);
   const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set());
@@ -223,6 +226,11 @@ export function PropertyEditor({
               </SortableContext>
             </DndContext>
           )}
+
+          <PropertyRecommendationsSection
+            propertyId={property.id}
+            initialRecommendations={initialRecommendations}
+          />
         </div>
 
         <div className="space-y-6">

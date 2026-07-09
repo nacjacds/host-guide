@@ -4,6 +4,8 @@ import { GuideSectionHeader } from "@/components/guide/GuideSectionHeader";
 import { TilePanel } from "@/components/guide/TilePanel";
 import { EmergencyPanel } from "@/components/guide/EmergencyPanel";
 import { PlaceListPanel } from "@/components/guide/PlaceListPanel";
+import { RecommendationCategoryPanel } from "@/components/guide/RecommendationCategoryPanel";
+import { RecommendationCategoryTitle } from "@/components/guide/RecommendationCategoryTitle";
 import { BlockImageCarousel } from "@/components/guide/BlockImageCarousel";
 import { BlockTitle } from "@/components/guide/BlockTitle";
 import { BackToGuideButton } from "@/components/guide/BackToGuideButton";
@@ -11,11 +13,12 @@ import { SectionHeading } from "@/components/guide/SectionHeading";
 import { WifiPanel } from "@/components/guide/WifiPanel";
 import { CheckinPanel } from "@/components/guide/CheckinPanel";
 import { BLOCK_ICONS } from "@/lib/guide-icons";
+import { RECOMMENDATION_CATEGORY_ICONS } from "@/lib/recommendations/constants";
 import { logAnalyticsEvent } from "@/lib/analytics";
 import { fetchPropertyTranslations, lookupTranslation } from "@/lib/translations/fetchTranslations";
 import { TARGET_LOCALES } from "@/lib/translations/constants";
 import type { TranslatablePayload } from "@/lib/translations/extract";
-import type { BlockType } from "@/types";
+import type { BlockType, PropertyRecommendationCategory } from "@/types";
 import type { PlaceListContent } from "@/components/editor/blocks/PlaceListBlock";
 
 const VALID_TYPES: readonly BlockType[] = [
@@ -28,17 +31,17 @@ const VALID_TYPES: readonly BlockType[] = [
   "custom",
   "emergencias",
   "pool",
-  "restaurants",
   "drinks",
-  "nightlife",
-  "attractions",
 ];
 
-const PLACE_LIST_TYPES: readonly BlockType[] = [
-  "restaurants",
-  "drinks",
-  "nightlife",
+const PLACE_LIST_TYPES: readonly BlockType[] = ["drinks"];
+
+const RECOMMENDATION_TYPES: readonly PropertyRecommendationCategory[] = [
   "attractions",
+  "restaurants",
+  "nightlife",
+  "beaches",
+  "nature",
 ];
 
 export default async function GuideBlockPage({
@@ -48,7 +51,11 @@ export default async function GuideBlockPage({
 }) {
   const { slug, type } = await params;
 
-  if (!VALID_TYPES.includes(type as BlockType)) notFound();
+  const isRecommendationCategory = RECOMMENDATION_TYPES.includes(
+    type as PropertyRecommendationCategory
+  );
+
+  if (!VALID_TYPES.includes(type as BlockType) && !isRecommendationCategory) notFound();
 
   const supabase = await createClient();
 
@@ -60,6 +67,42 @@ export default async function GuideBlockPage({
     .single();
 
   if (!property) notFound();
+
+  if (isRecommendationCategory) {
+    const category = type as PropertyRecommendationCategory;
+    const { data: recommendations } = await supabase
+      .from("property_recommendations")
+      .select("*")
+      .eq("property_id", property.id)
+      .eq("category", category)
+      .order("display_order");
+
+    if (!recommendations || recommendations.length === 0) notFound();
+
+    await logAnalyticsEvent(property.id, "section_viewed", type);
+
+    const Icon = RECOMMENDATION_CATEGORY_ICONS[category];
+
+    return (
+      <div className="mx-auto max-w-2xl pb-24">
+        <GuideSectionHeader
+          slug={slug}
+          propertyName={property.name}
+          accentColor={property.accent_color}
+          coverImageUrl={property.cover_image_url}
+        />
+        <div className="space-y-8 px-4 pt-8 pb-6 sm:px-6 lg:px-8">
+          <div>
+            <SectionHeading icon={Icon} accentColor={property.accent_color}>
+              <RecommendationCategoryTitle category={category} />
+            </SectionHeading>
+            <RecommendationCategoryPanel recommendations={recommendations} />
+          </div>
+          <BackToGuideButton slug={slug} />
+        </div>
+      </div>
+    );
+  }
 
   const { data: blocks } = await supabase
     .from("guide_blocks")

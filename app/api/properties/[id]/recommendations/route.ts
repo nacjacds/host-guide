@@ -3,14 +3,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 
 const createRecommendationSchema = z.object({
-  category: z.enum([
-    "restaurant",
-    "bar",
-    "supermarket",
-    "pharmacy",
-    "transport",
-    "activity",
-  ]),
+  category: z.enum(["supermarket", "pharmacy", "transport"]),
   name: z.string().min(1).max(120),
   description: z.string().max(500).optional(),
   address: z.string().max(255).optional(),

@@ -46,7 +46,7 @@ export function DeletePropertyButton({
       <CardContent className="space-y-3">
         <p className="text-sm text-muted-foreground">
           Eliminar &quot;{propertyName}&quot; borra permanentemente su guía, bloques,
-          reservas y estadísticas asociadas.
+          recomendaciones y estadísticas asociadas.
         </p>
         <Button
           type="button"
@@ -62,7 +62,7 @@ export function DeletePropertyButton({
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         title={`¿Eliminar "${propertyName}"?`}
-        description="Esta acción no se puede deshacer. Se eliminará la guía, los bloques de contenido, las reservas y las estadísticas de esta propiedad."
+        description="Esta acción no se puede deshacer. Se eliminará la guía, los bloques de contenido, las recomendaciones y las estadísticas de esta propiedad."
         onConfirm={handleDelete}
         loading={deleting}
       />

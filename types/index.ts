@@ -13,10 +13,7 @@ export type BlockType =
   | "custom"
   | "emergencias"
   | "pool"
-  | "restaurants"
-  | "drinks"
-  | "nightlife"
-  | "attractions";
+  | "drinks";
 
 export type PriceLevel = "€" | "€€" | "€€€";
 
@@ -32,13 +29,21 @@ export interface PlaceEntry {
   price_level?: PriceLevel | null;
   images?: BlockImage[];
 }
-export type RecommendationCategory =
-  | "restaurant"
-  | "bar"
-  | "supermarket"
-  | "pharmacy"
-  | "transport"
-  | "activity";
+export type RecommendationCategory = "supermarket" | "pharmacy" | "transport";
+
+// The 5 AI-curated local recommendation categories, backed by real Google
+// Places data (see property_recommendations). "beaches" and "nature" are
+// only ever populated when detected near the property.
+export type PropertyRecommendationCategory =
+  | "attractions"
+  | "restaurants"
+  | "nightlife"
+  | "beaches"
+  | "nature";
+
+export type PropertyRecommendationSource = "ai_curated" | "manual";
+
+export type RegenerationTriggerType = "manual" | "scheduled";
 
 export interface BotMessage {
   role: "user" | "assistant";
@@ -93,6 +98,8 @@ export interface Database {
           host_id: string;
           name: string;
           address: string | null;
+          lat: number | null;
+          lng: number | null;
           slug: string;
           cover_image_url: string | null;
           accent_color: string;
@@ -113,6 +120,8 @@ export interface Database {
           host_id: string;
           name: string;
           address?: string | null;
+          lat?: number | null;
+          lng?: number | null;
           slug: string;
           cover_image_url?: string | null;
           accent_color?: string;
@@ -133,6 +142,8 @@ export interface Database {
           host_id?: string;
           name?: string;
           address?: string | null;
+          lat?: number | null;
+          lng?: number | null;
           slug?: string;
           cover_image_url?: string | null;
           accent_color?: string;
@@ -237,6 +248,105 @@ export interface Database {
           is_visible?: boolean;
           order_index?: number;
           created_at?: string;
+        };
+        Relationships: [];
+      };
+      property_recommendations: {
+        Row: {
+          id: string;
+          property_id: string;
+          category: PropertyRecommendationCategory;
+          place_id: string | null;
+          name: string;
+          address: string | null;
+          lat: number | null;
+          lng: number | null;
+          distance_meters: number | null;
+          distance_walking_minutes: number | null;
+          maps_url: string | null;
+          rating: number | null;
+          photo_url: string | null;
+          source: PropertyRecommendationSource;
+          display_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          property_id: string;
+          category: PropertyRecommendationCategory;
+          place_id?: string | null;
+          name: string;
+          address?: string | null;
+          lat?: number | null;
+          lng?: number | null;
+          distance_meters?: number | null;
+          distance_walking_minutes?: number | null;
+          maps_url?: string | null;
+          rating?: number | null;
+          photo_url?: string | null;
+          source?: PropertyRecommendationSource;
+          display_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          property_id?: string;
+          category?: PropertyRecommendationCategory;
+          place_id?: string | null;
+          name?: string;
+          address?: string | null;
+          lat?: number | null;
+          lng?: number | null;
+          distance_meters?: number | null;
+          distance_walking_minutes?: number | null;
+          maps_url?: string | null;
+          rating?: number | null;
+          photo_url?: string | null;
+          source?: PropertyRecommendationSource;
+          display_order?: number;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      property_recommendation_meta: {
+        Row: {
+          property_id: string;
+          last_generated_at: string | null;
+          categories_detected: PropertyRecommendationCategory[];
+        };
+        Insert: {
+          property_id: string;
+          last_generated_at?: string | null;
+          categories_detected?: PropertyRecommendationCategory[];
+        };
+        Update: {
+          property_id?: string;
+          last_generated_at?: string | null;
+          categories_detected?: PropertyRecommendationCategory[];
+        };
+        Relationships: [];
+      };
+      recommendation_regeneration_usage: {
+        Row: {
+          id: string;
+          host_id: string;
+          property_id: string;
+          trigger_type: RegenerationTriggerType;
+          triggered_at: string;
+        };
+        Insert: {
+          id?: string;
+          host_id: string;
+          property_id: string;
+          trigger_type?: RegenerationTriggerType;
+          triggered_at?: string;
+        };
+        Update: {
+          id?: string;
+          host_id?: string;
+          property_id?: string;
+          trigger_type?: RegenerationTriggerType;
+          triggered_at?: string;
         };
         Relationships: [];
       };
@@ -403,6 +513,9 @@ export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type Property = Database["public"]["Tables"]["properties"]["Row"];
 export type GuideBlock = Database["public"]["Tables"]["guide_blocks"]["Row"];
 export type Recommendation = Database["public"]["Tables"]["recommendations"]["Row"];
+export type PropertyRecommendation = Database["public"]["Tables"]["property_recommendations"]["Row"];
+export type PropertyRecommendationMeta = Database["public"]["Tables"]["property_recommendation_meta"]["Row"];
+export type RecommendationRegenerationUsage = Database["public"]["Tables"]["recommendation_regeneration_usage"]["Row"];
 export type BotConversation = Database["public"]["Tables"]["bot_conversations"]["Row"];
 export type AnalyticsEvent = Database["public"]["Tables"]["analytics_events"]["Row"];
 export type SupportTicket = Database["public"]["Tables"]["support_tickets"]["Row"];

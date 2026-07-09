@@ -14,10 +14,7 @@ const BLOCK_DEFAULTS: Record<
   parking: { title: "Parking", icon: "🅿️", content: { rules: [] } },
   appliances: { title: "Electrodomésticos", icon: "🔌", content: { rules: [] } },
   pool: { title: "Piscina", icon: "🏊", content: { rules: [] } },
-  restaurants: { title: "Dónde comer", icon: "🍽️", content: { places: [] } },
   drinks: { title: "Copas y bares", icon: "🍷", content: { places: [] } },
-  nightlife: { title: "Ocio nocturno", icon: "🎵", content: { places: [] } },
-  attractions: { title: "Qué visitar", icon: "🏛️", content: { places: [] } },
   custom: { title: "Bloque personalizado", icon: "📄", content: { text: "" } },
   emergencias: {
     title: "Emergencias",
@@ -44,10 +41,7 @@ const createBlockSchema = z.object({
     "custom",
     "emergencias",
     "pool",
-    "restaurants",
     "drinks",
-    "nightlife",
-    "attractions",
   ]),
 });
 

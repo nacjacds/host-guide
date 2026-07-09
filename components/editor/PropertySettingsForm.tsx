@@ -1,17 +1,34 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "sonner";
 import type { Property } from "@/types";
 
 const WELCOME_MESSAGE_MAX = 500;
 
-export function PropertySettingsForm({ property }: { property: Property }) {
+interface RecommendationQuota {
+  limit: number;
+  used: number;
+  remaining: number;
+  resetDateLabel: string;
+}
+
+export function PropertySettingsForm({
+  property,
+  recommendationQuota,
+  upgradePlanLabel,
+}: {
+  property: Property;
+  recommendationQuota: RecommendationQuota;
+  upgradePlanLabel: string | null;
+}) {
   const [name, setName] = useState(property.name);
   const [address, setAddress] = useState(property.address ?? "");
   const [accentColor, setAccentColor] = useState(property.accent_color);
@@ -19,6 +36,35 @@ export function PropertySettingsForm({ property }: { property: Property }) {
   const [whatsappNumber, setWhatsappNumber] = useState(property.whatsapp_number ?? "");
   const [welcomeMessage, setWelcomeMessage] = useState(property.welcome_message ?? "");
   const [saving, setSaving] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
+  const [confirmRegenerateOpen, setConfirmRegenerateOpen] = useState(false);
+  const [quota, setQuota] = useState(recommendationQuota);
+
+  async function handleRegenerate() {
+    setRegenerating(true);
+    try {
+      const response = await fetch(
+        `/api/properties/${property.id}/property-recommendations/regenerate`,
+        { method: "POST" }
+      );
+      if (!response.ok) {
+        const { error } = await response.json().catch(() => ({ error: null }));
+        toast.error(error ?? "No se pudieron regenerar las recomendaciones");
+        return;
+      }
+      toast.success("Recomendaciones regeneradas");
+      setConfirmRegenerateOpen(false);
+      setQuota((prev) => ({
+        ...prev,
+        used: prev.used + 1,
+        remaining: Math.max(0, prev.remaining - 1),
+      }));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error de red");
+    } finally {
+      setRegenerating(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -52,6 +98,7 @@ export function PropertySettingsForm({ property }: { property: Property }) {
   }
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="space-y-6">
       <Card>
         <CardHeader>
@@ -147,5 +194,56 @@ export function PropertySettingsForm({ property }: { property: Property }) {
         {saving ? "Guardando..." : "Guardar cambios"}
       </Button>
     </form>
+
+    <Card>
+      <CardHeader>
+        <CardTitle>Recomendaciones locales</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="text-xs text-muted-foreground">
+          Qué visitar, dónde comer, ocio nocturno, playas y naturaleza se generan
+          automáticamente con datos reales de Google y se regeneran cada 90 días. Usa este
+          botón para forzar una regeneración inmediata.
+        </p>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setConfirmRegenerateOpen(true)}
+          disabled={regenerating || quota.remaining <= 0}
+        >
+          {regenerating ? "Regenerando..." : "Regenerar recomendaciones"}
+        </Button>
+        {quota.remaining > 0 ? (
+          <p className="text-xs text-muted-foreground">
+            Te quedan {quota.remaining} de {quota.limit} regeneraciones manuales este mes.
+          </p>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            Sin regeneraciones disponibles este mes · Se restablecen el {quota.resetDateLabel}
+            {upgradePlanLabel && (
+              <>
+                {" · "}
+                <Link
+                  href="/account"
+                  className="text-primary underline underline-offset-2 hover:no-underline"
+                >
+                  Mejorar plan
+                </Link>
+              </>
+            )}
+          </p>
+        )}
+      </CardContent>
+    </Card>
+
+    <ConfirmDialog
+      open={confirmRegenerateOpen}
+      onOpenChange={setConfirmRegenerateOpen}
+      title="¿Regenerar recomendaciones?"
+      description="Esto reemplazará las recomendaciones generadas automáticamente. Los lugares añadidos manualmente no se verán afectados."
+      onConfirm={handleRegenerate}
+      loading={regenerating}
+    />
+    </>
   );
 }
