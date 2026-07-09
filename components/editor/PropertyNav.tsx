@@ -7,7 +7,6 @@ import { cn, isActiveNavLink } from "@/lib/utils";
 const TABS = [
   { key: "edit", label: "Editor", href: (id: string) => `/properties/${id}/edit` },
   { key: "settings", label: "Ajustes", href: (id: string) => `/properties/${id}/settings` },
-  { key: "messages", label: "Mensajes", href: (id: string) => `/properties/${id}/messages` },
   { key: "stats", label: "Estadísticas", href: (id: string) => `/properties/${id}/stats` },
 ] as const;
 

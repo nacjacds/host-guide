@@ -4,7 +4,6 @@ import { HeroSection } from "@/components/guide/HeroSection";
 import { WelcomeMessage } from "@/components/guide/WelcomeMessage";
 import { TileGrid } from "@/components/guide/TileGrid";
 import { EmptyGuideState } from "@/components/guide/EmptyGuideState";
-import { GuestBookForm } from "@/components/guide/GuestBookForm";
 import { logAnalyticsEvent } from "@/lib/analytics";
 import { fetchPropertyTranslations, lookupTranslation } from "@/lib/translations/fetchTranslations";
 import { TARGET_LOCALES } from "@/lib/translations/constants";
@@ -88,11 +87,6 @@ export default async function GuidePage({
           translations={translations}
         />
       )}
-      <GuestBookForm
-        slug={slug}
-        propertyId={property.id}
-        accentColor={property.accent_color}
-      />
     </div>
   );
 }

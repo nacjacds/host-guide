@@ -11,8 +11,8 @@ export async function DELETE() {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
-  // Deleting the auth user cascades to profiles, properties, guide_blocks,
-  // bookings and every other row scoped to this host (all FKs are ON DELETE
+  // Deleting the auth user cascades to profiles, properties, guide_blocks
+  // and every other row scoped to this host (all FKs are ON DELETE
   // CASCADE) — no per-table cleanup needed here. Storage objects (avatars,
   // cover images, block images) are not covered by that cascade and are
   // left orphaned; out of scope for this endpoint.

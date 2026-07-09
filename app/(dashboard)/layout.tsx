@@ -51,10 +51,7 @@ export default async function DashboardLayout({
   }
 
   const navGroups: NavLinkGroup[] = [
-    [
-      { href: "/dashboard", label: "Propiedades" },
-      { href: "/bookings", label: "Reservas" },
-    ],
+    [{ href: "/dashboard", label: "Propiedades" }],
     [{ href: "/account", label: "Mi cuenta" }],
     ...(isAdmin
       ? [[{ href: "/admin", label: "Admin", badge: openTicketCount > 0 ? openTicketCount : undefined }]]

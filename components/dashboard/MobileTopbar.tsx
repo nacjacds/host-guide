@@ -81,13 +81,10 @@ export function MobileTopbar({
               <div key={groupIndex}>
                 {groupIndex > 0 && <hr className="my-3 border-[#DDD8CC]" />}
                 <div className="flex flex-col gap-2">
-                  {group.map((link, linkIndex) => {
+                  {group.map((link) => {
                     const active = isActiveNavLink(pathname, link.href);
                     return (
                       <div key={link.href}>
-                        {groupIndex === 0 && linkIndex === 1 && (
-                          <hr className="my-2 border-[#DDD8CC]" />
-                        )}
                         <Link
                           href={link.href}
                           onClick={() => setOpen(false)}

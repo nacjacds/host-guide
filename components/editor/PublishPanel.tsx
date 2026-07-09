@@ -186,9 +186,7 @@ export function PublishPanel({ property }: { property: Property }) {
 
         <ShareGuideDialog
           propertyId={property.id}
-          propertyName={property.name}
           guideUrl={guideUrl}
-          guest={null}
           triggerLabel="Compartir guía"
           triggerVariant="secondary"
           triggerClassName="w-full"
