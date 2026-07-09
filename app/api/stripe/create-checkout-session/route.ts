@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { getStripe, getPlanPriceId, getAppUrl, type PaidPlanId } from "@/lib/stripe";
+import { getStripe, getPlanPriceId, type PaidPlanId } from "@/lib/stripe";
+import { getAppUrl } from "@/lib/env";
 
 const createCheckoutSchema = z.object({
   plan: z.enum(["starter", "pro", "agency"]),

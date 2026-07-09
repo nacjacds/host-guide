@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ShareGuideDialog } from "@/components/dashboard/ShareGuideDialog";
 import { toast } from "sonner";
+import { getAppUrl } from "@/lib/env";
 import type { Property } from "@/types";
 
 const MAX_COVER_SIZE_BYTES = 3 * 1024 * 1024;
@@ -25,7 +26,7 @@ export function PublishPanel({ property }: { property: Property }) {
   const [whatsappNumber, setWhatsappNumber] = useState(property.whatsapp_number ?? "");
   const [savingWhatsapp, setSavingWhatsapp] = useState(false);
 
-  const guideUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/guide/${property.slug}`;
+  const guideUrl = `${getAppUrl()}/guide/${property.slug}`;
 
   async function handleCoverFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

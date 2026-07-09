@@ -1,7 +1,8 @@
 import QRCode from "qrcode";
+import { getAppUrl } from "@/lib/env";
 
 export function getGuideUrl(slug: string): string {
-  return `${process.env.NEXT_PUBLIC_APP_URL}/guide/${slug}`;
+  return `${getAppUrl()}/guide/${slug}`;
 }
 
 export async function generateGuideQrCode(slug: string): Promise<string> {
