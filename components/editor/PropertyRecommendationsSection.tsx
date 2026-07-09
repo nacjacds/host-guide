@@ -123,13 +123,21 @@ function AddPlaceSearch({
 export function PropertyRecommendationsSection({
   propertyId,
   initialRecommendations,
+  categoriesDetected,
 }: {
   propertyId: string;
   initialRecommendations: PropertyRecommendation[];
+  categoriesDetected: PropertyRecommendationCategory[];
 }) {
   const [recommendations, setRecommendations] = useState(initialRecommendations);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  // Categories the host revealed by hand this session (see "+ Añadir
+  // sección" below) — not persisted; once a place is actually added the
+  // category has a row and stays visible on its own from then on.
+  const [manuallyRevealed, setManuallyRevealed] = useState<Set<PropertyRecommendationCategory>>(
+    new Set()
+  );
 
   useEffect(() => setRecommendations(initialRecommendations), [initialRecommendations]);
 
@@ -145,10 +153,26 @@ export function PropertyRecommendationsSection({
     setConfirmDeleteId(null);
   }
 
+  // "Qué visitar"/"Dónde comer"/"Ocio nocturno" always show — every
+  // property has relevant content for them. "Playas"/"Naturaleza" only
+  // show once detected near the property, once the host has actually added
+  // a place there, or once revealed by hand for this session.
+  const visibleCategories = ALL_CATEGORIES.filter((category) => {
+    if (BASE_RECOMMENDATION_CATEGORIES.includes(category)) return true;
+    return (
+      categoriesDetected.includes(category) ||
+      recommendations.some((r) => r.category === category) ||
+      manuallyRevealed.has(category)
+    );
+  });
+  const hiddenOptionalCategories = OPTIONAL_RECOMMENDATION_CATEGORIES.filter(
+    (category) => !visibleCategories.includes(category)
+  );
+
   return (
     <div className="space-y-3">
       <h2 className="text-sm font-medium text-muted-foreground">Recomendaciones locales</h2>
-      {ALL_CATEGORIES.map((category) => {
+      {visibleCategories.map((category) => {
         const items = recommendations.filter((r) => r.category === category);
         const Icon = RECOMMENDATION_CATEGORY_ICONS[category];
         return (
@@ -215,6 +239,23 @@ export function PropertyRecommendationsSection({
           </Card>
         );
       })}
+
+      {hiddenOptionalCategories.length > 0 && (
+        <div className="flex flex-wrap gap-3 px-1">
+          {hiddenOptionalCategories.map((category) => (
+            <button
+              key={category}
+              type="button"
+              className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+              onClick={() =>
+                setManuallyRevealed((prev) => new Set(prev).add(category))
+              }
+            >
+              + Añadir sección de {RECOMMENDATION_CATEGORY_LABELS[category]}
+            </button>
+          ))}
+        </div>
+      )}
 
       <ConfirmDialog
         open={confirmDeleteId !== null}

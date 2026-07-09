@@ -30,11 +30,18 @@ export default async function EditPropertyPage({
     .eq("property_id", id)
     .order("display_order");
 
+  const { data: recommendationMeta } = await supabase
+    .from("property_recommendation_meta")
+    .select("categories_detected")
+    .eq("property_id", id)
+    .maybeSingle();
+
   return (
     <PropertyEditor
       property={property}
       initialBlocks={blocks ?? []}
       initialRecommendations={recommendations ?? []}
+      categoriesDetected={recommendationMeta?.categories_detected ?? []}
     />
   );
 }
