@@ -6,6 +6,8 @@ import { TileGrid } from "@/components/guide/TileGrid";
 import { EmptyGuideState } from "@/components/guide/EmptyGuideState";
 import { GuestBookForm } from "@/components/guide/GuestBookForm";
 import { logAnalyticsEvent } from "@/lib/analytics";
+import { fetchPropertyTranslations, lookupTranslation } from "@/lib/translations/fetchTranslations";
+import { TARGET_LOCALES } from "@/lib/translations/constants";
 
 export default async function GuidePage({
   params,
@@ -54,6 +56,16 @@ export default async function GuidePage({
   const hasVisibleRecommendations = (recommendations ?? []).some((r) => r.is_visible);
   const isEmpty = !hasVisibleBlocks && !hasVisibleRecommendations;
 
+  // See app/guide/[slug]/[type]/page.tsx — locale is guest-selected
+  // client-side, so both the welcome message and (for custom blocks) tile
+  // titles are pre-fetched here regardless of which language ends up shown.
+  const translations = await fetchPropertyTranslations(property.id, TARGET_LOCALES[0]);
+  const translatedWelcomeMessage = lookupTranslation<string>(
+    translations,
+    "welcome_message",
+    null
+  );
+
   return (
     <div className="mx-auto max-w-2xl pb-24">
       <HeroSection property={property} />
@@ -62,6 +74,7 @@ export default async function GuidePage({
           message={property.welcome_message}
           hostName={host?.full_name ?? null}
           hostAvatarUrl={host?.avatar_url ?? null}
+          translated={translatedWelcomeMessage}
         />
       )}
       {isEmpty ? (
@@ -72,6 +85,7 @@ export default async function GuidePage({
           blocks={blocks ?? []}
           recommendations={recommendations ?? []}
           accentColor={property.accent_color}
+          translations={translations}
         />
       )}
       <GuestBookForm

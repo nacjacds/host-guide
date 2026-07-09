@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { generateGuideContent } from "@/lib/claude";
+import { triggerBlockTranslation } from "@/lib/translations/trigger";
 import type { Database } from "@/types";
 
 type GuideBlockInsert = Database["public"]["Tables"]["guide_blocks"]["Insert"];
@@ -87,6 +88,16 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  for (const block of blocks ?? []) {
+    triggerBlockTranslation({
+      propertyId: property.id,
+      blockType: block.type,
+      blockId: block.id,
+      title: block.title,
+      content: block.content,
+    });
   }
 
   return NextResponse.json({

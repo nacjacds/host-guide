@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { blockImageStoragePath } from "@/lib/utils";
+import { triggerBlockTranslation } from "@/lib/translations/trigger";
 
 const blockImageSchema = z.object({
   url: z.string().url(),
@@ -48,6 +49,18 @@ export async function PATCH(
 
   if (error || !block) {
     return NextResponse.json({ error: "Bloque no encontrado" }, { status: 404 });
+  }
+
+  // Fire-and-forget: only re-translate when content/title actually changed,
+  // not on a plain visibility/order toggle.
+  if (parsed.data.content !== undefined || parsed.data.title !== undefined) {
+    triggerBlockTranslation({
+      propertyId: block.property_id,
+      blockType: block.type,
+      blockId: block.id,
+      title: block.title,
+      content: block.content,
+    });
   }
 
   return NextResponse.json({ block });

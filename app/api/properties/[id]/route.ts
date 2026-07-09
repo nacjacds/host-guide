@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { triggerWelcomeMessageTranslation } from "@/lib/translations/trigger";
 
 const updatePropertySchema = z.object({
   name: z.string().min(1).max(120).optional(),
@@ -66,6 +67,10 @@ export async function PATCH(
 
   if (error || !property) {
     return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+  }
+
+  if (parsed.data.welcome_message !== undefined) {
+    triggerWelcomeMessageTranslation(property.id, property.welcome_message);
   }
 
   return NextResponse.json({ property });

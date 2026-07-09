@@ -1,14 +1,26 @@
+"use client";
+
 import { Check } from "lucide-react";
+import { useTranslatedBlock } from "./useTranslatedBlock";
+import type { TranslatablePayload } from "@/lib/translations/extract";
 import type { GuideBlock } from "@/types";
 
 export function TilePanel({
   block,
   accentColor,
+  translated,
 }: {
   block: GuideBlock;
   accentColor: string;
+  translated: TranslatablePayload | null;
 }) {
-  const content = block.content as Record<string, unknown>;
+  const { content } = useTranslatedBlock({
+    blockType: block.type,
+    blockId: block.id,
+    content: block.content,
+    translated,
+    skip: block.type === "wifi",
+  });
 
   return (
     <div className="space-y-3">

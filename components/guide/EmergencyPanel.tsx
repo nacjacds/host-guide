@@ -1,6 +1,8 @@
 "use client";
 
 import { useGuideLocale } from "./GuideLocaleProvider";
+import { useTranslatedBlock } from "./useTranslatedBlock";
+import type { TranslatablePayload } from "@/lib/translations/extract";
 import type { GuideBlock } from "@/types";
 import type { GuideTranslationKey } from "@/lib/guide-i18n";
 
@@ -21,11 +23,23 @@ const FIELD_ORDER: Array<{ key: keyof EmergencyContent; labelKey: GuideTranslati
   { key: "hospital", labelKey: "emergency_hospital" },
 ];
 
-export function EmergencyPanel({ block }: { block: GuideBlock }) {
+export function EmergencyPanel({
+  block,
+  translated,
+}: {
+  block: GuideBlock;
+  translated: TranslatablePayload | null;
+}) {
   const { t } = useGuideLocale();
-  const content = block.content as unknown as EmergencyContent;
+  const { content } = useTranslatedBlock({
+    blockType: block.type,
+    blockId: block.id,
+    content: block.content,
+    translated,
+  });
+  const emergencyContent = content as unknown as EmergencyContent;
 
-  const rows = FIELD_ORDER.filter((field) => content[field.key]);
+  const rows = FIELD_ORDER.filter((field) => emergencyContent[field.key]);
 
   return (
     <div className="space-y-3 rounded-xl border-2 border-destructive/50 bg-destructive/5 p-4">
@@ -36,15 +50,17 @@ export function EmergencyPanel({ block }: { block: GuideBlock }) {
         >
           <span className="text-sm font-medium text-destructive">{t(labelKey)}</span>
           <a
-            href={`tel:${content[key]}`}
+            href={`tel:${emergencyContent[key]}`}
             className="text-sm font-semibold text-destructive underline underline-offset-2"
           >
-            {content[key]}
+            {emergencyContent[key]}
           </a>
         </div>
       ))}
-      {content.notes && (
-        <p className="pt-2 text-sm whitespace-pre-wrap text-destructive/90">{content.notes}</p>
+      {emergencyContent.notes && (
+        <p className="pt-2 text-sm whitespace-pre-wrap text-destructive/90">
+          {emergencyContent.notes}
+        </p>
       )}
     </div>
   );

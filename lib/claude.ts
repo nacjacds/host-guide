@@ -4,7 +4,6 @@ import type { HostTone } from "@/types";
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const MODEL = "claude-sonnet-4-6";
-const TRANSLATION_MODEL = "claude-haiku-4-5-20251001";
 
 function extractJson<T>(text: string): T {
   const match = text.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
@@ -149,19 +148,66 @@ Devuelve SOLO un JSON con esta estructura exacta:
   return extractJson<PlaceSuggestion>(text);
 }
 
-export async function translateText(text: string, targetLanguage: string): Promise<string> {
+const TRANSLATION_TONE_GUIDANCE = `
+Eres el traductor oficial de WelcoKit, una guía digital para huéspedes de alojamientos turísticos.
+Tono: cálido, natural y profesional — nunca frío ni literal. Como si un anfitrión atento
+le explicara esto en persona a su huésped. No traduzcas palabra por palabra: adapta la
+frase para que suene natural en el idioma de destino.
+`.trim();
+
+// Plain-text variant — used for property.welcome_message (a single free-text
+// field, not a block content object).
+export async function translateContentText(
+  text: string,
+  targetLanguageName: string
+): Promise<string> {
   const message = await anthropic.messages.create({
-    model: TRANSLATION_MODEL,
+    model: MODEL,
     max_tokens: 1024,
     messages: [
       {
         role: "user",
-        content: `Translate this guide text into ${targetLanguage}. If it is already in ${targetLanguage}, return it unchanged. Return ONLY the resulting text itself — never a question, comment, or explanation about it, even if it looks short, incomplete, or already translated:\n\n${text}`,
+        content: `${TRANSLATION_TONE_GUIDANCE}
+
+Traduce este texto al ${targetLanguageName}. Devuelve SOLO el texto traducido, sin comillas, sin comentarios ni explicaciones:
+
+${text}`,
       },
     ],
   });
 
   return message.content[0].type === "text" ? message.content[0].text.trim() : text;
+}
+
+// JSON variant — used for block content, which is a JSON object of
+// already-extracted translatable string/string[]/Record<string,string>
+// fields (see lib/translations/extract.ts). Keys and structure must come
+// back unchanged; only the string values are translated.
+export async function translateContentJson(
+  content: Record<string, unknown>,
+  targetLanguageName: string
+): Promise<Record<string, unknown>> {
+  const message = await anthropic.messages.create({
+    model: MODEL,
+    max_tokens: 2048,
+    messages: [
+      {
+        role: "user",
+        content: `${TRANSLATION_TONE_GUIDANCE}
+
+Traduce al ${targetLanguageName} todos los valores de texto de este objeto JSON.
+Mantén exactamente la misma estructura y las mismas claves — no añadas, quites ni
+renombres ninguna clave. Traduce únicamente los valores de tipo texto (incluidos los
+que están dentro de arrays o de objetos anidados). Devuelve SOLO el JSON resultante,
+sin comentarios, sin explicación, sin bloque de código markdown:
+
+${JSON.stringify(content)}`,
+      },
+    ],
+  });
+
+  const text = message.content[0].type === "text" ? message.content[0].text : "";
+  return extractJson<Record<string, unknown>>(text);
 }
 
 export async function askBot(systemPrompt: string, userMessage: string) {

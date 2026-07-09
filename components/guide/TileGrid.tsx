@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { useGuideLocale } from "./GuideLocaleProvider";
 import { BlockTitle } from "./BlockTitle";
 import { BLOCK_ICONS } from "@/lib/guide-icons";
+import { lookupTranslation, type PropertyTranslations } from "@/lib/translations/lookup";
+import type { TranslatablePayload } from "@/lib/translations/extract";
 import type { GuideBlock, Recommendation } from "@/types";
 
 const TILE_CLASSES =
@@ -16,11 +18,13 @@ export function TileGrid({
   blocks,
   recommendations,
   accentColor,
+  translations,
 }: {
   slug: string;
   blocks: GuideBlock[];
   recommendations: Recommendation[];
   accentColor: string;
+  translations: PropertyTranslations;
 }) {
   const { t } = useGuideLocale();
 
@@ -33,6 +37,7 @@ export function TileGrid({
     <div className="grid grid-cols-2 gap-3 px-4 py-6 sm:grid-cols-3 sm:gap-4 sm:px-6 lg:px-8">
       {visibleBlocks.map((block) => {
         const Icon = BLOCK_ICONS[block.type];
+        const translated = lookupTranslation<TranslatablePayload>(translations, block.type, block.id);
         return (
           <Link key={block.id} href={`/guide/${slug}/${block.type}`}>
             <div
@@ -41,7 +46,7 @@ export function TileGrid({
             >
               <Icon size={32} strokeWidth={1.5} color={accentColor} />
               <span className="text-[13px] font-medium text-neutral-700">
-                <BlockTitle block={block} />
+                <BlockTitle block={block} translated={translated} />
               </span>
             </div>
           </Link>

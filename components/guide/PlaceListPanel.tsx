@@ -2,8 +2,10 @@
 
 import { ExternalLink } from "lucide-react";
 import { useGuideLocale } from "./GuideLocaleProvider";
-import { useTranslatedText } from "./useTranslatedText";
-import type { PlaceEntry } from "@/types";
+import { useTranslatedBlock } from "./useTranslatedBlock";
+import type { TranslatablePayload } from "@/lib/translations/extract";
+import type { PlaceListContent } from "@/components/editor/blocks/PlaceListBlock";
+import type { GuideBlock, PlaceEntry } from "@/types";
 
 function formatDistance(meters: number | null): string | null {
   if (meters === null) return null;
@@ -13,7 +15,6 @@ function formatDistance(meters: number | null): string | null {
 
 function PlaceCard({ place, accentColor }: { place: PlaceEntry; accentColor: string }) {
   const { t } = useGuideLocale();
-  const description = useTranslatedText(place.description);
   const distance = formatDistance(place.distance_meters);
 
   return (
@@ -31,7 +32,7 @@ function PlaceCard({ place, accentColor }: { place: PlaceEntry; accentColor: str
           {[place.cuisine_type, place.address, distance].filter(Boolean).join(" · ")}
         </p>
       )}
-      {description && <p className="mt-2 text-sm">{description}</p>}
+      {place.description && <p className="mt-2 text-sm">{place.description}</p>}
       {place.maps_url && (
         <a
           href={place.maps_url}
@@ -49,12 +50,24 @@ function PlaceCard({ place, accentColor }: { place: PlaceEntry; accentColor: str
 }
 
 export function PlaceListPanel({
-  places,
+  block,
+  content,
   accentColor,
+  translated,
 }: {
-  places: PlaceEntry[];
+  block: GuideBlock;
+  content: PlaceListContent;
   accentColor: string;
+  translated: TranslatablePayload | null;
 }) {
+  const { content: mergedContent } = useTranslatedBlock({
+    blockType: block.type,
+    blockId: block.id,
+    content: content as unknown as Record<string, unknown>,
+    translated,
+  });
+  const places = ((mergedContent as unknown as PlaceListContent).places ?? []) as PlaceEntry[];
+
   const sorted = [...places].sort((a, b) => {
     if (a.distance_meters === null) return 1;
     if (b.distance_meters === null) return -1;

@@ -12,6 +12,9 @@ import { WifiPanel } from "@/components/guide/WifiPanel";
 import { CheckinPanel } from "@/components/guide/CheckinPanel";
 import { BLOCK_ICONS } from "@/lib/guide-icons";
 import { logAnalyticsEvent } from "@/lib/analytics";
+import { fetchPropertyTranslations, lookupTranslation } from "@/lib/translations/fetchTranslations";
+import { TARGET_LOCALES } from "@/lib/translations/constants";
+import type { TranslatablePayload } from "@/lib/translations/extract";
 import type { BlockType } from "@/types";
 import type { PlaceListContent } from "@/components/editor/blocks/PlaceListBlock";
 
@@ -70,6 +73,12 @@ export default async function GuideBlockPage({
 
   await logAnalyticsEvent(property.id, "section_viewed", type);
 
+  // Locale is guest-selected client-side (see GuideLocaleProvider), so the
+  // server can't know in advance which language will be shown — fetching
+  // the (only) target locale's translations here means switching languages
+  // client-side is instant, with zero AI call on the guest's critical path.
+  const translations = await fetchPropertyTranslations(property.id, TARGET_LOCALES[0]);
+
   return (
     <div className="mx-auto max-w-2xl pb-24">
       <GuideSectionHeader
@@ -82,8 +91,9 @@ export default async function GuideBlockPage({
         {blocks.map((block) => {
           const isEmergency = block.type === "emergencias";
           const isWifi = block.type === "wifi";
-          const isCheckin = block.type === "checkin";
+          const isCheckin = block.type === "checkin" || block.type === "checkout";
           const isPlaceList = PLACE_LIST_TYPES.includes(block.type);
+          const translated = lookupTranslation<TranslatablePayload>(translations, block.type, block.id);
           return (
             <div key={block.id}>
               <SectionHeading
@@ -91,12 +101,12 @@ export default async function GuideBlockPage({
                 accentColor={property.accent_color}
                 isDestructive={isEmergency}
               >
-                <BlockTitle block={block} />
+                <BlockTitle block={block} translated={translated} />
               </SectionHeading>
               <div className="space-y-4">
                 <BlockImageCarousel images={block.images} />
                 {isEmergency ? (
-                  <EmergencyPanel block={block} />
+                  <EmergencyPanel block={block} translated={translated} />
                 ) : isWifi ? (
                   <WifiPanel
                     block={block}
@@ -104,14 +114,16 @@ export default async function GuideBlockPage({
                     propertyId={property.id}
                   />
                 ) : isCheckin ? (
-                  <CheckinPanel block={block} />
+                  <CheckinPanel block={block} translated={translated} />
                 ) : isPlaceList ? (
                   <PlaceListPanel
-                    places={(block.content as unknown as PlaceListContent).places ?? []}
+                    block={block}
+                    content={block.content as unknown as PlaceListContent}
                     accentColor={property.accent_color}
+                    translated={translated}
                   />
                 ) : (
-                  <TilePanel block={block} accentColor={property.accent_color} />
+                  <TilePanel block={block} accentColor={property.accent_color} translated={translated} />
                 )}
               </div>
             </div>

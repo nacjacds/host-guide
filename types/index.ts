@@ -296,6 +296,45 @@ export interface Database {
         };
         Relationships: [];
       };
+      content_translations: {
+        Row: {
+          id: string;
+          property_id: string | null;
+          block_type: string;
+          block_id: string | null;
+          source_locale: string;
+          target_locale: string;
+          source_hash: string;
+          translated_content: unknown;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          property_id?: string | null;
+          block_type: string;
+          block_id?: string | null;
+          source_locale: string;
+          target_locale: string;
+          source_hash: string;
+          translated_content: unknown;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          property_id?: string | null;
+          block_type?: string;
+          block_id?: string | null;
+          source_locale?: string;
+          target_locale?: string;
+          source_hash?: string;
+          translated_content?: unknown;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       guest_messages: {
         Row: {
           id: string;
