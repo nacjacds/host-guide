@@ -33,7 +33,8 @@ export function HeroSection({ property }: { property: Property }) {
         <img
           src="/logo-white.svg"
           alt="WelcoKit"
-          className="h-7 w-auto drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]"
+          style={{ width: "180px", height: "auto" }}
+          className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]"
         />
       </div>
       <div className="absolute top-4 right-4 z-10">

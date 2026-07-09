@@ -23,10 +23,11 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/15 px-3 py-1 text-xs font-medium text-white backdrop-blur-md transition-colors hover:bg-white/25"
+        className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-[rgba(27,79,114,0.6)] px-3 py-1 text-xs font-medium text-white backdrop-blur-md transition-colors hover:bg-[rgba(27,79,114,0.75)]"
       >
-        {current.flag} {current.label}
-        <ChevronDown className="size-3" strokeWidth={2} />
+        <span className="text-[20px] leading-none">{current.flag}</span>
+        {current.label}
+        <ChevronDown className="size-3.5" strokeWidth={2.5} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={6} className="min-w-24">
         {LANGUAGES.map((lang) => (
@@ -34,11 +35,12 @@ export function LanguageSwitcher() {
             key={lang.code}
             onClick={() => setLocale(lang.code)}
             className={cn(
-              "justify-between",
+              "justify-between gap-1.5",
               lang.code === locale && "bg-accent text-accent-foreground"
             )}
           >
-            {lang.flag} {lang.label}
+            <span className="text-[20px] leading-none">{lang.flag}</span>
+            {lang.label}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
