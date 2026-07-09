@@ -113,16 +113,22 @@ const CURATION_CATEGORY_GUIDANCE: Record<string, string> = {
   nature: "Prioriza parques y espacios naturales con buena valoración.",
 };
 
-// Selects and orders up to `limit` place_ids from real Google Places
-// candidates — Claude must not invent or modify any factual data, only
-// choose and rank from the list it's given.
+export interface CuratedRecommendation {
+  place_id: string;
+  description: string;
+}
+
+// Selects, orders, and writes a short description for up to `limit` places
+// from real Google Places candidates — Claude must not invent or modify
+// any factual data (name/address/rating/etc.), only choose, rank, and
+// describe from the list it's given.
 export async function curateRecommendations(params: {
   propertyName: string;
   address: string;
   category: string;
   candidates: RecommendationCandidate[];
   limit?: number;
-}): Promise<string[]> {
+}): Promise<CuratedRecommendation[]> {
   const limit = params.limit ?? 10;
   const guidance = CURATION_CATEGORY_GUIDANCE[params.category] ?? "";
 
@@ -136,22 +142,28 @@ ${JSON.stringify(params.candidates, null, 2)}
 Selecciona un máximo de ${limit} lugares y ordénalos de mejor a peor recomendación para un
 huésped turístico. ${guidance}
 
-No inventes ni modifiques ningún dato. Solo elige y ordena place_id de la lista proporcionada.
+Para cada lugar seleccionado, escribe una descripción breve (máximo 1-2 frases) que explique
+qué lo hace destacar — tipo de lugar, ambiente, qué esperar — basándote únicamente en su
+nombre, rating y tipos. No inventes datos factuales (precios, platos concretos, horarios) que
+no estén en los datos proporcionados.
 
-Devuelve SOLO un JSON array de place_id en el orden de recomendación:
-["place_id_1", "place_id_2", ...]
+No inventes ni modifiques ningún dato factual. Solo elige, ordena y describe a partir de la
+lista proporcionada.
+
+Devuelve SOLO un JSON array en el orden de recomendación:
+[{ "place_id": "...", "description": "..." }, ...]
 `;
 
   const message = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 1024,
+    max_tokens: 2048,
     messages: [{ role: "user", content: prompt }],
   });
 
   const text = message.content[0].type === "text" ? message.content[0].text : "";
-  const ids = extractJson<string[]>(text);
+  const results = extractJson<CuratedRecommendation[]>(text);
   const validIds = new Set(params.candidates.map((c) => c.place_id));
-  return ids.filter((id) => validIds.has(id)).slice(0, limit);
+  return results.filter((r) => validIds.has(r.place_id)).slice(0, limit);
 }
 
 export interface PlaceSuggestion {

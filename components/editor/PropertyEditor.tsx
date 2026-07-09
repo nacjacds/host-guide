@@ -24,6 +24,7 @@ import { BlockToolbar } from "./BlockToolbar";
 import { PublishPanel } from "./PublishPanel";
 import { AirbnbImportPanel } from "./AirbnbImportPanel";
 import { PropertyRecommendationsSection } from "./PropertyRecommendationsSection";
+import type { RecommendationQuota } from "@/lib/recommendations/constants";
 import type { GuideBlock, Property, PropertyRecommendation, PropertyRecommendationCategory } from "@/types";
 
 async function saveBlock(block: GuideBlock) {
@@ -45,11 +46,13 @@ export function PropertyEditor({
   initialBlocks,
   initialRecommendations,
   categoriesDetected,
+  recommendationQuota,
 }: {
   property: Property;
   initialBlocks: GuideBlock[];
   initialRecommendations: PropertyRecommendation[];
   categoriesDetected: PropertyRecommendationCategory[];
+  recommendationQuota: RecommendationQuota;
 }) {
   const [blocks, setBlocks] = useState(initialBlocks);
   const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set());
@@ -233,6 +236,7 @@ export function PropertyEditor({
             propertyId={property.id}
             initialRecommendations={initialRecommendations}
             categoriesDetected={categoriesDetected}
+            initialQuota={recommendationQuota}
           />
         </div>
 

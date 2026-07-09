@@ -258,6 +258,7 @@ export interface Database {
           category: PropertyRecommendationCategory;
           place_id: string | null;
           name: string;
+          description: string | null;
           address: string | null;
           lat: number | null;
           lng: number | null;
@@ -276,6 +277,7 @@ export interface Database {
           category: PropertyRecommendationCategory;
           place_id?: string | null;
           name: string;
+          description?: string | null;
           address?: string | null;
           lat?: number | null;
           lng?: number | null;
@@ -294,6 +296,7 @@ export interface Database {
           category?: PropertyRecommendationCategory;
           place_id?: string | null;
           name?: string;
+          description?: string | null;
           address?: string | null;
           lat?: number | null;
           lng?: number | null;

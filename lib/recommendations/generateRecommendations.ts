@@ -11,14 +11,24 @@ import {
   OPTIONAL_RECOMMENDATION_CATEGORIES,
   MAX_PLACES_PER_CATEGORY,
 } from "./constants";
-import type { PropertyRecommendationCategory } from "@/types";
+import type { PropertyRecommendation, PropertyRecommendationCategory } from "@/types";
 
 const ALL_CATEGORIES = [...BASE_RECOMMENDATION_CATEGORIES, ...OPTIONAL_RECOMMENDATION_CATEGORIES];
 
-export async function generatePropertyRecommendations(propertyId: string): Promise<{
+// Generates (or regenerates) AI-curated recommendations. By default runs
+// every category (used by the cron job and the "regenerate all" button in
+// Settings) — pass `category` to regenerate just one section (used by the
+// per-card "Generar con IA" button in the Editor), leaving every other
+// category's rows untouched.
+export async function generatePropertyRecommendations(
+  propertyId: string,
+  options?: { category?: PropertyRecommendationCategory }
+): Promise<{
   categoriesDetected: PropertyRecommendationCategory[];
+  recommendations: PropertyRecommendation[];
 }> {
   const supabase = createServiceRoleClient();
+  const categoriesToProcess = options?.category ? [options.category] : ALL_CATEGORIES;
 
   const { data: property } = await supabase
     .from("properties")
@@ -43,12 +53,13 @@ export async function generatePropertyRecommendations(propertyId: string): Promi
       .eq("id", propertyId);
   }
 
-  const categoriesDetected: PropertyRecommendationCategory[] = [];
+  const categoriesFoundThisRun: PropertyRecommendationCategory[] = [];
   const newRows: Array<{
     property_id: string;
     category: PropertyRecommendationCategory;
     place_id: string;
     name: string;
+    description: string;
     address: string;
     lat: number;
     lng: number;
@@ -61,11 +72,11 @@ export async function generatePropertyRecommendations(propertyId: string): Promi
     display_order: number;
   }> = [];
 
-  for (const category of ALL_CATEGORIES) {
+  for (const category of categoriesToProcess) {
     const candidates = await searchRecommendationCandidates(center, category);
     if (candidates.length === 0) continue;
 
-    const selectedIds = await curateRecommendations({
+    const curated = await curateRecommendations({
       propertyName: property.name,
       address: property.address ?? "",
       category,
@@ -79,23 +90,27 @@ export async function generatePropertyRecommendations(propertyId: string): Promi
       limit: MAX_PLACES_PER_CATEGORY,
     });
 
-    const selectedPlaces = selectedIds
-      .map((id) => candidates.find((c) => c.place_id === id))
-      .filter((p): p is NonNullable<typeof p> => p !== undefined);
+    const selected = curated
+      .map((c) => {
+        const place = candidates.find((p) => p.place_id === c.place_id);
+        return place ? { place, description: c.description } : null;
+      })
+      .filter((s): s is NonNullable<typeof s> => s !== null);
 
-    if (selectedPlaces.length === 0) continue;
+    if (selected.length === 0) continue;
 
     const walkingMinutes = await getWalkingMinutes(
       center,
-      selectedPlaces.map((p) => p.location)
+      selected.map((s) => s.place.location)
     );
 
-    selectedPlaces.forEach((place, i) => {
+    selected.forEach(({ place, description }, i) => {
       newRows.push({
         property_id: propertyId,
         category,
         place_id: place.place_id,
         name: place.name,
+        description,
         address: place.address,
         lat: place.location.lat,
         lng: place.location.lng,
@@ -109,20 +124,46 @@ export async function generatePropertyRecommendations(propertyId: string): Promi
       });
     });
 
-    categoriesDetected.push(category);
+    categoriesFoundThisRun.push(category);
   }
 
-  // Only ever replace ai_curated rows — manually-added places are never
-  // touched by (re)generation.
-  await supabase
+  // Only ever replace ai_curated rows for the category/categories just
+  // processed — manually-added places, and other untouched categories'
+  // rows, are never affected.
+  let deleteQuery = supabase
     .from("property_recommendations")
     .delete()
     .eq("property_id", propertyId)
     .eq("source", "ai_curated");
-
-  if (newRows.length > 0) {
-    await supabase.from("property_recommendations").insert(newRows);
+  if (options?.category) {
+    deleteQuery = deleteQuery.eq("category", options.category);
+  } else {
+    deleteQuery = deleteQuery.in("category", ALL_CATEGORIES);
   }
+  await deleteQuery;
+
+  let insertedRows: PropertyRecommendation[] = [];
+  if (newRows.length > 0) {
+    const { data } = await supabase.from("property_recommendations").insert(newRows).select();
+    insertedRows = data ?? [];
+  }
+
+  const { data: existingMeta } = await supabase
+    .from("property_recommendation_meta")
+    .select("categories_detected")
+    .eq("property_id", propertyId)
+    .maybeSingle();
+
+  // Merge: keep detected status for categories not touched this run:
+  // drop categoriesToProcess from the existing set, then add back whichever
+  // of those actually found results this time.
+  const categoriesDetected = Array.from(
+    new Set(
+      (existingMeta?.categories_detected ?? [])
+        .filter((c) => !categoriesToProcess.includes(c))
+        .concat(categoriesFoundThisRun)
+    )
+  );
 
   await supabase.from("property_recommendation_meta").upsert({
     property_id: propertyId,
@@ -130,5 +171,5 @@ export async function generatePropertyRecommendations(propertyId: string): Promi
     categories_detected: categoriesDetected,
   });
 
-  return { categoriesDetected };
+  return { categoriesDetected, recommendations: insertedRows };
 }

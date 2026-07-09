@@ -9,16 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "sonner";
+import type { RecommendationQuota } from "@/lib/recommendations/constants";
 import type { Property } from "@/types";
 
 const WELCOME_MESSAGE_MAX = 500;
-
-interface RecommendationQuota {
-  limit: number;
-  used: number;
-  remaining: number;
-  resetDateLabel: string;
-}
 
 export function PropertySettingsForm({
   property,

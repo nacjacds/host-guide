@@ -78,6 +78,7 @@ export function RecommendationCategoryPanel({
                 )}
               </div>
               {rec.address && <p className="mt-1 text-xs text-muted-foreground">{rec.address}</p>}
+              {rec.description && <p className="mt-1.5 text-sm">{rec.description}</p>}
             </div>
           </div>
         );

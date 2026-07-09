@@ -22,6 +22,16 @@ export const OPTIONAL_RECOMMENDATION_CATEGORIES: PropertyRecommendationCategory[
 
 export const MAX_PLACES_PER_CATEGORY = 10;
 
+// Shared shape for the host's monthly manual-regeneration quota status —
+// used by the Settings page's global button and the Editor's per-section
+// "Generar con IA" buttons alike (see lib/recommendations/quota.ts).
+export interface RecommendationQuota {
+  limit: number;
+  used: number;
+  remaining: number;
+  resetDateLabel: string;
+}
+
 export const RECOMMENDATION_CATEGORY_LABELS: Record<PropertyRecommendationCategory, string> = {
   attractions: "Qué visitar",
   restaurants: "Dónde comer",

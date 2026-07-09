@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { generatePropertyRecommendations } from "@/lib/recommendations/generateRecommendations";
 import { getRegenerationQuotaStatus, formatResetDate } from "@/lib/recommendations/quota";
 
+const regenerateSchema = z.object({
+  // Omitted = regenerate every category (Settings' global button); present
+  // = regenerate just that one section (per-card button in the Editor).
+  category: z.enum(["attractions", "restaurants", "nightlife", "beaches", "nature"]).optional(),
+});
+
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: propertyId } = await params;
@@ -15,6 +22,12 @@ export async function POST(
 
   if (!user) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+
+  const body = await request.json().catch(() => ({}));
+  const parsed = regenerateSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Categoría inválida" }, { status: 400 });
   }
 
   const { data: profile } = await supabase
@@ -45,7 +58,9 @@ export async function POST(
   }
 
   try {
-    const result = await generatePropertyRecommendations(propertyId);
+    const result = await generatePropertyRecommendations(propertyId, {
+      category: parsed.data.category,
+    });
 
     const serviceClient = createServiceRoleClient();
     await serviceClient.from("recommendation_regeneration_usage").insert({

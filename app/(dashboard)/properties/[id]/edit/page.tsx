@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PropertyEditor } from "@/components/editor/PropertyEditor";
+import { getRegenerationQuotaStatus, formatResetDate } from "@/lib/recommendations/quota";
 
 export default async function EditPropertyPage({
   params,
@@ -36,12 +37,26 @@ export default async function EditPropertyPage({
     .eq("property_id", id)
     .maybeSingle();
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("plan")
+    .eq("id", property.host_id)
+    .single();
+
+  const quotaStatus = await getRegenerationQuotaStatus(property.host_id, profile?.plan);
+
   return (
     <PropertyEditor
       property={property}
       initialBlocks={blocks ?? []}
       initialRecommendations={recommendations ?? []}
       categoriesDetected={recommendationMeta?.categories_detected ?? []}
+      recommendationQuota={{
+        limit: quotaStatus.limit,
+        used: quotaStatus.used,
+        remaining: quotaStatus.remaining,
+        resetDateLabel: formatResetDate(quotaStatus.resetDate),
+      }}
     />
   );
 }

@@ -5,13 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Trash2, ExternalLink } from "lucide-react";
+import { Trash2, ExternalLink, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import {
   BASE_RECOMMENDATION_CATEGORIES,
   OPTIONAL_RECOMMENDATION_CATEGORIES,
   RECOMMENDATION_CATEGORY_LABELS,
   RECOMMENDATION_CATEGORY_ICONS,
+  type RecommendationQuota,
 } from "@/lib/recommendations/constants";
 import type { PropertyRecommendation, PropertyRecommendationCategory } from "@/types";
 
@@ -19,9 +20,13 @@ const ALL_CATEGORIES = [...BASE_RECOMMENDATION_CATEGORIES, ...OPTIONAL_RECOMMEND
 
 function formatDistance(rec: PropertyRecommendation): string | null {
   if (rec.distance_meters == null) return null;
-  return rec.distance_meters < 1000
-    ? `${rec.distance_meters}m`
-    : `${(rec.distance_meters / 1000).toFixed(1)}km`;
+  const meters =
+    rec.distance_meters < 1000
+      ? `${rec.distance_meters}m`
+      : `${(rec.distance_meters / 1000).toFixed(1)}km`;
+  return rec.distance_walking_minutes != null
+    ? `${meters} · ${rec.distance_walking_minutes} min andando`
+    : meters;
 }
 
 function AddPlaceSearch({
@@ -124,14 +129,20 @@ export function PropertyRecommendationsSection({
   propertyId,
   initialRecommendations,
   categoriesDetected,
+  initialQuota,
 }: {
   propertyId: string;
   initialRecommendations: PropertyRecommendation[];
   categoriesDetected: PropertyRecommendationCategory[];
+  initialQuota: RecommendationQuota;
 }) {
   const [recommendations, setRecommendations] = useState(initialRecommendations);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [quota, setQuota] = useState(initialQuota);
+  const [generatingCategory, setGeneratingCategory] = useState<PropertyRecommendationCategory | null>(
+    null
+  );
   // Categories the host revealed by hand this session (see "+ Añadir
   // sección" below) — not persisted; once a place is actually added the
   // category has a row and stays visible on its own from then on.
@@ -153,6 +164,52 @@ export function PropertyRecommendationsSection({
     setConfirmDeleteId(null);
   }
 
+  async function handleGenerate(category: PropertyRecommendationCategory) {
+    setGeneratingCategory(category);
+    try {
+      const response = await fetch(
+        `/api/properties/${propertyId}/property-recommendations/regenerate`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ category }),
+        }
+      );
+
+      if (!response.ok) {
+        const { error } = await response.json().catch(() => ({ error: null }));
+        toast.error(error ?? "No se pudieron generar recomendaciones");
+        return;
+      }
+
+      const { recommendations: newForCategory } = (await response.json()) as {
+        recommendations: PropertyRecommendation[];
+      };
+
+      // Replace only this category's ai_curated rows — everything else
+      // (manual entries here, and every other category) stays untouched.
+      setRecommendations((prev) => [
+        ...prev.filter((r) => !(r.category === category && r.source === "ai_curated")),
+        ...newForCategory,
+      ]);
+      setQuota((prev) => ({
+        ...prev,
+        used: prev.used + 1,
+        remaining: Math.max(0, prev.remaining - 1),
+      }));
+
+      if (newForCategory.length === 0) {
+        toast.error("No se encontraron lugares reales cerca para esta categoría");
+      } else {
+        toast.success(`${newForCategory.length} lugares generados`);
+      }
+    } catch {
+      toast.error("Error de red");
+    } finally {
+      setGeneratingCategory(null);
+    }
+  }
+
   // "Qué visitar"/"Dónde comer"/"Ocio nocturno" always show — every
   // property has relevant content for them. "Playas"/"Naturaleza" only
   // show once detected near the property, once the host has actually added
@@ -171,16 +228,41 @@ export function PropertyRecommendationsSection({
 
   return (
     <div className="space-y-3">
-      <h2 className="text-sm font-medium text-muted-foreground">Recomendaciones locales</h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-sm font-medium text-muted-foreground">Recomendaciones locales</h2>
+        <span className="text-xs text-muted-foreground">
+          {quota.remaining > 0
+            ? `${quota.remaining} de ${quota.limit} generaciones con IA este mes`
+            : `Sin generaciones disponibles · se restablecen el ${quota.resetDateLabel}`}
+        </span>
+      </div>
       {visibleCategories.map((category) => {
         const items = recommendations.filter((r) => r.category === category);
         const Icon = RECOMMENDATION_CATEGORY_ICONS[category];
+        const generating = generatingCategory === category;
         return (
           <Card key={category}>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Icon className="size-4" strokeWidth={1.5} />
-                {RECOMMENDATION_CATEGORY_LABELS[category]}
+              <CardTitle className="flex items-center justify-between gap-2 text-base">
+                <span className="flex items-center gap-2">
+                  <Icon className="size-4" strokeWidth={1.5} />
+                  {RECOMMENDATION_CATEGORY_LABELS[category]}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleGenerate(category)}
+                  disabled={generatingCategory !== null || quota.remaining <= 0}
+                  title={
+                    quota.remaining <= 0
+                      ? `Sin generaciones disponibles este mes · se restablecen el ${quota.resetDateLabel}`
+                      : undefined
+                  }
+                >
+                  <Sparkles size={14} strokeWidth={1.5} />
+                  {generating ? "Generando..." : "Generar con IA"}
+                </Button>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -204,6 +286,12 @@ export function PropertyRecommendationsSection({
                             .filter(Boolean)
                             .join(" · ")}
                         </p>
+                        {rec.address && (
+                          <p className="truncate text-xs text-muted-foreground">{rec.address}</p>
+                        )}
+                        {rec.description && (
+                          <p className="mt-1 text-xs text-muted-foreground">{rec.description}</p>
+                        )}
                       </div>
                       <div className="flex shrink-0 items-center gap-1">
                         {rec.maps_url && (
