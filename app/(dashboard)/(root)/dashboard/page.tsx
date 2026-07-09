@@ -28,7 +28,7 @@ export default async function DashboardPage() {
         action={
           hasProperties ? (
             <Button nativeButton={false} render={<Link href="/properties/new" />}>
-              Nueva propiedad
+              Añadir nueva
             </Button>
           ) : undefined
         }
