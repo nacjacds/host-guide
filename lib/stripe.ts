@@ -29,6 +29,16 @@ export function getStripe(): Stripe {
   return stripeClient;
 }
 
+// Stripe requires absolute URLs for success_url/cancel_url — a missing env
+// var here used to silently fall back to "", producing a relative URL that
+// Stripe rejects with a cryptic "Not a valid URL" error. Throwing here
+// instead gives an immediately diagnosable message.
+export function getAppUrl(): string {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+  if (!appUrl) throw new Error("Falta configurar NEXT_PUBLIC_APP_URL");
+  return appUrl;
+}
+
 export type PaidPlanId = Extract<PlanId, "starter" | "pro" | "agency">;
 
 export function getPlanPriceId(plan: PaidPlanId): string {

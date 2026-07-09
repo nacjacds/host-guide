@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { getStripe, getPlanPriceId, type PaidPlanId } from "@/lib/stripe";
+import { getStripe, getPlanPriceId, getAppUrl, type PaidPlanId } from "@/lib/stripe";
 
 const createCheckoutSchema = z.object({
   plan: z.enum(["starter", "pro", "agency"]),
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
         .eq("id", user.id);
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+    const appUrl = getAppUrl();
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
