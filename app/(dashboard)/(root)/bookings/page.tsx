@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getGuideUrl } from "@/lib/qr";
+import { PageHeader } from "@/components/dashboard/PageHeader";
 import { BookingsList, type BookingRow } from "@/components/dashboard/bookings/BookingsList";
 
 export default async function BookingsPage() {
@@ -67,12 +68,12 @@ export default async function BookingsPage() {
 
   if (propertyIds.length === 0) {
     return (
-      <div className="space-y-4">
-        <h1 className="text-2xl font-semibold">Reservas</h1>
+      <>
+        <PageHeader title="Reservas" />
         <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
           Crea primero una propiedad para poder añadir reservas.
         </p>
-      </div>
+      </>
     );
   }
 

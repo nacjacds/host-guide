@@ -96,6 +96,59 @@ Devuelve SOLO un JSON array:
   return extractJson<RecommendationDraft[]>(text);
 }
 
+export interface PlaceSuggestion {
+  name: string;
+  description: string;
+  address: string;
+  distance_meters: number | null;
+}
+
+const PLACE_CATEGORY_LABELS: Record<string, string> = {
+  restaurants: "un restaurante o sitio para comer",
+  nightlife: "un bar o local de ocio nocturno",
+  attractions: "una atracción turística o lugar de interés",
+  parking: "un parking o aparcamiento",
+};
+
+export async function generatePlaceSuggestion(params: {
+  propertyName: string;
+  address: string;
+  blockType: string;
+  excludeNames: string[];
+}): Promise<PlaceSuggestion> {
+  const category = PLACE_CATEGORY_LABELS[params.blockType] ?? "un lugar de interés";
+  const exclusions =
+    params.excludeNames.length > 0
+      ? `No sugieras ninguno de estos lugares, que ya están en la lista: ${params.excludeNames.join(", ")}.`
+      : "";
+
+  const prompt = `
+Eres un asistente que conoce bien la zona de ${params.address}, donde se encuentra el alojamiento "${params.propertyName}".
+
+Sugiere ${category} real y conocido cerca de esa dirección, útil para huéspedes turísticos.
+${exclusions}
+
+Devuelve SOLO un JSON con esta estructura exacta:
+{
+  "name": "Nombre del lugar",
+  "description": "Descripción breve en 2 frases: qué lo hace especial, qué pedir o qué hacer allí",
+  "address": "Dirección aproximada del lugar",
+  "distance_meters": 400
+}
+
+"distance_meters" es la distancia aproximada a pie en metros desde ${params.address}, como número entero.
+`;
+
+  const message = await anthropic.messages.create({
+    model: MODEL,
+    max_tokens: 512,
+    messages: [{ role: "user", content: prompt }],
+  });
+
+  const text = message.content[0].type === "text" ? message.content[0].text : "";
+  return extractJson<PlaceSuggestion>(text);
+}
+
 export async function translateText(text: string, targetLanguage: string): Promise<string> {
   const message = await anthropic.messages.create({
     model: TRANSLATION_MODEL,
@@ -103,7 +156,7 @@ export async function translateText(text: string, targetLanguage: string): Promi
     messages: [
       {
         role: "user",
-        content: `Translate this guide text into ${targetLanguage}. Return ONLY the translated text, with no quotes and no explanation:\n\n${text}`,
+        content: `Translate this guide text into ${targetLanguage}. If it is already in ${targetLanguage}, return it unchanged. Return ONLY the resulting text itself — never a question, comment, or explanation about it, even if it looks short, incomplete, or already translated:\n\n${text}`,
       },
     ],
   });

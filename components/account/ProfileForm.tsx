@@ -12,7 +12,22 @@ import type { Profile } from "@/types";
 export function ProfileForm({ profile, email }: { profile: Profile | null; email: string }) {
   const [fullName, setFullName] = useState(profile?.full_name ?? "");
   const [phone, setPhone] = useState(profile?.phone ?? "");
+  const [editing, setEditing] = useState(false);
+  const [snapshot, setSnapshot] = useState<{ fullName: string; phone: string } | null>(null);
   const [saving, setSaving] = useState(false);
+
+  function handleEdit() {
+    setSnapshot({ fullName, phone });
+    setEditing(true);
+  }
+
+  function handleCancel() {
+    if (snapshot) {
+      setFullName(snapshot.fullName);
+      setPhone(snapshot.phone);
+    }
+    setEditing(false);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -34,6 +49,7 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
       }
 
       toast.success("Perfil guardado");
+      setEditing(false);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error de red");
     } finally {
@@ -49,30 +65,64 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <AvatarUpload initialAvatarUrl={profile?.avatar_url ?? null} fullName={fullName} />
+
           <div>
             <Label htmlFor="full_name">Nombre completo</Label>
-            <Input
-              id="full_name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-            />
+            {editing ? (
+              <Input
+                id="full_name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+              />
+            ) : (
+              <p className="text-sm text-foreground">{fullName || "Sin especificar"}</p>
+            )}
           </div>
+
           <div>
             <Label htmlFor="email">Email</Label>
-            <Input id="email" value={email} disabled readOnly />
+            <p className="text-sm text-muted-foreground">{email}</p>
           </div>
+
           <div>
             <Label htmlFor="phone">Teléfono/WhatsApp personal</Label>
-            <Input
-              id="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+34 600 000 000"
-            />
+            {editing ? (
+              <Input
+                id="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+34 600 000 000"
+              />
+            ) : (
+              <p className="text-sm text-foreground">{phone || "Sin especificar"}</p>
+            )}
           </div>
-          <Button type="submit" disabled={saving}>
-            {saving ? "Guardando..." : "Guardar cambios"}
-          </Button>
+
+          {editing ? (
+            <div className="flex items-center gap-2">
+              <Button type="submit" disabled={saving}>
+                {saving ? "Guardando..." : "Guardar cambios"}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-muted-foreground"
+                onClick={handleCancel}
+                disabled={saving}
+              >
+                Cancelar
+              </Button>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              className="border-[#1B4F72] text-[#1B4F72] hover:bg-[#1B4F72]/5 hover:text-[#1B4F72]"
+              onClick={handleEdit}
+            >
+              Editar perfil
+            </Button>
+          )}
         </form>
       </CardContent>
     </Card>

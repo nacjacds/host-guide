@@ -31,6 +31,11 @@ export function avatarStoragePath(url: string): string | null {
   return decodeURIComponent(url.slice(index + marker.length).split("?")[0])
 }
 
+export function buildGoogleMapsUrl(name: string, address: string): string {
+  const query = [name, address].filter(Boolean).join(" ")
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
+}
+
 export function getInitials(name: string | null | undefined): string {
   if (!name?.trim()) return "?"
   const parts = name.trim().split(/\s+/)
@@ -39,5 +44,9 @@ export function getInitials(name: string | null | undefined): string {
 }
 
 export function isActiveNavLink(pathname: string, href: string): boolean {
-  return pathname === href || pathname.startsWith(`${href}/`)
+  if (pathname === href || pathname.startsWith(`${href}/`)) return true
+  // The property editor lives at /properties/[id]/... rather than under
+  // /dashboard, but it's still part of the "Propiedades" section.
+  if (href === "/dashboard" && pathname.startsWith("/properties")) return true
+  return false
 }

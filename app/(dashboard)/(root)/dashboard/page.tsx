@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/dashboard/PageHeader";
 import { PropertyCard } from "@/components/dashboard/PropertyCard";
 import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
+import { UpgradedToast } from "@/components/dashboard/UpgradedToast";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -19,15 +21,18 @@ export default async function DashboardPage() {
   const hasProperties = Boolean(properties?.length);
 
   return (
-    <div className="space-y-6">
-      {hasProperties && (
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">Mis propiedades</h1>
-          <Button nativeButton={false} render={<Link href="/properties/new" />}>
-            Nueva propiedad
-          </Button>
-        </div>
-      )}
+    <>
+      <UpgradedToast />
+      <PageHeader
+        title="Mis propiedades"
+        action={
+          hasProperties ? (
+            <Button nativeButton={false} render={<Link href="/properties/new" />}>
+              Nueva propiedad
+            </Button>
+          ) : undefined
+        }
+      />
 
       {hasProperties ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -38,6 +43,6 @@ export default async function DashboardPage() {
       ) : (
         <OnboardingWizard />
       )}
-    </div>
+    </>
   );
 }

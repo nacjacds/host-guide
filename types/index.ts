@@ -32,6 +32,7 @@ export interface PlaceEntry {
   google_place_id: string | null;
   cuisine_type?: string;
   price_level?: PriceLevel | null;
+  images?: BlockImage[];
 }
 export type RecommendationCategory =
   | "restaurant"
@@ -102,6 +103,9 @@ export interface Database {
           whatsapp_number: string | null;
           welcome_message: string | null;
           airbnb_url: string | null;
+          bedrooms: number | null;
+          bathrooms: number | null;
+          max_guests: number | null;
           is_published: boolean;
           created_at: string;
           updated_at: string;
@@ -119,6 +123,9 @@ export interface Database {
           whatsapp_number?: string | null;
           welcome_message?: string | null;
           airbnb_url?: string | null;
+          bedrooms?: number | null;
+          bathrooms?: number | null;
+          max_guests?: number | null;
           is_published?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -136,6 +143,9 @@ export interface Database {
           whatsapp_number?: string | null;
           welcome_message?: string | null;
           airbnb_url?: string | null;
+          bedrooms?: number | null;
+          bathrooms?: number | null;
+          max_guests?: number | null;
           is_published?: boolean;
           created_at?: string;
           updated_at?: string;

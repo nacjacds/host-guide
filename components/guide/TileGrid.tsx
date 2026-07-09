@@ -32,29 +32,15 @@ export function TileGrid({
   return (
     <div className="grid grid-cols-2 gap-3 px-4 py-6 sm:grid-cols-3 sm:gap-4 sm:px-6 lg:px-8">
       {visibleBlocks.map((block) => {
-        const isEmergency = block.type === "emergencias";
         const Icon = BLOCK_ICONS[block.type];
         return (
           <Link key={block.id} href={`/guide/${slug}/${block.type}`}>
             <div
-              className={cn(
-                TILE_CLASSES,
-                isEmergency ? "hover:border-destructive/60" : "hover:border-[var(--tile-accent)]"
-              )}
-              style={isEmergency ? undefined : ({ "--tile-accent": accentColor } as React.CSSProperties)}
+              className={cn(TILE_CLASSES, "hover:border-[var(--tile-accent)]")}
+              style={{ "--tile-accent": accentColor } as React.CSSProperties}
             >
-              <Icon
-                size={32}
-                strokeWidth={1.5}
-                color={isEmergency ? undefined : accentColor}
-                className={isEmergency ? "text-destructive" : undefined}
-              />
-              <span
-                className={cn(
-                  "text-[13px] font-medium text-neutral-700",
-                  isEmergency && "text-destructive"
-                )}
-              >
+              <Icon size={32} strokeWidth={1.5} color={accentColor} />
+              <span className="text-[13px] font-medium text-neutral-700">
                 <BlockTitle block={block} />
               </span>
             </div>

@@ -49,6 +49,10 @@ export const GUIDE_TRANSLATIONS = {
     guestBookSubmit: "Enviar",
     guestBookSending: "Enviando...",
     guestBookThanks: "¡Gracias por tu mensaje!",
+    backToGuide: "Volver a la guía",
+    emptyGuideTitle: "Esta guía está siendo preparada",
+    emptyGuideMessage:
+      "Esta guía está siendo preparada por tu anfitrión. Vuelve pronto o contacta directamente si necesitas algo.",
   },
   en: {
     back: "Back",
@@ -96,6 +100,10 @@ export const GUIDE_TRANSLATIONS = {
     guestBookSubmit: "Send",
     guestBookSending: "Sending...",
     guestBookThanks: "Thanks for your message!",
+    backToGuide: "Back to guide",
+    emptyGuideTitle: "This guide is being prepared",
+    emptyGuideMessage:
+      "Your host is still preparing this guide. Check back soon or reach out directly if you need anything.",
   },
 } as const;
 

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ShareGuideDialog } from "@/components/dashboard/ShareGuideDialog";
 import { toast } from "sonner";
 import type { Property } from "@/types";
@@ -19,6 +20,7 @@ export function PublishPanel({ property }: { property: Property }) {
   const [loadingQr, setLoadingQr] = useState(false);
   const [coverUrl, setCoverUrl] = useState(property.cover_image_url);
   const [uploadingCover, setUploadingCover] = useState(false);
+  const [confirmCoverDelete, setConfirmCoverDelete] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const [whatsappNumber, setWhatsappNumber] = useState(property.whatsapp_number ?? "");
   const [savingWhatsapp, setSavingWhatsapp] = useState(false);
@@ -78,6 +80,7 @@ export function PublishPanel({ property }: { property: Property }) {
       toast.error("Error de red");
     } finally {
       setUploadingCover(false);
+      setConfirmCoverDelete(false);
     }
   }
 
@@ -216,7 +219,7 @@ export function PublishPanel({ property }: { property: Property }) {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={handleRemoveCover}
+                  onClick={() => setConfirmCoverDelete(true)}
                   disabled={uploadingCover}
                 >
                   Eliminar
@@ -292,6 +295,15 @@ export function PublishPanel({ property }: { property: Property }) {
           </div>
         )}
       </CardContent>
+
+      <ConfirmDialog
+        open={confirmCoverDelete}
+        onOpenChange={setConfirmCoverDelete}
+        title="¿Eliminar imagen de portada?"
+        description="Esta acción no se puede deshacer."
+        onConfirm={handleRemoveCover}
+        loading={uploadingCover}
+      />
     </Card>
   );
 }

@@ -3,6 +3,7 @@ import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { HeroSection } from "@/components/guide/HeroSection";
 import { WelcomeMessage } from "@/components/guide/WelcomeMessage";
 import { TileGrid } from "@/components/guide/TileGrid";
+import { EmptyGuideState } from "@/components/guide/EmptyGuideState";
 import { GuestBookForm } from "@/components/guide/GuestBookForm";
 import { logAnalyticsEvent } from "@/lib/analytics";
 
@@ -49,6 +50,10 @@ export default async function GuidePage({
 
   await logAnalyticsEvent(property.id, "guide_opened");
 
+  const hasVisibleBlocks = (blocks ?? []).some((b) => b.is_visible);
+  const hasVisibleRecommendations = (recommendations ?? []).some((r) => r.is_visible);
+  const isEmpty = !hasVisibleBlocks && !hasVisibleRecommendations;
+
   return (
     <div className="mx-auto max-w-2xl pb-24">
       <HeroSection property={property} />
@@ -59,13 +64,21 @@ export default async function GuidePage({
           hostAvatarUrl={host?.avatar_url ?? null}
         />
       )}
-      <TileGrid
+      {isEmpty ? (
+        <EmptyGuideState accentColor={property.accent_color} />
+      ) : (
+        <TileGrid
+          slug={slug}
+          blocks={blocks ?? []}
+          recommendations={recommendations ?? []}
+          accentColor={property.accent_color}
+        />
+      )}
+      <GuestBookForm
         slug={slug}
-        blocks={blocks ?? []}
-        recommendations={recommendations ?? []}
+        propertyId={property.id}
         accentColor={property.accent_color}
       />
-      <GuestBookForm propertyId={property.id} accentColor={property.accent_color} />
     </div>
   );
 }

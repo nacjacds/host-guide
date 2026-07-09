@@ -2,8 +2,12 @@
 
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { PageHeader } from "@/components/dashboard/PageHeader";
 import { ShareGuideDialog } from "@/components/dashboard/ShareGuideDialog";
 import { NewBookingDialog } from "./NewBookingDialog";
+import { toast } from "sonner";
 import type { Booking, BookingStatus, GuestLanguage } from "@/types";
 
 export interface BookingRow {
@@ -54,6 +58,26 @@ export function BookingsList({
   propertiesById: Record<string, { name: string; guideUrl: string; checkinTime: string | null }>;
 }) {
   const [rows, setRows] = useState(initialRows);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete(id: string) {
+    setDeleting(true);
+    try {
+      const response = await fetch(`/api/bookings/${id}`, { method: "DELETE" });
+      if (!response.ok) {
+        toast.error("No se pudo eliminar la reserva");
+        return;
+      }
+      setRows((prev) => prev.filter((row) => row.id !== id));
+      toast.success("Reserva eliminada");
+    } catch {
+      toast.error("Error de red");
+    } finally {
+      setDeleting(false);
+      setPendingDeleteId(null);
+    }
+  }
 
   function handleCreated(booking: Booking) {
     const property = propertiesById[booking.property_id];
@@ -83,10 +107,10 @@ export function BookingsList({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Reservas</h1>
-        <NewBookingDialog properties={propertyOptions} onCreated={handleCreated} />
-      </div>
+      <PageHeader
+        title="Reservas"
+        action={<NewBookingDialog properties={propertyOptions} onCreated={handleCreated} />}
+      />
 
       {rows.length === 0 ? (
         <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
@@ -114,22 +138,40 @@ export function BookingsList({
                   {formatDate(row.checkinDate)} → {formatDate(row.checkoutDate)}
                 </p>
               </div>
-              <ShareGuideDialog
-                propertyId={row.propertyId}
-                propertyName={row.propertyName}
-                guideUrl={row.guideUrl}
-                guest={{
-                  name: row.guestName,
-                  checkinDate: row.checkinDate,
-                  checkinTime: row.checkinTime,
-                  language: row.guestLanguage,
-                }}
-                triggerClassName="shrink-0"
-              />
+              <div className="flex shrink-0 items-center gap-2">
+                <ShareGuideDialog
+                  propertyId={row.propertyId}
+                  propertyName={row.propertyName}
+                  guideUrl={row.guideUrl}
+                  guest={{
+                    name: row.guestName,
+                    checkinDate: row.checkinDate,
+                    checkinTime: row.checkinTime,
+                    language: row.guestLanguage,
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPendingDeleteId(row.id)}
+                >
+                  Eliminar
+                </Button>
+              </div>
             </div>
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        onOpenChange={(open) => !open && setPendingDeleteId(null)}
+        title="¿Eliminar esta reserva?"
+        description="Esta acción no se puede deshacer."
+        onConfirm={() => pendingDeleteId && handleDelete(pendingDeleteId)}
+        loading={deleting}
+      />
     </div>
   );
 }

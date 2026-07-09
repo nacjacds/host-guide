@@ -11,6 +11,9 @@ const updatePropertySchema = z.object({
   whatsapp_number: z.string().max(20).nullable().optional(),
   welcome_message: z.string().max(500).nullable().optional(),
   airbnb_url: z.string().max(500).nullable().optional(),
+  bedrooms: z.number().int().min(0).max(50).nullable().optional(),
+  bathrooms: z.number().int().min(0).max(50).nullable().optional(),
+  max_guests: z.number().int().min(0).max(100).nullable().optional(),
   is_published: z.boolean().optional(),
 });
 

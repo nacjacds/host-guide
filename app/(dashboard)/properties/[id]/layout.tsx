@@ -1,0 +1,59 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { PropertyNav } from "@/components/editor/PropertyNav";
+
+export default async function PropertyLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Scoped to host_id: properties are also readable by anyone when
+  // published (RLS "properties_select_published"), so an unfiltered query
+  // here would leak other hosts' property names to anyone who guesses an
+  // id. This check is what actually gates access to all four tabs.
+  const { data: property } = await supabase
+    .from("properties")
+    .select("id, name")
+    .eq("id", id)
+    .eq("host_id", user?.id ?? "")
+    .single();
+
+  if (!property) notFound();
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <nav className="mb-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Link href="/dashboard" className="hover:text-foreground">
+            Propiedades
+          </Link>
+          <span aria-hidden>&gt;</span>
+          <span>{property.name}</span>
+        </nav>
+        <h1 className="text-2xl font-semibold">{property.name}</h1>
+      </div>
+
+      <PropertyNav propertyId={id} />
+
+      {/*
+        The property-actions sidebar (publish toggle, share, QR, cover
+        image, WhatsApp, Airbnb import) lives only on the Editor tab, not
+        here. AirbnbImportPanel needs to sync newly created/updated blocks
+        into PropertyEditor's live block list — that state only exists on
+        the Editor page, so hoisting the sidebar here would either break
+        that sync or force it into a no-op on the other three tabs. This is
+        a deliberate choice, not an oversight.
+      */}
+      {children}
+    </div>
+  );
+}

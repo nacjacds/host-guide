@@ -1,7 +1,5 @@
-import { notFound } from "next/navigation";
 import { Star } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { PropertyNav } from "@/components/editor/PropertyNav";
 
 export default async function PropertyMessagesPage({
   params,
@@ -11,14 +9,7 @@ export default async function PropertyMessagesPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: property } = await supabase
-    .from("properties")
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  if (!property) notFound();
-
+  // Property existence/ownership is already guarded by the parent layout.
   const { data: messages } = await supabase
     .from("guest_messages")
     .select("*")
@@ -27,9 +18,6 @@ export default async function PropertyMessagesPage({
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">{property.name}</h1>
-      <PropertyNav propertyId={id} active="messages" />
-
       <div className="space-y-3">
         {!messages?.length && (
           <p className="text-muted-foreground">

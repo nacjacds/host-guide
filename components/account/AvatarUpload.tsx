@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "sonner";
 import { getInitials } from "@/lib/utils";
 
@@ -18,6 +19,7 @@ export function AvatarUpload({
 }) {
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
   const [uploading, setUploading] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -73,6 +75,7 @@ export function AvatarUpload({
       toast.error("Error de red");
     } finally {
       setUploading(false);
+      setConfirmOpen(false);
     }
   }
 
@@ -99,7 +102,7 @@ export function AvatarUpload({
             type="button"
             variant="ghost"
             size="sm"
-            onClick={handleRemove}
+            onClick={() => setConfirmOpen(true)}
             disabled={uploading}
           >
             Eliminar
@@ -112,6 +115,15 @@ export function AvatarUpload({
         accept="image/jpeg,image/png,image/webp"
         className="hidden"
         onChange={handleFileChange}
+      />
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="¿Eliminar foto de perfil?"
+        description="Esta acción no se puede deshacer."
+        onConfirm={handleRemove}
+        loading={uploading}
+        tone="terracotta"
       />
     </div>
   );

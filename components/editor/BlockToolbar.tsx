@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import type { BlockType, GuideBlock } from "@/types";
 
@@ -37,14 +39,39 @@ const BLOCK_TYPE_ICONS: Record<BlockType, string> = {
   emergencias: "🆘",
 };
 
+// "drinks" is intentionally excluded here — hosts no longer create new
+// drinks blocks from the toolbar, but existing ones keep working (the type
+// stays valid in BLOCK_TYPE_LABELS/ICONS and everywhere else).
+const TOOLBAR_TYPES: BlockType[] = [
+  "wifi",
+  "checkin",
+  "checkout",
+  "rules",
+  "parking",
+  "appliances",
+  "pool",
+  "restaurants",
+  "nightlife",
+  "attractions",
+  "custom",
+  "emergencias",
+];
+
+// Once one of these exists, the toolbar button stays permanently "added" —
+// a property only ever needs a single wifi/checkin/checkout/emergencias block.
+const FIXED_TYPES = new Set<BlockType>(["wifi", "checkin", "checkout", "emergencias"]);
+
 export function BlockToolbar({
   propertyId,
+  blocks,
   onCreated,
 }: {
   propertyId: string;
+  blocks: GuideBlock[];
   onCreated: (block: GuideBlock) => void;
 }) {
   const [creatingType, setCreatingType] = useState<BlockType | null>(null);
+  const existingTypes = new Set(blocks.map((b) => b.type));
 
   async function handleCreate(type: BlockType) {
     setCreatingType(type);
@@ -72,19 +99,27 @@ export function BlockToolbar({
 
   return (
     <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
-      {(Object.keys(BLOCK_TYPE_LABELS) as BlockType[]).map((type) => (
-        <Button
-          key={type}
-          variant="outline"
-          size="sm"
-          disabled={creatingType !== null}
-          onClick={() => handleCreate(type)}
-          className="shrink-0"
-        >
-          <span aria-hidden>{BLOCK_TYPE_ICONS[type]}</span>
-          {creatingType === type ? "Añadiendo..." : BLOCK_TYPE_LABELS[type]}
-        </Button>
-      ))}
+      {TOOLBAR_TYPES.map((type) => {
+        const added = existingTypes.has(type);
+        const locked = added && FIXED_TYPES.has(type);
+        return (
+          <Button
+            key={type}
+            variant="outline"
+            size="sm"
+            disabled={creatingType !== null || locked}
+            onClick={() => handleCreate(type)}
+            className={cn(
+              "shrink-0",
+              added && "border-[#1B4F72] bg-[#1B4F72] text-white hover:bg-[#1B4F72] hover:text-white"
+            )}
+          >
+            <span aria-hidden>{BLOCK_TYPE_ICONS[type]}</span>
+            {creatingType === type ? "Añadiendo..." : BLOCK_TYPE_LABELS[type]}
+            {added && <Check className="size-3.5" strokeWidth={2} />}
+          </Button>
+        );
+      })}
     </div>
   );
 }

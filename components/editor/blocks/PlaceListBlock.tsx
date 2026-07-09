@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,13 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { BlockType, PlaceEntry, PriceLevel } from "@/types";
+import { PlaceImageUploader } from "./PlaceImageUploader";
+import { AIPlaceGenerateButton } from "./AIPlaceGenerateButton";
+import type { BlockImage, BlockType, PlaceEntry, PriceLevel } from "@/types";
 
 export interface PlaceListContent {
   places: PlaceEntry[];
 }
 
 const PRICE_LEVELS: PriceLevel[] = ["€", "€€", "€€€"];
+const AI_GENERATE_TYPES = new Set<BlockType>(["restaurants", "nightlife", "attractions"]);
 
 function emptyPlace(): PlaceEntry {
   return {
@@ -30,10 +36,12 @@ function emptyPlace(): PlaceEntry {
 }
 
 export function PlaceListBlock({
+  blockId,
   blockType,
   content,
   onChange,
 }: {
+  blockId: string;
   blockType: BlockType;
   content: PlaceListContent;
   onChange: (content: PlaceListContent) => void;
@@ -41,6 +49,7 @@ export function PlaceListBlock({
   const places = content.places ?? [];
   const showCuisine = blockType === "restaurants";
   const showPrice = blockType === "restaurants" || blockType === "drinks";
+  const [skippedImageIds, setSkippedImageIds] = useState<Set<string>>(new Set());
 
   function updatePlace(index: number, patch: Partial<PlaceEntry>) {
     const next = [...places];
@@ -55,6 +64,12 @@ export function PlaceListBlock({
   function addPlace() {
     onChange({ places: [...places, emptyPlace()] });
   }
+
+  const lastPlace = places[places.length - 1];
+  const canAddAnotherPlace =
+    places.length === 0 ||
+    (lastPlace.images?.length ?? 0) > 0 ||
+    skippedImageIds.has(lastPlace.id);
 
   return (
     <div className="space-y-3">
@@ -92,28 +107,27 @@ export function PlaceListBlock({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <Label>Distancia (metros)</Label>
-              <Input
-                type="number"
-                min={0}
-                value={place.distance_meters ?? ""}
-                onChange={(e) =>
-                  updatePlace(i, {
-                    distance_meters: e.target.value ? Number(e.target.value) : null,
-                  })
-                }
-              />
-            </div>
-            <div>
-              <Label>Enlace de Google Maps</Label>
-              <Input
-                value={place.maps_url}
-                onChange={(e) => updatePlace(i, { maps_url: e.target.value })}
-                placeholder="https://maps.google.com/..."
-              />
-            </div>
+          <div>
+            <Label>Distancia (metros)</Label>
+            <Input
+              type="number"
+              min={0}
+              value={place.distance_meters ?? ""}
+              onChange={(e) =>
+                updatePlace(i, {
+                  distance_meters: e.target.value ? Number(e.target.value) : null,
+                })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>Enlace de Google Maps</Label>
+            <Input
+              value={place.maps_url}
+              onChange={(e) => updatePlace(i, { maps_url: e.target.value })}
+              placeholder="https://maps.google.com/..."
+            />
           </div>
 
           {(showCuisine || showPrice) && (
@@ -161,12 +175,43 @@ export function PlaceListBlock({
               placeholder="Se rellenará automáticamente en el futuro"
             />
           </div>
+
+          <div className="space-y-2 border-t border-border pt-2.5">
+            <PlaceImageUploader
+              blockId={blockId}
+              placeId={place.id}
+              images={place.images ?? []}
+              onUploaded={(images: BlockImage[]) => updatePlace(i, { images })}
+              onCaptionChange={(images: BlockImage[]) => updatePlace(i, { images })}
+            />
+            {(place.images?.length ?? 0) === 0 && !skippedImageIds.has(place.id) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  setSkippedImageIds((prev) => new Set(prev).add(place.id))
+                }
+              >
+                Omitir
+              </Button>
+            )}
+          </div>
         </div>
       ))}
 
-      <Button variant="secondary" size="sm" onClick={addPlace}>
-        + Añadir lugar
-      </Button>
+      {canAddAnotherPlace && (
+        <Button variant="secondary" size="sm" onClick={addPlace}>
+          + Añadir lugar
+        </Button>
+      )}
+
+      {AI_GENERATE_TYPES.has(blockType) && (
+        <AIPlaceGenerateButton
+          blockId={blockId}
+          onGenerated={(place) => onChange({ places: [...places, place] })}
+        />
+      )}
     </div>
   );
 }

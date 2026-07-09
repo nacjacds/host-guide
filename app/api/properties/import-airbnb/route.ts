@@ -15,6 +15,7 @@ function decodeHtmlEntities(text: string): string {
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#0?39;/g, "'")
+    .replace(/&#x27;/gi, "'")
     .replace(/&apos;/g, "'");
 }
 
@@ -88,6 +89,17 @@ export async function POST(request: NextRequest) {
   const rawTitle = titleMatch ? decodeHtmlEntities(titleMatch[1]) : null;
   const description = descriptionMatch ? decodeHtmlEntities(descriptionMatch[1]) : null;
 
+  // Airbnb serves these with a 200 status (SPA shell), so response.ok above
+  // doesn't catch them — the room ID doesn't exist or the listing is gone.
+  if (rawTitle && /^\s*(404|page not found|not found)\b/i.test(rawTitle)) {
+    return NextResponse.json(
+      {
+        error: "Este anuncio no existe o ya no está disponible. Rellena los datos manualmente.",
+      },
+      { status: 422 }
+    );
+  }
+
   if (!rawTitle) {
     return NextResponse.json(
       {
@@ -104,5 +116,66 @@ export async function POST(request: NextRequest) {
   const address = locationMatch ? locationMatch[1].trim() : null;
   const title = rawTitle.replace(/\s*-\s*Airbnb$/i, "").trim();
 
-  return NextResponse.json({ title, description, address });
+  // Everything below is best-effort: Airbnb listing pages are heavily
+  // client-rendered, so these numbers/times are only found when they happen
+  // to appear in the server-rendered HTML (og:description, embedded JSON,
+  // or visible summary text). Any of these can legitimately come back null —
+  // the UI shows only what was found and lets the host fill in the rest.
+  const searchText = `${description ?? ""} ${html}`;
+
+  function matchNumber(patterns: RegExp[]): number | null {
+    for (const pattern of patterns) {
+      const match = searchText.match(pattern);
+      if (match) return Math.round(parseFloat(match[1]));
+    }
+    return null;
+  }
+
+  function matchTime(patterns: RegExp[]): string | null {
+    for (const pattern of patterns) {
+      const match = searchText.match(pattern);
+      if (match) return match[1].trim();
+    }
+    return null;
+  }
+
+  const maxGuests = matchNumber([/(\d+)\s*(?:guests?|hu[ée]spedes?)/i]);
+  let bedrooms = matchNumber([/(\d+)\s*(?:bedrooms?|habitaciones?|dormitorios?)/i]);
+  if (bedrooms === null && /\bstudio\b/i.test(searchText)) bedrooms = 0;
+  const bathrooms = matchNumber([/(\d+(?:\.\d+)?)\s*(?:baths?|bathrooms?|ba[ñn]os?)/i]);
+
+  const checkinTime = matchTime([
+    /check-?in[^0-9]{0,25}(\d{1,2}(?::\d{2})?\s?(?:am|pm)?)/i,
+    /entrada[^0-9]{0,25}(\d{1,2}(?::\d{2})?\s?(?:h|am|pm)?)/i,
+  ]);
+  const checkoutTime = matchTime([
+    /check-?out[^0-9]{0,25}(\d{1,2}(?::\d{2})?\s?(?:am|pm)?)/i,
+    /salida[^0-9]{0,25}(\d{1,2}(?::\d{2})?\s?(?:h|am|pm)?)/i,
+  ]);
+
+  const KNOWN_RULES: { pattern: RegExp; label: string }[] = [
+    { pattern: /no smoking/i, label: "No fumar" },
+    { pattern: /no pets/i, label: "No se admiten mascotas" },
+    { pattern: /no parties or events/i, label: "No se permiten fiestas ni eventos" },
+    { pattern: /no unregistered guests/i, label: "No huéspedes no registrados" },
+    { pattern: /quiet hours/i, label: "Horas de silencio" },
+    { pattern: /no fumar/i, label: "No fumar" },
+    { pattern: /no se admiten mascotas/i, label: "No se admiten mascotas" },
+    { pattern: /no fiestas/i, label: "No se permiten fiestas ni eventos" },
+  ];
+  const houseRules = Array.from(
+    new Set(KNOWN_RULES.filter((rule) => rule.pattern.test(searchText)).map((rule) => rule.label))
+  );
+
+  return NextResponse.json({
+    title,
+    description,
+    address,
+    max_guests: maxGuests,
+    bedrooms,
+    bathrooms,
+    checkin_time: checkinTime,
+    checkout_time: checkoutTime,
+    house_rules: houseRules,
+  });
 }

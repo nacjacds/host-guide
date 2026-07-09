@@ -77,7 +77,9 @@ Web app SaaS para anfitriones de alojamientos turísticos (Airbnb, Vrbo, Booking
 │       ├── whatsapp/
 │       │   └── webhook/            # Webhook de YCloud para mensajes entrantes
 │       └── stripe/
-│           └── webhook/
+│           ├── webhook/                     # checkout.session.completed, subscription.updated/deleted
+│           ├── create-checkout-session/     # Crea customer si falta + Checkout Session (subscription)
+│           └── create-portal-session/       # Stripe Customer Portal (gestionar/cancelar)
 ├── components/
 │   ├── guide/                  # Componentes de la guía pública
 │   │   ├── HeroSection.tsx         # Imagen de portada + gradiente + título Playfair
@@ -487,9 +489,23 @@ Ver sección "Sistema de traducciones" arriba — usa `claude-haiku-4-5-20251001
 
 - `getPlan(planId)` / `planPropertyLimit(planId)` en `lib/plans.ts` — usado por `/api/properties` (POST) para bloquear la creación de propiedades por encima del límite del plan, y por el modal "Cambiar de plan" (`ChangePlanDialog.tsx`) y `/account` para mostrar precio y features.
 - Los guards `aiEnabled` / `analyticsEnabled` / `whiteLabel` de `lib/plans.ts` describen qué debería estar disponible por plan; **todavía no hay enforcement de estos guards en el código** (p. ej. no se oculta el botón "Generar con IA" en plan Free) — son la fuente de verdad para cuando se implemente esa restricción.
-- **Cambio de plan:** los anfitriones ven sus opciones y contactan por email desde `/account` (sin Stripe todavía — el botón de planes superiores abre un `mailto:` a `ignajac@gmail.com`). El único lugar que efectivamente *cambia* `profiles.plan` hoy es el panel de superadmin.
-- **Panel de superadmin** (`/admin`, `lib/admin.ts`): acceso restringido al email `ignajac@gmail.com` (redirige a `/login` para cualquier otro usuario, autenticado o no). Lista todos los anfitriones (email vía `auth.admin.listUsers()`, plan, nº de propiedades, fecha de registro), permite cambiar el plan de cualquier anfitrión con un select (`PATCH /api/admin/profiles/[id]/plan`, revalida el email en el servidor además de en la página), y muestra estadísticas globales (anfitriones, propiedades totales, publicadas vs borrador).
-- Cuando Stripe esté conectado de verdad: `getPriceToPlan()` en `app/api/stripe/webhook/route.ts` ya mapea `STRIPE_PRICE_STARTER` / `STRIPE_PRICE_PRO` / `STRIPE_PRICE_AGENCY` a cada plan — solo falta rellenar esas env vars y probar el flujo de checkout.
+- **Cambio de plan:** desde `/account`, `ChangePlanDialog.tsx` — si el anfitrión ya tiene un plan de pago activo, muestra un único botón "Gestionar suscripción" que abre el Stripe Customer Portal (cancelar, cambiar método de pago, ver facturas); si está en `free`, muestra los 3 planes de pago con botón "Actualizar" que abre Stripe Checkout. `profiles.plan` se actualiza siempre desde el webhook (`app/api/stripe/webhook/route.ts`, service-role), nunca directamente desde el cliente — ver sección "Pagos (Stripe)" más abajo.
+- **Panel de superadmin** (`/admin`, `lib/admin.ts`): acceso restringido al email `ignajac@gmail.com` (redirige a `/login` para cualquier otro usuario, autenticado o no). Lista todos los anfitriones (email vía `auth.admin.listUsers()`, plan, nº de propiedades, fecha de registro), permite cambiar el plan de cualquier anfitrión con un select (`PATCH /api/admin/profiles/[id]/plan`, revalida el email en el servidor además de en la página, y muestra estadísticas globales (anfitriones, propiedades totales, publicadas vs borrador). Este cambio manual **no** toca Stripe (solo la BD) — pensado para casos de soporte, no para el flujo normal del anfitrión.
+
+---
+
+## Pagos (Stripe)
+
+- **Cliente:** `lib/stripe.ts` — instancia única server-side (`stripe`, usa `STRIPE_SECRET_KEY`) y un singleton client-side (`getStripeJs()`, vía `@stripe/stripe-js` + `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`). El singleton client-side no se usa hoy para el redirect (ver checkout abajo) — queda preparado por si en el futuro se usa Stripe Elements/Embedded Checkout.
+- **Checkout** (`POST /api/stripe/create-checkout-session`): recibe `{ plan: "starter" | "pro" | "agency" }`, crea un `stripe.customers` si el anfitrión no tiene `profiles.stripe_customer_id` todavía (y lo guarda), crea una `checkout.sessions` en modo `subscription` con el price ID correspondiente (`lib/stripe.ts` → `getPlanPriceId()`), y devuelve `{ url }`. El cliente hace `window.location.href = url` — se usa la `url` de la Checkout Session directamente (recomendado por Stripe), no `redirectToCheckout(sessionId)`. `success_url` → `/dashboard?upgraded=true` (muestra un toast de confirmación vía `UpgradedToast.tsx` y limpia la query string), `cancel_url` → `/account`.
+- **Portal de cliente** (`POST /api/stripe/create-portal-session`): requiere `profiles.stripe_customer_id`; crea una `billingPortal.sessions` con `return_url` → `/account`. Desde ahí el anfitrión cancela/cambia su suscripción sin que la app tenga que implementar esa UI.
+- **Webhook** (`POST /api/stripe/webhook`, ya existente, actualizado): verifica la firma con `STRIPE_WEBHOOK_SECRET` y maneja:
+  - `checkout.session.completed` → recupera la subscription creada, mapea su price ID a un plan, y actualiza `profiles.plan` + `profiles.stripe_customer_id` (busca la fila por `stripe_customer_id`, que ya se guardó al crear el customer en el paso de checkout).
+  - `customer.subscription.updated` → recalcula el plan según el price ID actual de la subscription; si el status no es `active`/`trialing` (p. ej. `past_due`, `unpaid`), degrada a `free`.
+  - `customer.subscription.deleted` → siempre degrada a `free`.
+  - Todas las escrituras usan `createServiceRoleClient()` — el webhook no tiene sesión de usuario, solo la firma de Stripe como autenticación.
+- **Mapeo price ID → plan:** `lib/stripe.ts` → `getPlanPriceId()` / `getPriceIdToPlan()`, leído de `STRIPE_STARTER_PRICE_ID` / `STRIPE_PRO_PRICE_ID` / `STRIPE_AGENCY_PRICE_ID` — nunca hardcodeado en el código, solo en `.env.local`.
+- **Desarrollo local:** el webhook necesita un secreto distinto al de producción. Con la Stripe CLI: `stripe listen --forward-to localhost:3000/api/stripe/webhook` imprime un `whsec_...` que va en `STRIPE_WEBHOOK_SECRET` de `.env.local`; hay que dejar ese comando corriendo en una terminal mientras se prueba el flujo de checkout en local.
 
 ---
 
@@ -502,7 +518,9 @@ npm install
 # Variables de entorno necesarias
 cp .env.example .env.local
 # Rellenar: ANTHROPIC_API_KEY, GOOGLE_PLACES_API_KEY, NEXT_PUBLIC_SUPABASE_URL,
-# SUPABASE_SERVICE_ROLE_KEY, YCLOUD_API_KEY, STRIPE_SECRET_KEY, RESEND_API_KEY
+# SUPABASE_SERVICE_ROLE_KEY, YCLOUD_API_KEY, RESEND_API_KEY,
+# STRIPE_SECRET_KEY, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET,
+# STRIPE_STARTER_PRICE_ID, STRIPE_PRO_PRICE_ID, STRIPE_AGENCY_PRICE_ID
 
 # Desarrollo local
 npm run dev

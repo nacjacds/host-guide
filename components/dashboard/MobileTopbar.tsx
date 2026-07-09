@@ -18,12 +18,10 @@ export type NavLinkGroup = NavLinkItem[];
 
 export function MobileTopbar({
   fullName,
-  email,
   avatarUrl,
   navGroups,
 }: {
   fullName: string | null;
-  email: string;
   avatarUrl: string | null;
   navGroups: NavLinkGroup[];
 }) {
@@ -31,19 +29,16 @@ export function MobileTopbar({
   const pathname = usePathname();
 
   return (
-    <div className="flex items-center justify-between border-b border-sidebar-border bg-sidebar px-4 py-3 text-sidebar-foreground md:hidden">
-      <Link
-        href="/account"
-        className="flex min-w-0 items-center gap-2"
-        onClick={() => setOpen(false)}
-      >
-        <Avatar className="size-8 shrink-0">
-          {avatarUrl && <AvatarImage src={avatarUrl} alt={fullName ?? ""} />}
-          <AvatarFallback className="text-xs font-medium">
-            {getInitials(fullName)}
-          </AvatarFallback>
-        </Avatar>
-        <span className="truncate text-sm font-medium">{fullName ?? email}</span>
+    <div className="grid grid-cols-3 items-center border-b border-sidebar-border bg-sidebar px-4 py-3 text-sidebar-foreground md:hidden">
+      <div aria-hidden />
+
+      <Link href="/dashboard" className="justify-self-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logo.svg"
+          alt="WelcoKit"
+          style={{ width: "180px", height: "auto" }}
+        />
       </Link>
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -51,20 +46,37 @@ export function MobileTopbar({
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Abrir menú"
-          className="flex size-9 shrink-0 items-center justify-center rounded-lg hover:bg-sidebar-accent"
+          className="flex size-9 shrink-0 items-center justify-center justify-self-end rounded-lg hover:bg-sidebar-accent"
         >
-          <Menu size={20} strokeWidth={1.5} />
+          <Menu size={26} strokeWidth={1.5} />
         </button>
         <DialogContent
           showCloseButton={false}
           className="top-0 left-0 flex h-dvh max-h-dvh w-72 max-w-[85vw] translate-x-0 translate-y-0 flex-col gap-0 overflow-y-auto rounded-none border-r border-sidebar-border bg-sidebar p-4 text-sidebar-foreground ring-0 sm:max-w-[85vw] data-open:slide-in-from-left data-open:zoom-in-100 data-closed:slide-out-to-left data-closed:zoom-out-100"
         >
           <DialogTitle className="sr-only">Menú de navegación</DialogTitle>
-          <div className="mb-6 px-3 py-2">
+          <div className="px-3 py-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="WelcoKit" height="56" className="mx-auto h-14 w-auto" />
           </div>
-          <nav className="mt-8 flex flex-col text-sm">
+
+          <Link
+            href="/account"
+            onClick={() => setOpen(false)}
+            className="mt-6 flex flex-col items-center gap-2 px-3"
+          >
+            <Avatar className="size-16">
+              {avatarUrl && <AvatarImage src={avatarUrl} alt={fullName ?? ""} />}
+              <AvatarFallback className="text-lg font-medium">
+                {getInitials(fullName)}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-sm font-medium">{fullName ?? "Mi cuenta"}</span>
+          </Link>
+
+          <hr className="mt-6 mb-2 border-[#DDD8CC]" />
+
+          <nav className="mt-2 flex flex-col text-sm">
             {navGroups.map((group, groupIndex) => (
               <div key={groupIndex}>
                 {groupIndex > 0 && <hr className="my-3 border-[#DDD8CC]" />}

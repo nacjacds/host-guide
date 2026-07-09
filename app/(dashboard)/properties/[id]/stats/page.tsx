@@ -1,6 +1,4 @@
-import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { PropertyNav } from "@/components/editor/PropertyNav";
 
 const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -45,14 +43,7 @@ export default async function PropertyStatsPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: property } = await supabase
-    .from("properties")
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  if (!property) notFound();
-
+  // Property existence/ownership is already guarded by the parent layout.
   const since = new Date(Date.now() - THIRTY_DAYS_MS).toISOString();
   const { data: events } = await supabase
     .from("analytics_events")
@@ -84,9 +75,6 @@ export default async function PropertyStatsPage({
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">{property.name}</h1>
-      <PropertyNav propertyId={id} active="stats" />
-
       <div className="rounded-lg border border-border p-4">
         <p className="text-sm text-muted-foreground">Visitas (últimos 30 días)</p>
         <p className="text-3xl font-bold">{totalVisits}</p>

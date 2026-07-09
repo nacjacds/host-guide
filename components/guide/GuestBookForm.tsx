@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Star, PenLine } from "lucide-react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Star, PenLine, ChevronLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -18,9 +19,11 @@ import { COUNTRIES } from "@/lib/countries";
 const MESSAGE_MAX = 300;
 
 export function GuestBookForm({
+  slug,
   propertyId,
   accentColor,
 }: {
+  slug: string;
   propertyId: string;
   accentColor: string;
 }) {
@@ -32,6 +35,13 @@ export function GuestBookForm({
   const [hoverRating, setHoverRating] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [showBackButton, setShowBackButton] = useState(false);
+
+  useEffect(() => {
+    if (!submitted) return;
+    const timer = setTimeout(() => setShowBackButton(true), 2000);
+    return () => clearTimeout(timer);
+  }, [submitted]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -60,6 +70,15 @@ export function GuestBookForm({
     return (
       <div className="mx-4 my-6 rounded-2xl border border-border bg-card p-6 text-center sm:mx-6 lg:mx-8">
         <p className="font-serif text-xl font-bold">{t("guestBookThanks")}</p>
+        {showBackButton && (
+          <Link
+            href={`/guide/${slug}`}
+            className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent/40 hover:text-foreground"
+          >
+            <ChevronLeft className="size-4" />
+            {t("backToGuide")}
+          </Link>
+        )}
       </div>
     );
   }

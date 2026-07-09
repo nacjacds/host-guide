@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
@@ -67,20 +68,21 @@ export default async function DashboardLayout({
       )}
       <MobileTopbar
         fullName={profile?.full_name ?? null}
-        email={user.email ?? ""}
         avatarUrl={profile?.avatar_url ?? null}
         navGroups={navGroups}
       />
       <div className="flex flex-1">
         <aside className="hidden w-56 shrink-0 border-r border-sidebar-border bg-sidebar p-4 text-sidebar-foreground md:block">
           <div className="space-y-2 px-3 py-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo.svg"
-              alt="WelcoKit"
-              style={{ width: "200px", height: "auto" }}
-              className="mx-auto max-w-full"
-            />
+            <Link href="/dashboard" className="block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.svg"
+                alt="WelcoKit"
+                style={{ width: "200px", height: "auto" }}
+                className="mx-auto max-w-full"
+              />
+            </Link>
             <div className="mb-6 flex items-center gap-2">
               <Avatar className="size-8">
                 {profile?.avatar_url && (

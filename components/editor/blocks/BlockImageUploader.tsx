@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "sonner";
 import type { BlockImage } from "@/types";
 
@@ -24,6 +25,7 @@ export function BlockImageUploader({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
+  const [pendingDeleteUrl, setPendingDeleteUrl] = useState<string | null>(null);
 
   async function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -77,6 +79,7 @@ export function BlockImageUploader({
       onUploaded(images.filter((img) => img.url !== url));
     } finally {
       setDeletingUrl(null);
+      setPendingDeleteUrl(null);
     }
   }
 
@@ -99,7 +102,7 @@ export function BlockImageUploader({
                 <img src={img.url} alt={img.alt} className="h-full w-full object-cover" />
                 <button
                   type="button"
-                  onClick={() => handleDelete(img.url)}
+                  onClick={() => setPendingDeleteUrl(img.url)}
                   disabled={deletingUrl === img.url}
                   className="absolute top-1 right-1 flex size-6 items-center justify-center rounded-full bg-black/60 text-xs text-white hover:bg-black/80 disabled:opacity-50"
                 >
@@ -138,6 +141,15 @@ export function BlockImageUploader({
           </Button>
         </>
       )}
+
+      <ConfirmDialog
+        open={pendingDeleteUrl !== null}
+        onOpenChange={(open) => !open && setPendingDeleteUrl(null)}
+        title="¿Eliminar imagen?"
+        description="Esta acción no se puede deshacer."
+        onConfirm={() => pendingDeleteUrl && handleDelete(pendingDeleteUrl)}
+        loading={deletingUrl !== null}
+      />
     </div>
   );
 }

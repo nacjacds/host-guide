@@ -2,14 +2,28 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { BlockEditor } from "./BlockEditor";
 import { BlockToolbar } from "./BlockToolbar";
-import { RecommendationsBlock } from "./blocks/RecommendationsBlock";
-import { AddRecommendationDialog } from "./AddRecommendationDialog";
 import { PublishPanel } from "./PublishPanel";
-import type { GuideBlock, Property, Recommendation } from "@/types";
+import { AirbnbImportPanel } from "./AirbnbImportPanel";
+import type { GuideBlock, Property } from "@/types";
 
 async function saveBlock(block: GuideBlock) {
   const response = await fetch(`/api/guide-blocks/${block.id}`, {
@@ -28,23 +42,19 @@ async function saveBlock(block: GuideBlock) {
 export function PropertyEditor({
   property,
   initialBlocks,
-  initialRecommendations,
 }: {
   property: Property;
   initialBlocks: GuideBlock[];
-  initialRecommendations: Recommendation[];
 }) {
   const [blocks, setBlocks] = useState(initialBlocks);
-  const [recommendations, setRecommendations] = useState(initialRecommendations);
   const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set());
   const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
   const [savingAll, setSavingAll] = useState(false);
   const [newBlockIds, setNewBlockIds] = useState<Set<string>>(new Set());
 
-  // Re-sync when the server component re-fetches (e.g. after AI generation
-  // calls router.refresh()) — useState's initial value is only read on mount.
+  // Re-sync when the server component re-fetches — useState's initial value
+  // is only read on mount.
   useEffect(() => setBlocks(initialBlocks), [initialBlocks]);
-  useEffect(() => setRecommendations(initialRecommendations), [initialRecommendations]);
 
   useEffect(() => {
     if (dirtyIds.size === 0) return;
@@ -135,16 +145,33 @@ export function PropertyEditor({
     }
   }
 
-  function handleRecommendationCreated(recommendation: Recommendation) {
-    setRecommendations((prev) => [...prev, recommendation]);
-  }
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
-  function handleRecommendationChanged(id: string, patch: Partial<Recommendation> | null) {
-    setRecommendations((prev) =>
-      patch === null
-        ? prev.filter((r) => r.id !== id)
-        : prev.map((r) => (r.id === id ? { ...r, ...patch } : r))
-    );
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = blocks.findIndex((b) => b.id === active.id);
+    const newIndex = blocks.findIndex((b) => b.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const previousBlocks = blocks;
+    const reordered = arrayMove(blocks, oldIndex, newIndex);
+    setBlocks(reordered);
+
+    const response = await fetch(`/api/properties/${property.id}/blocks/reorder`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ blockIds: reordered.map((b) => b.id) }),
+    });
+
+    if (!response.ok) {
+      toast.error("No se pudo guardar el nuevo orden");
+      setBlocks(previousBlocks);
+    }
   }
 
   return (
@@ -158,7 +185,7 @@ export function PropertyEditor({
         <div className="space-y-4 lg:col-span-2">
           <div className="sticky top-0 z-10 -mx-1 flex items-center justify-between gap-3 bg-background/95 px-1 py-3 backdrop-blur-sm">
             <div className="min-w-0 flex-1">
-              <BlockToolbar propertyId={property.id} onCreated={handleBlockCreated} />
+              <BlockToolbar propertyId={property.id} blocks={blocks} onCreated={handleBlockCreated} />
             </div>
             <Button
               size="sm"
@@ -171,44 +198,42 @@ export function PropertyEditor({
             </Button>
           </div>
 
-          <div className="space-y-3">
-            {blocks.map((block) => (
-              <BlockEditor
-                key={block.id}
-                block={block}
-                dirty={dirtyIds.has(block.id)}
-                saving={savingIds.has(block.id)}
-                defaultOpen={newBlockIds.has(block.id)}
-                onChange={(patch) => handleBlockChange(block.id, patch)}
-                onSynced={(patch) => handleBlockSynced(block.id, patch)}
-                onSave={() => handleSaveOne(block.id)}
-                onDeleted={handleBlockDeleted}
-              />
-            ))}
-            {blocks.length === 0 && (
-              <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
-                Añade tu primer bloque con los botones de arriba.
-              </p>
-            )}
-          </div>
+          {blocks.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
+              Añade tu primer bloque con los botones de arriba.
+            </p>
+          ) : (
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
+                <div className="space-y-3">
+                  {blocks.map((block) => (
+                    <BlockEditor
+                      key={block.id}
+                      block={block}
+                      dirty={dirtyIds.has(block.id)}
+                      saving={savingIds.has(block.id)}
+                      defaultOpen={newBlockIds.has(block.id)}
+                      onChange={(patch) => handleBlockChange(block.id, patch)}
+                      onSynced={(patch) => handleBlockSynced(block.id, patch)}
+                      onSave={() => handleSaveOne(block.id)}
+                      onDeleted={handleBlockDeleted}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          )}
         </div>
 
         <div className="space-y-6">
           <PublishPanel property={property} />
 
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-sm font-medium text-muted-foreground">Recomendaciones</h2>
-              <AddRecommendationDialog
-                propertyId={property.id}
-                onCreated={handleRecommendationCreated}
-              />
-            </div>
-            <RecommendationsBlock
-              recommendations={recommendations}
-              onChanged={handleRecommendationChanged}
-            />
-          </div>
+          <AirbnbImportPanel
+            property={property}
+            blocks={blocks}
+            onBlockCreated={handleBlockCreated}
+            onBlockSynced={handleBlockSynced}
+          />
         </div>
       </div>
 
