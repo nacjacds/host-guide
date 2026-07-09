@@ -37,7 +37,7 @@ export function DeleteAccountButton() {
       <CardContent className="space-y-3">
         <p className="text-sm text-muted-foreground">
           Eliminar tu cuenta borra permanentemente tu perfil, todas tus propiedades, guías,
-          bloques de contenido y reservas.
+          bloques de contenido y recomendaciones.
         </p>
         <Button
           type="button"
@@ -53,7 +53,7 @@ export function DeleteAccountButton() {
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         title="¿Eliminar tu cuenta?"
-        description="Esta acción no se puede deshacer. Se eliminarán permanentemente tu perfil, todas tus propiedades, guías y reservas."
+        description="Esta acción no se puede deshacer. Se eliminarán permanentemente tu perfil, todas tus propiedades, guías y recomendaciones."
         onConfirm={handleDelete}
         loading={deleting}
       />

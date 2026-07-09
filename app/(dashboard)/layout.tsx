@@ -52,7 +52,6 @@ export default async function DashboardLayout({
 
   const navGroups: NavLinkGroup[] = [
     [{ href: "/dashboard", label: "Propiedades" }],
-    [{ href: "/account", label: "Mi cuenta" }],
     ...(isAdmin
       ? [[{ href: "/admin", label: "Admin", badge: openTicketCount > 0 ? openTicketCount : undefined }]]
       : []),
@@ -80,7 +79,10 @@ export default async function DashboardLayout({
                 className="mx-auto max-w-full"
               />
             </Link>
-            <div className="mb-6 flex items-center gap-2">
+            <Link
+              href="/account"
+              className="mb-6 flex items-center gap-2 rounded-lg px-1 py-1 -mx-1 transition-colors hover:bg-sidebar-accent"
+            >
               <Avatar className="size-8">
                 {profile?.avatar_url && (
                   <AvatarImage src={profile.avatar_url} alt={profile.full_name ?? ""} />
@@ -92,7 +94,7 @@ export default async function DashboardLayout({
               <span className="truncate text-sm font-medium">
                 {profile?.full_name ?? user.email}
               </span>
-            </div>
+            </Link>
           </div>
           <SidebarNav navGroups={navGroups} />
         </aside>

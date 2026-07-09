@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { ProfileForm } from "@/components/account/ProfileForm";
 import { ChangePlanDialog } from "@/components/account/ChangePlanDialog";
+import { LogoutButton } from "@/components/account/LogoutButton";
 import { DeleteAccountButton } from "@/components/account/DeleteAccountButton";
 import { getPlan } from "@/lib/plans";
 
@@ -44,6 +45,8 @@ export default async function AccountPage() {
       </Card>
 
       <ProfileForm profile={profile} email={user!.email ?? ""} />
+
+      <LogoutButton />
 
       <DeleteAccountButton />
     </div>
