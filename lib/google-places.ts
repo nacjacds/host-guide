@@ -150,11 +150,36 @@ export async function geocodeAddress(
   url.searchParams.set("language", "es");
 
   const response = await fetch(url);
-  if (!response.ok) return null;
+  if (!response.ok) {
+    // TEMPORARY diagnostic logging — remove once geocoding failures are
+    // understood. Google's Geocoding API almost always returns HTTP 200
+    // even for API-level errors, so this branch (non-2xx) is the less
+    // likely path, but log it fully just in case.
+    const bodyText = await response.text().catch(() => "<no body>");
+    console.error("[geocodeAddress] HTTP error", {
+      httpStatus: response.status,
+      body: bodyText,
+      address,
+    });
+    return null;
+  }
 
   const data = await response.json();
   const location = data.results?.[0]?.geometry?.location;
-  if (!location) return null;
+  if (!location) {
+    // TEMPORARY diagnostic logging — remove once geocoding failures are
+    // understood. Google returns HTTP 200 with a `status` field
+    // (REQUEST_DENIED, ZERO_RESULTS, INVALID_REQUEST, OVER_QUERY_LIMIT,
+    // etc.) and often an `error_message` explaining why — this is almost
+    // certainly where the real cause is.
+    console.error("[geocodeAddress] No location in response", {
+      status: data.status,
+      error_message: data.error_message,
+      address,
+      fullResponse: data,
+    });
+    return null;
+  }
 
   return { lat: location.lat, lng: location.lng };
 }
