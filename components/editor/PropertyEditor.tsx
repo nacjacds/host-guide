@@ -17,6 +17,7 @@ import {
   arrayMove,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
+import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { BlockEditor } from "./BlockEditor";
@@ -24,6 +25,7 @@ import { BlockToolbar } from "./BlockToolbar";
 import { PublishPanel } from "./PublishPanel";
 import { AirbnbImportPanel } from "./AirbnbImportPanel";
 import { PropertyRecommendationsSection } from "./PropertyRecommendationsSection";
+import { getAppUrl } from "@/lib/env";
 import type { RecommendationQuota } from "@/lib/recommendations/constants";
 import type { GuideBlock, Property, PropertyRecommendation, PropertyRecommendationCategory } from "@/types";
 
@@ -47,12 +49,14 @@ export function PropertyEditor({
   initialRecommendations,
   categoriesDetected,
   recommendationQuota,
+  upgradePlanLabel,
 }: {
   property: Property;
   initialBlocks: GuideBlock[];
   initialRecommendations: PropertyRecommendation[];
   categoriesDetected: PropertyRecommendationCategory[];
   recommendationQuota: RecommendationQuota;
+  upgradePlanLabel: string | null;
 }) {
   const [blocks, setBlocks] = useState(initialBlocks);
   const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set());
@@ -195,6 +199,24 @@ export function PropertyEditor({
             <div className="min-w-0 flex-1">
               <BlockToolbar propertyId={property.id} blocks={blocks} onCreated={handleBlockCreated} />
             </div>
+            {property.is_published && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="shrink-0"
+                render={
+                  <a
+                    href={`${getAppUrl()}/guide/${property.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                }
+                nativeButton={false}
+              >
+                Ver guía
+                <ExternalLink className="size-3.5" strokeWidth={1.5} />
+              </Button>
+            )}
             <Button
               size="sm"
               variant="secondary"
@@ -237,6 +259,7 @@ export function PropertyEditor({
             initialRecommendations={initialRecommendations}
             categoriesDetected={categoriesDetected}
             initialQuota={recommendationQuota}
+            upgradePlanLabel={upgradePlanLabel}
           />
         </div>
 

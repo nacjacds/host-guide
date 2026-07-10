@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -130,11 +131,13 @@ export function PropertyRecommendationsSection({
   initialRecommendations,
   categoriesDetected,
   initialQuota,
+  upgradePlanLabel,
 }: {
   propertyId: string;
   initialRecommendations: PropertyRecommendation[];
   categoriesDetected: PropertyRecommendationCategory[];
   initialQuota: RecommendationQuota;
+  upgradePlanLabel: string | null;
 }) {
   const [recommendations, setRecommendations] = useState(initialRecommendations);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -231,9 +234,24 @@ export function PropertyRecommendationsSection({
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-medium text-muted-foreground">Recomendaciones locales</h2>
         <span className="text-xs text-muted-foreground">
-          {quota.remaining > 0
-            ? `${quota.remaining} de ${quota.limit} generaciones con IA este mes`
-            : `Sin generaciones disponibles · se restablecen el ${quota.resetDateLabel}`}
+          {quota.remaining > 0 ? (
+            `Te quedan ${quota.remaining} de ${quota.limit} regeneraciones este mes`
+          ) : (
+            <>
+              Sin generaciones disponibles · se restablecen el {quota.resetDateLabel}
+              {upgradePlanLabel && (
+                <>
+                  {" · "}
+                  <Link
+                    href="/account"
+                    className="text-primary underline underline-offset-2 hover:no-underline"
+                  >
+                    Mejorar plan
+                  </Link>
+                </>
+              )}
+            </>
+          )}
         </span>
       </div>
       {visibleCategories.map((category) => {

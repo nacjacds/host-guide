@@ -210,7 +210,7 @@ export function SupportWidget() {
         onClick={handleToggle}
         aria-label={open ? "Cerrar ayuda" : "Abrir ayuda"}
         className={cn(
-          "flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105"
+          "flex size-12 items-center justify-center rounded-full bg-[#1A1A18] text-white shadow-lg transition-transform hover:scale-105"
         )}
       >
         {open ? <X size={22} /> : <span className="text-xl font-semibold">?</span>}

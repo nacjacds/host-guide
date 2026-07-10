@@ -55,15 +55,11 @@ export function MobileTopbar({
           className="top-0 left-0 flex h-dvh max-h-dvh w-72 max-w-[85vw] translate-x-0 translate-y-0 flex-col gap-0 overflow-y-auto rounded-none border-r border-sidebar-border bg-sidebar p-4 text-sidebar-foreground ring-0 sm:max-w-[85vw] data-open:slide-in-from-left data-open:zoom-in-100 data-closed:slide-out-to-left data-closed:zoom-out-100"
         >
           <DialogTitle className="sr-only">Menú de navegación</DialogTitle>
-          <div className="px-3 py-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="WelcoKit" height="56" className="mx-auto h-14 w-auto" />
-          </div>
 
           <Link
             href="/account"
             onClick={() => setOpen(false)}
-            className="mt-6 flex flex-col items-center gap-2 px-3"
+            className="mt-4 flex flex-col items-center gap-2 px-3"
           >
             <Avatar className="size-16">
               {avatarUrl && <AvatarImage src={avatarUrl} alt={fullName ?? ""} />}
