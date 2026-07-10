@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/dashboard/PageHeader";
@@ -12,10 +13,16 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // The layout above already redirects when there's no session, but it
+  // re-fetches the user independently — an expired/invalid refresh token
+  // can make that call return null here even when the layout's own check
+  // passed moments earlier. Guard again rather than crash on user!.id.
+  if (!user) redirect("/login");
+
   const { data: properties } = await supabase
     .from("properties")
     .select("*")
-    .eq("host_id", user!.id)
+    .eq("host_id", user.id)
     .order("created_at", { ascending: false });
 
   const hasProperties = Boolean(properties?.length);
