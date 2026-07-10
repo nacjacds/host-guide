@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   }
 
   const response = await fetch(
-    `https://places.googleapis.com/v1/${name}/media?maxWidthPx=480&key=${process.env.GOOGLE_PLACES_API_KEY}`
+    `https://places.googleapis.com/v1/${name}/media?maxWidthPx=480&key=${process.env.GOOGLE_MAPS_SERVER_KEY}`
   );
 
   if (!response.ok || !response.body) {

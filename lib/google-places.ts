@@ -1,5 +1,11 @@
 import type { PropertyRecommendationCategory } from "@/types";
 
+// Every call in this file runs server-side only (this module has no
+// browser consumers — the manual-search/autocomplete UI hits our own API
+// routes, which call these functions from the server), so it uses
+// GOOGLE_MAPS_SERVER_KEY: an IP-restricted key. A domain/referrer-restricted
+// key doesn't work here since server-to-server requests carry no Referer
+// header.
 const PLACES_API_BASE = "https://places.googleapis.com/v1/places";
 const GEOCODING_API_BASE = "https://maps.googleapis.com/maps/api/geocode/json";
 const DISTANCE_MATRIX_API_BASE = "https://maps.googleapis.com/maps/api/distancematrix/json";
@@ -52,7 +58,7 @@ export async function searchNearbyPlaces(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY!,
+      "X-Goog-Api-Key": process.env.GOOGLE_MAPS_SERVER_KEY!,
       "X-Goog-FieldMask":
         "places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.location,places.googleMapsUri,places.types,places.photos",
     },
@@ -81,7 +87,7 @@ export async function searchRecommendationCandidates(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY!,
+      "X-Goog-Api-Key": process.env.GOOGLE_MAPS_SERVER_KEY!,
       "X-Goog-FieldMask":
         "places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.location,places.googleMapsUri,places.types,places.photos",
     },
@@ -140,7 +146,7 @@ export async function geocodeAddress(
 ): Promise<{ lat: number; lng: number } | null> {
   const url = new URL(GEOCODING_API_BASE);
   url.searchParams.set("address", address);
-  url.searchParams.set("key", process.env.GOOGLE_PLACES_API_KEY!);
+  url.searchParams.set("key", process.env.GOOGLE_MAPS_SERVER_KEY!);
   url.searchParams.set("language", "es");
 
   const response = await fetch(url);
@@ -170,7 +176,7 @@ export async function getWalkingMinutes(
     destinations.map((d) => `${d.lat},${d.lng}`).join("|")
   );
   url.searchParams.set("mode", "walking");
-  url.searchParams.set("key", process.env.GOOGLE_PLACES_API_KEY!);
+  url.searchParams.set("key", process.env.GOOGLE_MAPS_SERVER_KEY!);
 
   try {
     const response = await fetch(url);
@@ -201,7 +207,7 @@ export async function autocompletePlaces(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY!,
+      "X-Goog-Api-Key": process.env.GOOGLE_MAPS_SERVER_KEY!,
     },
     body: JSON.stringify({
       input,
@@ -233,7 +239,7 @@ export async function autocompletePlaces(
 export async function getPlaceDetails(placeId: string): Promise<PlaceResult | null> {
   const response = await fetch(`${PLACES_API_BASE}/${placeId}`, {
     headers: {
-      "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY!,
+      "X-Goog-Api-Key": process.env.GOOGLE_MAPS_SERVER_KEY!,
       "X-Goog-FieldMask":
         "id,displayName,formattedAddress,rating,userRatingCount,location,googleMapsUri,types,photos",
     },
