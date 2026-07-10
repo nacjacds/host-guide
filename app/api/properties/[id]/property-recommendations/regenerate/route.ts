@@ -15,6 +15,11 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: propertyId } = await params;
+  // TEMPORARY diagnostic logging — confirms the request is actually
+  // reaching this handler at all (routing/deploy sanity check), remove
+  // once geocoding failures are understood.
+  console.error("[REGENERATE] Endpoint hit, property:", propertyId);
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -71,6 +76,11 @@ export async function POST(
 
     return NextResponse.json(result);
   } catch (err) {
+    // TEMPORARY diagnostic logging — the catch block previously logged
+    // nothing server-side, only returning err.message to the client.
+    // Logs the full error (stack included) so any failure here, not just
+    // geocoding ones, is visible in server logs.
+    console.error("[REGENERATE] generatePropertyRecommendations failed:", err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "No se pudieron generar recomendaciones" },
       { status: 500 }
