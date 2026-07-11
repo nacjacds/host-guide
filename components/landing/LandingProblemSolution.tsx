@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { X, Check } from "lucide-react";
+import { HandDrawnCheck, HandDrawnCross } from "./HandDrawnMark";
 
 export function LandingProblemSolution() {
   const t = useTranslations("landing.problem");
@@ -11,7 +11,7 @@ export function LandingProblemSolution() {
 
   return (
     <section className="bg-[#F5EFE6] py-16 sm:py-24">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-12 text-center">
           <span className="text-xs font-medium tracking-wide text-[#C0603A] uppercase">
             {t("eyebrow")}
@@ -21,21 +21,21 @@ export function LandingProblemSolution() {
           </h2>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-6 sm:grid-cols-2 sm:items-stretch lg:gap-8">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.45 }}
-            className="rounded-2xl border border-[#DDD8CC] bg-white/60 p-6"
+            className="rounded-2xl border border-[#DDD8CC] bg-white/60 p-6 sm:p-7"
           >
-            <p className="mb-4 text-xs font-medium tracking-wide text-[#6B6B67] uppercase">
+            <p className="mb-5 text-xs font-medium tracking-wide text-[#6B6B67] uppercase">
               {t("beforeLabel")}
             </p>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {before.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-sm text-[#6B6B67]">
-                  <X className="mt-0.5 size-4 shrink-0 text-[#6B6B67]" strokeWidth={1.5} />
+                <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-[#6B6B67]">
+                  <HandDrawnCross className="mt-0.5 size-5 shrink-0 text-[#FF4200]" />
                   {item}
                 </li>
               ))}
@@ -47,15 +47,15 @@ export function LandingProblemSolution() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.45, delay: 0.1 }}
-            className="rounded-2xl border border-[#1B4F72]/15 bg-white p-6 shadow-sm"
+            className="rounded-2xl border border-[#1B4F72]/15 bg-white p-6 shadow-sm sm:p-7"
           >
-            <p className="mb-4 text-xs font-medium tracking-wide text-[#1B4F72] uppercase">
+            <p className="mb-5 text-xs font-medium tracking-wide text-[#1B4F72] uppercase">
               {t("afterLabel")}
             </p>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {after.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-sm text-[#1A1A18]">
-                  <Check className="mt-0.5 size-4 shrink-0 text-[#FF4200]" strokeWidth={1.5} />
+                <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-[#1A1A18]">
+                  <HandDrawnCheck className="mt-0.5 size-5 shrink-0 text-[#5B7B52]" />
                   {item}
                 </li>
               ))}

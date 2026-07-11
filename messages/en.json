@@ -19,16 +19,19 @@
       "beforeLabel": "Without WelcoKit",
       "afterLabel": "With WelcoKit",
       "before": [
-        "The same WiFi message, copy-pasted, again",
-        "A generic PDF nobody actually opens",
-        "“Where can we eat tonight?” — at 10pm",
-        "Paper notes that get lost in the sheets"
+        "Guests arrive from different platforms (Airbnb, Booking, VRBO...) and each one gives them different or incomplete information",
+        "They're not sure about house rules, or check-in and check-out times",
+        "They have to ask for the WiFi password — again",
+        "They don't know the area they're staying in, or where to eat, what to see, or where to go at night",
+        "They message you with questions at any hour, often the same ones over and over"
       ],
       "after": [
-        "One link or QR — opens instantly, no app needed",
-        "Automatically translated into your guest's language",
-        "Real local recommendations, with distance and map",
-        "You answer less, they enjoy more"
+        "Build your stay's digital guide in minutes",
+        "Share it with a link or a QR code — no app to install",
+        "Everything in one place: house rules, check-in and check-out times, WiFi, emergency numbers, your WhatsApp, how the appliances work, photos",
+        "Automatically translated into each guest's language",
+        "Real restaurant, sightseeing, and nightlife recommendations, with distance and a map — generated automatically with AI or added by hand",
+        "You answer less, your guests enjoy more, and leave better reviews"
       ]
     },
     "features": {
