@@ -81,6 +81,7 @@
       "mostPopular": "Más popular",
       "perMonth": "/mes",
       "cta": "Empezar gratis",
+      "ctaPaid": "Empezar con {plan}",
       "planFeatures": {
         "free": ["1 propiedad", "Bloques de contenido manuales", "QR descargable"],
         "starter": ["3 propiedades", "IA para contenido y recomendaciones", "QR descargable"],

@@ -31,7 +31,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
   starter: {
     id: "starter",
     label: "Starter",
-    priceEurMonth: 4,
+    priceEurMonth: 5,
     maxProperties: 3,
     aiEnabled: true,
     analyticsEnabled: false,

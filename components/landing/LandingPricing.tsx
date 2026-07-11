@@ -78,7 +78,7 @@ export function LandingPricing() {
                   nativeButton={false}
                   render={<Link href="/register" />}
                 >
-                  {t("cta")}
+                  {planId === "free" ? t("cta") : t("ctaPaid", { plan: plan.label })}
                 </Button>
               </motion.div>
             );
