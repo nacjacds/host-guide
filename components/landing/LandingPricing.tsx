@@ -14,7 +14,7 @@ export function LandingPricing() {
   const t = useTranslations("landing.pricing");
 
   return (
-    <section className="bg-[#FAFAF8] py-16 sm:py-24">
+    <section className="bg-[#FAFAF8] pt-16 pb-0 sm:pt-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-12 text-center">
           <span className="text-xs font-medium tracking-wide text-[#C0603A] uppercase">
