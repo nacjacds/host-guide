@@ -35,7 +35,7 @@ export function LandingProblemSolution() {
             <ul className="space-y-4">
               {before.map((item) => (
                 <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-[#6B6B67]">
-                  <HandDrawnCross className="mt-0.5 size-5 shrink-0 text-[#FF4200]" />
+                  <HandDrawnCross className="mt-0 size-6 shrink-0 text-[#FF4200]" />
                   {item}
                 </li>
               ))}
@@ -55,7 +55,7 @@ export function LandingProblemSolution() {
             <ul className="space-y-4">
               {after.map((item) => (
                 <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-[#1A1A18]">
-                  <HandDrawnCheck className="mt-0.5 size-5 shrink-0 text-[#5B7B52]" />
+                  <HandDrawnCheck className="mt-0 size-6 shrink-0 text-[#5B7B52]" />
                   {item}
                 </li>
               ))}
