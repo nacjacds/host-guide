@@ -1,0 +1,94 @@
+"use client";
+
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PLANS, PLAN_ORDER } from "@/lib/plans";
+import { RoofDivider } from "./RoofDivider";
+
+const HIGHLIGHTED_PLAN_ID = "pro";
+
+export function LandingPricing() {
+  const t = useTranslations("landing.pricing");
+
+  return (
+    <section className="bg-[#FAFAF8] py-16 sm:py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="mb-12 text-center">
+          <span className="text-xs font-medium tracking-wide text-[#C0603A] uppercase">
+            {t("eyebrow")}
+          </span>
+          <h2 className="mt-3 font-serif text-3xl font-semibold text-balance text-[#1A1A18] sm:text-4xl">
+            {t("title")}
+          </h2>
+          <p className="mt-3 text-base text-[#6B6B67]">{t("subtitle")}</p>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {PLAN_ORDER.map((planId, i) => {
+            const plan = PLANS[planId];
+            const highlighted = planId === HIGHLIGHTED_PLAN_ID;
+            const features = t.raw(`planFeatures.${planId}`) as string[];
+
+            return (
+              <motion.div
+                key={planId}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.4, delay: i * 0.06 }}
+                className={`relative flex flex-col rounded-2xl border p-6 ${
+                  highlighted
+                    ? "border-[#FF4200] bg-white shadow-md"
+                    : "border-[#DDD8CC] bg-white/60"
+                }`}
+              >
+                {highlighted && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#FF4200] px-3 py-1 text-[11px] font-medium whitespace-nowrap text-white">
+                    {t("mostPopular")}
+                  </span>
+                )}
+                <p className="text-sm font-medium text-[#1B4F72]">{plan.label}</p>
+                <p className="mt-2 mb-4">
+                  <span className="font-serif text-3xl font-bold text-[#1A1A18]">
+                    {plan.priceEurMonth}€
+                  </span>
+                  <span className="text-sm text-[#6B6B67]">{t("perMonth")}</span>
+                </p>
+                <ul className="mb-6 flex-1 space-y-2.5">
+                  {features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-2 text-sm text-[#1A1A18]">
+                      <Check
+                        className="mt-0.5 size-4 shrink-0 text-[#FF4200]"
+                        strokeWidth={1.5}
+                      />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  variant={highlighted ? "default" : "outline"}
+                  className={
+                    highlighted
+                      ? "w-full bg-[#FF4200] text-white hover:bg-[#e03a00]"
+                      : "w-full border-[#1B4F72] text-[#1B4F72] hover:bg-[#1B4F72]/5"
+                  }
+                  nativeButton={false}
+                  render={<Link href="/register" />}
+                >
+                  {t("cta")}
+                </Button>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-14 sm:mt-20">
+        <RoofDivider color="#1B4F72" />
+      </div>
+    </section>
+  );
+}

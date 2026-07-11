@@ -1,0 +1,100 @@
+{
+  "landing": {
+    "nav": {
+      "login": "Log in",
+      "cta": "Start for free"
+    },
+    "hero": {
+      "eyebrow": "Digital guides for short-term stays",
+      "headline": "Everything your guest needs to know, in one link",
+      "subhead": "Build your stay's digital guide in minutes: WiFi, check-in, house rules, and AI-curated local recommendations — automatically translated for every guest.",
+      "ctaPrimary": "Create my first guide",
+      "ctaSecondary": "See how it works",
+      "previewHost": "Carmen & Nacho",
+      "previewGreeting": "Welcome to Carihuela Cristal!"
+    },
+    "problem": {
+      "eyebrow": "You know the routine",
+      "title": "Fewer repeated questions, happier guests",
+      "beforeLabel": "Without WelcoKit",
+      "afterLabel": "With WelcoKit",
+      "before": [
+        "The same WiFi message, copy-pasted, again",
+        "A generic PDF nobody actually opens",
+        "“Where can we eat tonight?” — at 10pm",
+        "Paper notes that get lost in the sheets"
+      ],
+      "after": [
+        "One link or QR — opens instantly, no app needed",
+        "Automatically translated into your guest's language",
+        "Real local recommendations, with distance and map",
+        "You answer less, they enjoy more"
+      ]
+    },
+    "features": {
+      "eyebrow": "What's included",
+      "title": "A complete guide, without the hassle",
+      "items": [
+        {
+          "title": "A guide built around your stay",
+          "description": "WiFi, check-in, check-out, house rules — all in one link you send just once."
+        },
+        {
+          "title": "Automatic translation",
+          "description": "Your guest reads the guide in their own language, without you writing an extra word."
+        },
+        {
+          "title": "AI-curated local recommendations",
+          "description": "What to see, where to eat, nightlife — real places, real distances, and a Google Maps link."
+        },
+        {
+          "title": "Print-ready QR code",
+          "description": "Stick it on the door or leave it on the table — your guest scans it and they're in."
+        }
+      ]
+    },
+    "howItWorks": {
+      "eyebrow": "Live in minutes",
+      "title": "Publish your guide in three steps",
+      "steps": [
+        {
+          "title": "Add your stay",
+          "description": "Name, address, the basics — two minutes."
+        },
+        {
+          "title": "Generate recommendations with one click",
+          "description": "AI finds and ranks the best of your area using real Google data."
+        },
+        {
+          "title": "Share the link or the QR",
+          "description": "Your guest already has everything they need to know."
+        }
+      ]
+    },
+    "pricing": {
+      "eyebrow": "Plans",
+      "title": "A plan for every host",
+      "subtitle": "Start free. Grow when you need to.",
+      "mostPopular": "Most popular",
+      "perMonth": "/mo",
+      "cta": "Start for free",
+      "planFeatures": {
+        "free": ["1 property", "Manual content blocks", "Downloadable QR"],
+        "starter": ["3 properties", "AI content & recommendations", "Downloadable QR"],
+        "pro": ["10 properties", "Everything in Starter + analytics", "WhatsApp bot"],
+        "agency": ["30 properties", "Everything in Pro + white label", "Priority support"]
+      }
+    },
+    "finalCta": {
+      "title": "Ready to stop repeating your WiFi password?",
+      "subtitle": "Create your first guide for free, no credit card needed.",
+      "cta": "Start for free"
+    },
+    "footer": {
+      "tagline": "Everything your guests need to know, in one place",
+      "login": "Log in",
+      "register": "Sign up",
+      "copyright": "© {year} WelcoKit. All rights reserved."
+    }
+  }
+}

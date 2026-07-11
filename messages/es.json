@@ -1,0 +1,100 @@
+{
+  "landing": {
+    "nav": {
+      "login": "Iniciar sesión",
+      "cta": "Empezar gratis"
+    },
+    "hero": {
+      "eyebrow": "Guías digitales para alojamientos",
+      "headline": "Todo lo que tu huésped necesita saber, en un solo enlace",
+      "subhead": "Crea la guía digital de tu alojamiento en minutos: WiFi, check-in, normas y recomendaciones locales curadas con IA — traducida automáticamente al idioma de cada huésped.",
+      "ctaPrimary": "Crear mi primera guía",
+      "ctaSecondary": "Ver cómo funciona",
+      "previewHost": "Carmen & Nacho",
+      "previewGreeting": "¡Bienvenido a Carihuela Cristal!"
+    },
+    "problem": {
+      "eyebrow": "Ya conoces la rutina",
+      "title": "Menos preguntas repetidas, más huéspedes contentos",
+      "beforeLabel": "Sin WelcoKit",
+      "afterLabel": "Con WelcoKit",
+      "before": [
+        "El mismo mensaje del WiFi, copiado y pegado, otra vez",
+        "Un PDF genérico que nadie llega a abrir",
+        "“¿Dónde podemos cenar esta noche?” — a las 22:00",
+        "Notas en papel que se pierden entre las sábanas"
+      ],
+      "after": [
+        "Un enlace o QR — se abre sin instalar nada",
+        "Traducida automáticamente al idioma de tu huésped",
+        "Recomendaciones locales reales, con distancia y mapa",
+        "Tú respondes menos, ellos disfrutan más"
+      ]
+    },
+    "features": {
+      "eyebrow": "Qué incluye",
+      "title": "Una guía completa, sin complicarte",
+      "items": [
+        {
+          "title": "Guía a medida de tu alojamiento",
+          "description": "WiFi, check-in, check-out, normas de la casa — todo en un enlace que envías una sola vez."
+        },
+        {
+          "title": "Traducción automática",
+          "description": "Tu huésped lee la guía en su idioma sin que tú escribas una palabra de más."
+        },
+        {
+          "title": "Recomendaciones locales con IA",
+          "description": "Qué visitar, dónde comer, vida nocturna — lugares reales, con distancia real y enlace a Google Maps."
+        },
+        {
+          "title": "Código QR listo para imprimir",
+          "description": "Pégalo en la puerta o déjalo en la mesa — tu huésped escanea y ya está dentro."
+        }
+      ]
+    },
+    "howItWorks": {
+      "eyebrow": "En marcha en minutos",
+      "title": "Publica tu guía en tres pasos",
+      "steps": [
+        {
+          "title": "Añade tu alojamiento",
+          "description": "Nombre, dirección y lo básico — dos minutos."
+        },
+        {
+          "title": "Genera recomendaciones con un clic",
+          "description": "La IA busca y ordena lo mejor de tu zona con datos reales de Google."
+        },
+        {
+          "title": "Comparte el enlace o el QR",
+          "description": "Tu huésped ya tiene todo lo que necesita saber."
+        }
+      ]
+    },
+    "pricing": {
+      "eyebrow": "Planes",
+      "title": "Un plan para cada anfitrión",
+      "subtitle": "Empieza gratis. Crece cuando lo necesites.",
+      "mostPopular": "Más popular",
+      "perMonth": "/mes",
+      "cta": "Empezar gratis",
+      "planFeatures": {
+        "free": ["1 propiedad", "Bloques de contenido manuales", "QR descargable"],
+        "starter": ["3 propiedades", "IA para contenido y recomendaciones", "QR descargable"],
+        "pro": ["10 propiedades", "Todo lo de Starter + estadísticas", "Bot de WhatsApp"],
+        "agency": ["30 propiedades", "Todo lo de Pro + marca blanca", "Soporte prioritario"]
+      }
+    },
+    "finalCta": {
+      "title": "¿Listo para dejar de repetir el WiFi?",
+      "subtitle": "Crea tu primera guía gratis, sin tarjeta de crédito.",
+      "cta": "Empezar gratis"
+    },
+    "footer": {
+      "tagline": "Todo lo que tus huéspedes necesitan saber, en un solo lugar",
+      "login": "Iniciar sesión",
+      "register": "Registrarse",
+      "copyright": "© {year} WelcoKit. Todos los derechos reservados."
+    }
+  }
+}
