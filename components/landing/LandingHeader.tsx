@@ -17,9 +17,9 @@ export function LandingHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-[#DDD8CC]/70 bg-[#FAFAF8]/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="/" className="shrink-0">
+        <Link href="/" className="w-[130px] shrink-0 sm:w-[200px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.svg" alt="WelcoKit" className="h-8 w-auto sm:h-9" />
+          <img src="/logo.svg" alt="WelcoKit" className="h-auto w-full" />
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-3">
