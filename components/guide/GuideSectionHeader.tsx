@@ -21,7 +21,7 @@ export function GuideSectionHeader({
 
   return (
     <div
-      className="sticky top-0 z-10 overflow-hidden shadow-md"
+      className="sticky top-0 z-10 overflow-hidden rounded-b-3xl shadow-md"
       style={coverImageUrl ? undefined : { backgroundColor: accentColor }}
     >
       {coverImageUrl && (
@@ -44,9 +44,12 @@ export function GuideSectionHeader({
           href={`/guide/${slug}`}
           className="flex shrink-0 items-center gap-1 text-sm text-white/80 hover:text-white"
         >
-          <ChevronLeft className="size-4" />
-          <span className="hidden sm:inline">{t("back")}</span>
+          <ChevronLeft className="size-5" />
+          <span className="hidden font-bold sm:inline">{t("back")}</span>
         </Link>
+        <span className="hidden text-white/35 sm:inline" aria-hidden="true">
+          |
+        </span>
         <span className="truncate text-sm font-medium">{propertyName}</span>
         <div className="ml-auto hidden shrink-0 sm:block">
           <LanguageSwitcher />
