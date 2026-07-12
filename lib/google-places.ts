@@ -49,6 +49,29 @@ function buildPhotoUrl(photoName: string | undefined): string | null {
   return `/api/places/photo?name=${encodeURIComponent(photoName)}`;
 }
 
+const EARTH_RADIUS_METERS = 6371000;
+
+// Places API (New) Text Search's `locationRestriction` only accepts a
+// rectangle (viewport), not a circle — this approximates our radius as the
+// smallest rectangle that circumscribes it, so real hard-restriction
+// (locationRestriction) can still be used instead of locationBias, which
+// Google treats as a weak preference and can ignore entirely for
+// well-known places far outside it (see the 90-140km outliers this was
+// fixed for). The one tradeoff: points in the rectangle's corners can be
+// up to radius*sqrt(2) from center, not just radius — still far tighter
+// than the previous unenforced behavior.
+function boundingRectangleFromCircle(center: { lat: number; lng: number }, radiusMeters: number) {
+  const latDelta = (radiusMeters / EARTH_RADIUS_METERS) * (180 / Math.PI);
+  const lngDelta =
+    (radiusMeters / (EARTH_RADIUS_METERS * Math.cos((center.lat * Math.PI) / 180))) *
+    (180 / Math.PI);
+
+  return {
+    low: { latitude: center.lat - latDelta, longitude: center.lng - lngDelta },
+    high: { latitude: center.lat + latDelta, longitude: center.lng + lngDelta },
+  };
+}
+
 export async function searchNearbyPlaces(
   address: string,
   category: string
@@ -86,14 +109,18 @@ export async function searchNearbyPlaces(
 }
 
 // Searches a recommendation category (attractions/restaurants/nightlife/
-// beaches/nature) centered on real coordinates with a locationBias circle —
-// more accurate than embedding the address as free text, and lets each
-// category use its own search radius.
+// beaches/nature) centered on real coordinates, hard-restricted to a
+// rectangle circumscribing the category's radius — locationBias (a weak
+// preference Google can ignore for well-known places far outside it) was
+// letting results 90-140km away through for generic queries like
+// "atracciones turísticas", so this uses locationRestriction instead,
+// which Text Search (New) only supports as a rectangle, not a circle.
 export async function searchRecommendationCandidates(
   center: { lat: number; lng: number },
   category: PropertyRecommendationCategory
 ): Promise<PlaceResult[]> {
   const config = RECOMMENDATION_CATEGORY_CONFIG[category];
+  const rectangle = boundingRectangleFromCircle(center, config.radiusMeters);
 
   const response = await fetch(`${PLACES_API_BASE}:searchText`, {
     method: "POST",
@@ -106,12 +133,7 @@ export async function searchRecommendationCandidates(
     body: JSON.stringify({
       textQuery: config.query,
       languageCode: "es",
-      locationBias: {
-        circle: {
-          center: { latitude: center.lat, longitude: center.lng },
-          radius: config.radiusMeters,
-        },
-      },
+      locationRestriction: { rectangle },
     }),
   });
 
@@ -141,12 +163,14 @@ export async function searchRecommendationCandidates(
     rating: p.rating,
     user_ratings_total: p.userRatingCount,
     types: p.types,
+    location: p.location,
   }));
   const rawLog = {
     category,
     center,
     query: config.query,
     radiusMeters: config.radiusMeters,
+    rectangle,
     rawCount: rawPlaces.length,
     rawPlaces,
   };
@@ -185,6 +209,7 @@ interface RawPlace {
   rating?: number;
   userRatingCount?: number;
   types?: string[];
+  location?: { latitude: number; longitude: number };
 }
 
 function mapPlacesResponse(data: {
