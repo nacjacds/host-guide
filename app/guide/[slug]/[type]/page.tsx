@@ -83,6 +83,12 @@ export default async function GuideBlockPage({
 
     const Icon = RECOMMENDATION_CATEGORY_ICONS[category];
 
+    // Same pre-fetch-then-fallback pattern as every other block below —
+    // see RecommendationCategoryPanel/useTranslatedRecommendations for the
+    // client-side locale switch and cache-miss fallback.
+    const translations = await fetchPropertyTranslations(property.id, TARGET_LOCALES[0]);
+    const translated = lookupTranslation<TranslatablePayload>(translations, category, null);
+
     return (
       <div className="mx-auto max-w-2xl pb-24">
         <GuideSectionHeader
@@ -96,7 +102,11 @@ export default async function GuideBlockPage({
             <SectionHeading icon={Icon} accentColor={property.accent_color}>
               <RecommendationCategoryTitle category={category} />
             </SectionHeading>
-            <RecommendationCategoryPanel recommendations={recommendations} />
+            <RecommendationCategoryPanel
+              recommendations={recommendations}
+              category={category}
+              translated={translated}
+            />
           </div>
           <BackToGuideButton slug={slug} />
         </div>

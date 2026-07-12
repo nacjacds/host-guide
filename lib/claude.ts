@@ -122,6 +122,15 @@ export interface CuratedRecommendation {
 // from real Google Places candidates — Claude must not invent or modify
 // any factual data (name/address/rating/etc.), only choose, rank, and
 // describe from the list it's given.
+//
+// Deliberately always writes in Spanish (SOURCE_LOCALE, see
+// lib/translations/constants.ts) regardless of what language a guest is
+// viewing the guide in — same as every other piece of host-authored/
+// AI-generated guide content. A guest viewing in English gets these
+// descriptions translated on the fly via the same content_translations
+// cache the rest of the guide uses (see
+// lib/translations/translateRecommendations.ts), not by asking Claude to
+// write in a different language here.
 export async function curateRecommendations(params: {
   propertyName: string;
   address: string;

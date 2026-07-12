@@ -2,6 +2,8 @@
 
 import { ExternalLink, Star } from "lucide-react";
 import { useGuideLocale } from "./GuideLocaleProvider";
+import { useTranslatedRecommendations } from "./useTranslatedRecommendations";
+import type { TranslatablePayload } from "@/lib/translations/extract";
 import type { PropertyRecommendation } from "@/types";
 
 function formatDistance(
@@ -24,10 +26,19 @@ function formatDistance(
 
 export function RecommendationCategoryPanel({
   recommendations,
+  category,
+  translated,
 }: {
   recommendations: PropertyRecommendation[];
+  category: string;
+  translated: TranslatablePayload | null;
 }) {
   const { t } = useGuideLocale();
+  const translatedDescriptions = useTranslatedRecommendations({
+    category,
+    recommendations,
+    translated,
+  });
 
   if (recommendations.length === 0) {
     return (
@@ -78,7 +89,9 @@ export function RecommendationCategoryPanel({
                 )}
               </div>
               {rec.address && <p className="mt-1 text-xs text-muted-foreground">{rec.address}</p>}
-              {rec.description && <p className="mt-1.5 text-sm">{rec.description}</p>}
+              {rec.description && (
+                <p className="mt-1.5 text-sm">{translatedDescriptions[rec.id] ?? rec.description}</p>
+              )}
             </div>
           </div>
         );

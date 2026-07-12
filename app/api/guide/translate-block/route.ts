@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import { extractTranslatable } from "@/lib/translations/extract";
+import { extractTranslatable, type TranslatablePayload } from "@/lib/translations/extract";
 import { translateContent } from "@/lib/translations/translateContent";
 import { isTargetLocale, SOURCE_LOCALE } from "@/lib/translations/constants";
+import {
+  BASE_RECOMMENDATION_CATEGORIES,
+  OPTIONAL_RECOMMENDATION_CATEGORIES,
+} from "@/lib/recommendations/constants";
 import type { BlockType } from "@/types";
+
+const RECOMMENDATION_CATEGORIES: readonly string[] = [
+  ...BASE_RECOMMENDATION_CATEGORIES,
+  ...OPTIONAL_RECOMMENDATION_CATEGORIES,
+];
 
 // This is the rare-exception path: the guest guide reads pre-generated
 // translations from content_translations (see app/guide/[slug]/...), and
@@ -79,6 +88,26 @@ export async function POST(request: NextRequest) {
         sourceLocale: SOURCE_LOCALE,
         targetLocale,
         content,
+      });
+      return NextResponse.json({ translated });
+    }
+
+    if (RECOMMENDATION_CATEGORIES.includes(blockType)) {
+      // The client already sends this pre-shaped as a TranslatablePayload
+      // ({ fields: { descriptions: { [recId]: description } } }) — a
+      // recommendation category has no single guide_blocks row to run
+      // through extractTranslatable, so this skips straight to
+      // translateContent, same as the welcome_message case above.
+      if (typeof content !== "object" || content === null) {
+        return NextResponse.json({ translated: null });
+      }
+      const translated = await translateContent({
+        propertyId,
+        blockType,
+        blockId: null,
+        sourceLocale: SOURCE_LOCALE,
+        targetLocale,
+        content: content as unknown as TranslatablePayload,
       });
       return NextResponse.json({ translated });
     }

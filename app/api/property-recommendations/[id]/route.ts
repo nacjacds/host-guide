@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { triggerRecommendationsTranslation } from "@/lib/translations/translateRecommendations";
 
 const editSchema = z.object({
   name: z.string().trim().min(1).max(200),
@@ -57,6 +58,17 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  // Refresh the cached English translation for this whole category in the
+  // background — a category's descriptions are cached together (see
+  // triggerRecommendationsTranslation), so any edit invalidates the whole
+  // set, not just this one row.
+  const { data: categoryRows } = await supabase
+    .from("property_recommendations")
+    .select("id, description")
+    .eq("property_id", updated.property_id)
+    .eq("category", updated.category);
+  triggerRecommendationsTranslation(updated.property_id, updated.category, categoryRows ?? []);
 
   return NextResponse.json({ recommendation: updated });
 }

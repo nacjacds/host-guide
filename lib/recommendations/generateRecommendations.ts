@@ -7,6 +7,7 @@ import {
   geocodeAddress,
 } from "@/lib/google-places";
 import { curateRecommendations } from "@/lib/claude";
+import { triggerRecommendationsTranslation } from "@/lib/translations/translateRecommendations";
 import {
   BASE_RECOMMENDATION_CATEGORIES,
   OPTIONAL_RECOMMENDATION_CATEGORIES,
@@ -166,6 +167,26 @@ export async function generatePropertyRecommendations(
   if (newRows.length > 0) {
     const { data } = await supabase.from("property_recommendations").insert(newRows).select();
     insertedRows = data ?? [];
+  }
+
+  // Refresh the cached English translation for every category touched this
+  // run — fetched fresh (not just insertedRows) since a category can also
+  // contain manual/edited rows this run never touched, and the guest view
+  // shows the whole category's descriptions translated together.
+  if (categoriesFoundThisRun.length > 0) {
+    const { data: currentByCategory } = await supabase
+      .from("property_recommendations")
+      .select("id, category, description")
+      .eq("property_id", propertyId)
+      .in("category", categoriesFoundThisRun);
+
+    for (const category of categoriesFoundThisRun) {
+      triggerRecommendationsTranslation(
+        propertyId,
+        category,
+        (currentByCategory ?? []).filter((r) => r.category === category)
+      );
+    }
   }
 
   const { data: existingMeta } = await supabase
