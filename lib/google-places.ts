@@ -67,6 +67,17 @@ export async function searchNearbyPlaces(
   });
 
   if (!response.ok) {
+    // TEMPORARY diagnostic logging — Places API (New) returns a JSON body
+    // like { error: { code, message, status } } explaining the real cause
+    // (e.g. PERMISSION_DENIED) — the generic "Google Places API error:
+    // 403" thrown below was hiding it.
+    const bodyText = await response.text().catch(() => "<no body>");
+    const logData = { httpStatus: response.status, body: bodyText, query };
+    console.error("[searchNearbyPlaces] HTTP error", logData);
+    fs.appendFileSync(
+      "/tmp/debug.log",
+      `${new Date().toISOString()} - [searchNearbyPlaces HTTP error] ${JSON.stringify(logData)}\n`
+    );
     throw new Error(`Google Places API error: ${response.status}`);
   }
 
@@ -105,6 +116,16 @@ export async function searchRecommendationCandidates(
   });
 
   if (!response.ok) {
+    // TEMPORARY diagnostic logging — same reasoning as searchNearbyPlaces
+    // above: capture Google's actual error body instead of just the
+    // generic HTTP status.
+    const bodyText = await response.text().catch(() => "<no body>");
+    const logData = { httpStatus: response.status, body: bodyText, category, center };
+    console.error("[searchRecommendationCandidates] HTTP error", logData);
+    fs.appendFileSync(
+      "/tmp/debug.log",
+      `${new Date().toISOString()} - [searchRecommendationCandidates HTTP error] ${JSON.stringify(logData)}\n`
+    );
     throw new Error(`Google Places API error: ${response.status}`);
   }
 
