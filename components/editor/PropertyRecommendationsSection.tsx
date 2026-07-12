@@ -305,7 +305,7 @@ export function PropertyRecommendationsSection({
         const Icon = RECOMMENDATION_CATEGORY_ICONS[category];
         const generating = generatingCategory === category;
         return (
-          <Card key={category}>
+          <Card key={category} className="overflow-visible">
             <CardHeader>
               <CardTitle className="flex items-center justify-between gap-2 text-base">
                 <span className="flex items-center gap-2">
