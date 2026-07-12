@@ -1,5 +1,6 @@
 "use client";
 
+import type { RefObject } from "react";
 import { Wifi, KeyRound, Landmark, UtensilsCrossed, Music, MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -19,7 +20,13 @@ const TILES = [
 // The signature visual: a real guide (Carihuela Cristal — its accent color
 // happens to be the brand's own #1B4F72) rendered like a door tag, string
 // and hole included, tilted as if just handed to a guest.
-export function GuidePreviewCard() {
+export function GuidePreviewCard({
+  holeRef,
+}: {
+  // Forwarded to the tag's "grommet hole" so LandingHero can anchor the
+  // DoodleConnector's start point to its real on-screen position.
+  holeRef?: RefObject<HTMLDivElement>;
+}) {
   const t = useTranslations("landing.hero");
 
   return (
@@ -38,7 +45,10 @@ export function GuidePreviewCard() {
           strokeLinecap="round"
         />
       </svg>
-      <div className="absolute top-[-8px] left-1/2 size-4 -translate-x-1/2 rounded-full border-2 border-[#C0603A] bg-[#FAFAF8]" />
+      <div
+        ref={holeRef}
+        className="absolute top-[-8px] left-1/2 size-4 -translate-x-1/2 rounded-full border-2 border-[#C0603A] bg-[#FAFAF8]"
+      />
 
       <div className="overflow-hidden rounded-3xl border border-[#DDD8CC] bg-white shadow-xl">
         {/* eslint-disable-next-line @next/next/no-img-element */}

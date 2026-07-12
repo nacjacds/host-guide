@@ -1,18 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GuidePreviewCard } from "./GuidePreviewCard";
 import { WaveDivider } from "./WaveDivider";
+import { DoodleConnector } from "./DoodleConnector";
 
 export function LandingHero() {
   const t = useTranslations("landing.hero");
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const holeRef = useRef<HTMLDivElement | null>(null);
+  const ctaRef = useRef<HTMLAnchorElement | null>(null);
 
   return (
-    <section className="relative overflow-hidden bg-[#FAFAF8] pt-12 pb-0 sm:pt-16">
+    <section ref={sectionRef} className="relative overflow-hidden bg-[#FAFAF8] pt-12 pb-0 sm:pt-16">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -31,6 +36,7 @@ export function LandingHero() {
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row lg:justify-start">
             <Button
+              ref={ctaRef}
               size="lg"
               className="w-full bg-[#FF4200] text-white hover:bg-[#e03a00] sm:w-auto"
               nativeButton={false}
@@ -53,9 +59,11 @@ export function LandingHero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
         >
-          <GuidePreviewCard />
+          <GuidePreviewCard holeRef={holeRef} />
         </motion.div>
       </div>
+
+      <DoodleConnector containerRef={sectionRef} originRef={holeRef} targetRef={ctaRef} />
 
       <div className="mt-14 sm:mt-20">
         <WaveDivider color="#F5EFE6" />
