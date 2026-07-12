@@ -24,8 +24,12 @@ export function LocaleProvider({
 }: {
   // Passed down from a server component that already read the shared
   // NEXT_LOCALE cookie — when present, it wins outright and no client-side
-  // detection/flash happens. Undefined only on a visitor's very first-ever
-  // request, before any cookie has been set.
+  // detection/flash happens. In practice this is always set by now:
+  // middleware.ts detects a locale from Accept-Language and writes the
+  // cookie on every request that doesn't already have one, before this
+  // component ever mounts — so `initialLocale` should only come back
+  // undefined if middleware didn't run for some reason (e.g. a future
+  // matcher change, a misconfigured edge/CDN layer in front of the app).
   initialLocale?: AppLocale;
   children: React.ReactNode;
 }) {
@@ -33,15 +37,17 @@ export function LocaleProvider({
 
   useEffect(() => {
     if (initialLocale) return;
-    // First-ever visit, no NEXT_LOCALE cookie yet — fall back to the
-    // browser's language and persist it immediately, so this detected
-    // preference is what every other route reads from now on.
+    // Defensive fallback only — see the comment on `initialLocale` above.
+    // Spanish is the explicit special case; everything else (English,
+    // French, German, ...) falls to English, matching
+    // detectLocaleFromAcceptLanguage's rule in lib/locale.ts exactly, so
+    // this and the middleware never disagree if both somehow ran.
     const browserLang = window.navigator.language.toLowerCase();
-    if (browserLang.startsWith("en")) {
+    if (browserLang.startsWith("es")) {
+      setLocaleCookie("es");
+    } else {
       setLocaleState("en");
       setLocaleCookie("en");
-    } else {
-      setLocaleCookie("es");
     }
   }, [initialLocale]);
 
