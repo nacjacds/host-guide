@@ -42,6 +42,9 @@ export const GUIDE_TRANSLATIONS = {
     emptyGuideTitle: "Esta guía está siendo preparada",
     emptyGuideMessage:
       "Esta guía está siendo preparada por tu anfitrión. Vuelve pronto o contacta directamente si necesitas algo.",
+    guideUnavailableTitle: "Esta guía ya no está disponible",
+    guideUnavailableMessage:
+      "El anfitrión ha retirado esta guía. Si crees que es un error, contacta directamente con él.",
   },
   en: {
     back: "Back",
@@ -82,6 +85,9 @@ export const GUIDE_TRANSLATIONS = {
     emptyGuideTitle: "This guide is being prepared",
     emptyGuideMessage:
       "Your host is still preparing this guide. Check back soon or reach out directly if you need anything.",
+    guideUnavailableTitle: "This guide is no longer available",
+    guideUnavailableMessage:
+      "The host has taken this guide down. If you think this is a mistake, please reach out to them directly.",
   },
 } as const;
 

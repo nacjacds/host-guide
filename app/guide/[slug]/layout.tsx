@@ -14,20 +14,26 @@ export default async function GuideLayout({
   const { slug } = await params;
   const supabase = await createClient();
 
+  // No is_published/deleted_at filter here — unlike the page routes, this
+  // layout needs to tell "draft" and "deleted" apart itself (both must
+  // hide the WhatsApp FAB, but a deleted property must never show it even
+  // if it's still otherwise flagged published — see
+  // lib/properties.ts's classifyGuideAvailability, used the same way by
+  // every page route nested under this layout).
   const { data: property } = await supabase
     .from("properties")
-    .select("id, host_id, whatsapp_number")
+    .select("id, host_id, whatsapp_number, is_published, deleted_at")
     .eq("slug", slug)
-    .eq("is_published", true)
     .single();
 
+  const isAvailable = Boolean(property && property.is_published && !property.deleted_at);
   let whatsappNumber = property?.whatsapp_number ?? null;
 
   // Fall back to the host's personal phone (profiles.phone) when the
   // property itself has no WhatsApp number configured, so a host only has
   // to fill it in once in /account to cover every property. profiles has no
   // public RLS select policy, so this needs the service-role client.
-  if (property && !whatsappNumber) {
+  if (isAvailable && !whatsappNumber && property) {
     const serviceClient = createServiceRoleClient();
     const { data: hostProfile } = await serviceClient
       .from("profiles")
@@ -41,7 +47,7 @@ export default async function GuideLayout({
     <GuideLocaleProvider propertyId={property?.id ?? ""}>
       <GuideTransition>{children}</GuideTransition>
       <GuideFooter />
-      {property && <WhatsAppFab whatsappNumber={whatsappNumber} />}
+      {isAvailable && <WhatsAppFab whatsappNumber={whatsappNumber} />}
     </GuideLocaleProvider>
   );
 }

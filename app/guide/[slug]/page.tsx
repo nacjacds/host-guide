@@ -4,9 +4,11 @@ import { HeroSection } from "@/components/guide/HeroSection";
 import { WelcomeMessage } from "@/components/guide/WelcomeMessage";
 import { TileGrid } from "@/components/guide/TileGrid";
 import { EmptyGuideState } from "@/components/guide/EmptyGuideState";
+import { GuideUnavailable } from "@/components/guide/GuideUnavailable";
 import { logAnalyticsEvent } from "@/lib/analytics";
 import { fetchPropertyTranslations, lookupTranslation } from "@/lib/translations/fetchTranslations";
 import { TARGET_LOCALES } from "@/lib/translations/constants";
+import { classifyGuideAvailability } from "@/lib/properties";
 
 export default async function GuidePage({
   params,
@@ -16,13 +18,19 @@ export default async function GuidePage({
   const { slug } = await params;
   const supabase = await createClient();
 
+  // No is_published filter here — fetched unconditionally so a
+  // soft-deleted property can be told apart from a genuinely-missing or
+  // still-draft one and shown different messaging (see
+  // lib/properties.ts's classifyGuideAvailability).
   const { data: property } = await supabase
     .from("properties")
     .select("*")
     .eq("slug", slug)
-    .eq("is_published", true)
     .single();
 
+  const availability = classifyGuideAvailability(property);
+  if (availability === "not_found" || availability === "unpublished") notFound();
+  if (availability === "deleted") return <GuideUnavailable />;
   if (!property) notFound();
 
   // profiles has no public/anon RLS select policy (only "own profile" for

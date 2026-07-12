@@ -115,6 +115,8 @@ export interface Database {
           bathrooms: number | null;
           max_guests: number | null;
           is_published: boolean;
+          deleted_at: string | null;
+          deleted_by_host_plan: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -137,6 +139,8 @@ export interface Database {
           bathrooms?: number | null;
           max_guests?: number | null;
           is_published?: boolean;
+          deleted_at?: string | null;
+          deleted_by_host_plan?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -159,6 +163,8 @@ export interface Database {
           bathrooms?: number | null;
           max_guests?: number | null;
           is_published?: boolean;
+          deleted_at?: string | null;
+          deleted_by_host_plan?: string | null;
           created_at?: string;
           updated_at?: string;
         };

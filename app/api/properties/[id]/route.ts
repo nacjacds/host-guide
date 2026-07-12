@@ -75,6 +75,7 @@ export async function PATCH(
     .update(updateData)
     .eq("id", id)
     .eq("host_id", user.id)
+    .is("deleted_at", null)
     .select()
     .single();
 
@@ -89,8 +90,16 @@ export async function PATCH(
   return NextResponse.json({ property });
 }
 
+const deleteRequestSchema = z.object({
+  // Type-to-confirm friction on the client (see DeletePropertyButton.tsx) —
+  // re-checked here too, since this is a meaningful, if recoverable,
+  // action and the client-side check alone is trivially bypassable via a
+  // raw fetch call.
+  confirmName: z.string(),
+});
+
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -103,9 +112,43 @@ export async function DELETE(
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
 
+  const parsed = deleteRequestSchema.safeParse(await request.json().catch(() => ({})));
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Falta confirmar el nombre de la propiedad" }, { status: 400 });
+  }
+
+  const { data: property } = await supabase
+    .from("properties")
+    .select("id, name")
+    .eq("id", id)
+    .eq("host_id", user.id)
+    .is("deleted_at", null)
+    .single();
+
+  if (!property) {
+    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+  }
+
+  if (parsed.data.confirmName !== property.name) {
+    return NextResponse.json({ error: "El nombre no coincide" }, { status: 400 });
+  }
+
+  // Soft delete only — see supabase/migrations/20260714090000_properties_soft_delete.sql.
+  // Never touches any Stripe subscription: billing is account-level
+  // (profiles.stripe_customer_id/plan), not per-property, so there is
+  // nothing Stripe-side tied to this one property to cancel. The host's
+  // current plan is captured here purely so a super admin reviewing
+  // deleted properties can see whether the host was on a paid plan at
+  // deletion time, in case that warrants a manual billing follow-up.
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("plan")
+    .eq("id", user.id)
+    .single();
+
   const { error } = await supabase
     .from("properties")
-    .delete()
+    .update({ deleted_at: new Date().toISOString(), deleted_by_host_plan: profile?.plan ?? null })
     .eq("id", id)
     .eq("host_id", user.id);
 

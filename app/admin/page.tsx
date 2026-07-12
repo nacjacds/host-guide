@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { isSuperAdmin } from "@/lib/admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -122,7 +123,15 @@ export default async function AdminPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Anfitriones</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            Anfitriones
+            <Link
+              href="/admin/properties"
+              className="text-sm font-normal text-primary underline-offset-2 hover:underline"
+            >
+              Ver todas las propiedades &rarr;
+            </Link>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <AdminHostsTable hosts={hosts} />

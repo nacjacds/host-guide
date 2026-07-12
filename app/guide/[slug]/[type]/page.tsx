@@ -12,11 +12,13 @@ import { BackToGuideButton } from "@/components/guide/BackToGuideButton";
 import { SectionHeading } from "@/components/guide/SectionHeading";
 import { WifiPanel } from "@/components/guide/WifiPanel";
 import { CheckinPanel } from "@/components/guide/CheckinPanel";
+import { GuideUnavailable } from "@/components/guide/GuideUnavailable";
 import { BLOCK_ICONS } from "@/lib/guide-icons";
 import { RECOMMENDATION_CATEGORY_ICONS } from "@/lib/recommendations/constants";
 import { logAnalyticsEvent } from "@/lib/analytics";
 import { fetchPropertyTranslations, lookupTranslation } from "@/lib/translations/fetchTranslations";
 import { TARGET_LOCALES } from "@/lib/translations/constants";
+import { classifyGuideAvailability } from "@/lib/properties";
 import type { TranslatablePayload } from "@/lib/translations/extract";
 import type { BlockType, PropertyRecommendationCategory } from "@/types";
 import type { PlaceListContent } from "@/components/editor/blocks/PlaceListBlock";
@@ -59,13 +61,16 @@ export default async function GuideBlockPage({
 
   const supabase = await createClient();
 
+  // No is_published filter — see app/guide/[slug]/page.tsx for why.
   const { data: property } = await supabase
     .from("properties")
     .select("*")
     .eq("slug", slug)
-    .eq("is_published", true)
     .single();
 
+  const availability = classifyGuideAvailability(property);
+  if (availability === "not_found" || availability === "unpublished") notFound();
+  if (availability === "deleted") return <GuideUnavailable />;
   if (!property) notFound();
 
   if (isRecommendationCategory) {

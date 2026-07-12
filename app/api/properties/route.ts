@@ -48,6 +48,7 @@ export async function GET() {
     .from("properties")
     .select("*")
     .eq("host_id", user.id)
+    .is("deleted_at", null)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -85,7 +86,8 @@ export async function POST(request: NextRequest) {
   const { count } = await supabase
     .from("properties")
     .select("id", { count: "exact", head: true })
-    .eq("host_id", user.id);
+    .eq("host_id", user.id)
+    .is("deleted_at", null);
 
   const limit = planPropertyLimit(profile?.plan);
   if ((count ?? 0) >= limit) {

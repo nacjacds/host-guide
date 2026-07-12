@@ -3,7 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { GuideSectionHeader } from "@/components/guide/GuideSectionHeader";
 import { RecommendationsPanel } from "@/components/guide/RecommendationsPanel";
 import { BackToGuideButton } from "@/components/guide/BackToGuideButton";
+import { GuideUnavailable } from "@/components/guide/GuideUnavailable";
 import { logAnalyticsEvent } from "@/lib/analytics";
+import { classifyGuideAvailability } from "@/lib/properties";
 
 export default async function GuideRecommendationsPage({
   params,
@@ -13,13 +15,16 @@ export default async function GuideRecommendationsPage({
   const { slug } = await params;
   const supabase = await createClient();
 
+  // No is_published filter — see app/guide/[slug]/page.tsx for why.
   const { data: property } = await supabase
     .from("properties")
     .select("*")
     .eq("slug", slug)
-    .eq("is_published", true)
     .single();
 
+  const availability = classifyGuideAvailability(property);
+  if (availability === "not_found" || availability === "unpublished") notFound();
+  if (availability === "deleted") return <GuideUnavailable />;
   if (!property) notFound();
 
   const { data: recommendations } = await supabase

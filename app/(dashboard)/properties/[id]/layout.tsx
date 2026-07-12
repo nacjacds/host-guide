@@ -25,6 +25,7 @@ export default async function PropertyLayout({
     .select("id, name")
     .eq("id", id)
     .eq("host_id", user?.id ?? "")
+    .is("deleted_at", null)
     .single();
 
   if (!property) notFound();
