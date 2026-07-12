@@ -1,7 +1,6 @@
-// A gentle rooftop-skyline silhouette — echoes the gable shape in the
-// WelcoKit logo symbol, reused as the page's one recurring structural
-// device instead of a plain straight section boundary.
-export function RoofDivider({
+// A gentle wave silhouette used as the page's one recurring structural
+// device between sections, instead of a plain straight section boundary.
+export function WaveDivider({
   color,
   flip = false,
   className = "",
@@ -18,7 +17,7 @@ export function RoofDivider({
       aria-hidden="true"
     >
       <path
-        d="M0,64 L0,40 L240,4 L480,40 L720,8 L960,40 L1200,4 L1440,40 L1440,64 Z"
+        d="M0,32 C240,64 480,0 720,32 C960,64 1200,0 1440,32 L1440,64 L0,64 Z"
         fill={color}
       />
     </svg>

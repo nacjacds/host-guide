@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PLANS, PLAN_ORDER } from "@/lib/plans";
-import { RoofDivider } from "./RoofDivider";
+import { WaveDivider } from "./WaveDivider";
 
 const HIGHLIGHTED_PLAN_ID = "pro";
 
@@ -87,7 +87,7 @@ export function LandingPricing() {
       </div>
 
       <div className="mt-14 sm:mt-20">
-        <RoofDivider color="#1B4F72" />
+        <WaveDivider color="#1B4F72" />
       </div>
     </section>
   );

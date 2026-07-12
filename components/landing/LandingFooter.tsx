@@ -11,9 +11,9 @@ export function LandingFooter() {
     <footer className="bg-[#F5EFE6] py-10">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 text-center sm:flex-row sm:justify-between sm:text-left">
         <div className="space-y-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.svg" alt="WelcoKit" className="mx-auto h-7 w-auto sm:mx-0" />
-          <p className="max-w-xs text-xs text-[#6B6B67]">{t("tagline")}</p>
+          <p className="max-w-xs font-script text-2xl font-bold text-[#1A4F72] italic">
+            {t("tagline")}
+          </p>
         </div>
 
         <div className="flex items-center gap-5 text-sm text-[#1B4F72]">

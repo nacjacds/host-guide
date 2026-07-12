@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GuidePreviewCard } from "./GuidePreviewCard";
-import { RoofDivider } from "./RoofDivider";
+import { WaveDivider } from "./WaveDivider";
 
 export function LandingHero() {
   const t = useTranslations("landing.hero");
@@ -58,7 +58,7 @@ export function LandingHero() {
       </div>
 
       <div className="mt-14 sm:mt-20">
-        <RoofDivider color="#F5EFE6" />
+        <WaveDivider color="#F5EFE6" />
       </div>
     </section>
   );

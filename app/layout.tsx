@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Inter, Playfair_Display, Caveat } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
@@ -11,6 +11,14 @@ const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-serif",
+});
+// Handwritten script accent — used sparingly (e.g. the landing footer
+// tagline) for a warm, human touch against the rest of the site's
+// sans/serif type system.
+const caveat = Caveat({
+  subsets: ["latin"],
+  weight: ["700"],
+  variable: "--font-script",
 });
 
 export const metadata: Metadata = {
@@ -39,7 +47,12 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={cn("scroll-smooth font-sans", inter.variable, playfairDisplay.variable)}
+      className={cn(
+        "scroll-smooth font-sans",
+        inter.variable,
+        playfairDisplay.variable,
+        caveat.variable
+      )}
     >
       <body className="antialiased">
         {children}

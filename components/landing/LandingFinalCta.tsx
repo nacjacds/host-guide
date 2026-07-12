@@ -18,7 +18,12 @@ export function LandingFinalCta() {
           transition={{ duration: 0.5 }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-white.svg" alt="WelcoKit" className="mx-auto mb-6 h-9 w-auto" />
+          <img
+            src="/logo-white.svg"
+            alt="WelcoKit"
+            style={{ width: "150px", height: "auto" }}
+            className="mx-auto mb-6"
+          />
           <h2 className="font-serif text-3xl font-semibold text-balance text-white sm:text-4xl">
             {t("title")}
           </h2>
