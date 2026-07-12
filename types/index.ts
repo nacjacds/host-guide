@@ -41,7 +41,7 @@ export type PropertyRecommendationCategory =
   | "beaches"
   | "nature";
 
-export type PropertyRecommendationSource = "ai_curated" | "manual";
+export type PropertyRecommendationSource = "ai_curated" | "manual" | "ai_curated_edited";
 
 export type RegenerationTriggerType = "manual" | "scheduled";
 

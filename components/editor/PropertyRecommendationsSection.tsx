@@ -5,8 +5,10 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Trash2, ExternalLink, Sparkles } from "lucide-react";
+import { Trash2, ExternalLink, Sparkles, Pencil, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   BASE_RECOMMENDATION_CATEGORIES,
@@ -142,6 +144,10 @@ export function PropertyRecommendationsSection({
   const [recommendations, setRecommendations] = useState(initialRecommendations);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
   const [quota, setQuota] = useState(initialQuota);
   const [generatingCategory, setGeneratingCategory] = useState<PropertyRecommendationCategory | null>(
     null
@@ -165,6 +171,46 @@ export function PropertyRecommendationsSection({
     }
     setRecommendations((prev) => prev.filter((r) => r.id !== id));
     setConfirmDeleteId(null);
+  }
+
+  function startEdit(rec: PropertyRecommendation) {
+    setEditingId(rec.id);
+    setEditName(rec.name);
+    setEditDescription(rec.description ?? "");
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditName("");
+    setEditDescription("");
+  }
+
+  async function handleSaveEdit(id: string) {
+    if (!editName.trim()) {
+      toast.error("El nombre no puede estar vacío");
+      return;
+    }
+    setSavingEdit(true);
+    try {
+      const response = await fetch(`/api/property-recommendations/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: editName.trim(), description: editDescription.trim() || null }),
+      });
+      if (!response.ok) {
+        const { error } = await response.json().catch(() => ({ error: null }));
+        toast.error(error ?? "No se pudo guardar el cambio");
+        return;
+      }
+      const { recommendation } = (await response.json()) as { recommendation: PropertyRecommendation };
+      setRecommendations((prev) => prev.map((r) => (r.id === id ? recommendation : r)));
+      cancelEdit();
+      toast.success("Cambios guardados");
+    } catch {
+      toast.error("Error de red");
+    } finally {
+      setSavingEdit(false);
+    }
   }
 
   async function handleGenerate(category: PropertyRecommendationCategory) {
@@ -235,10 +281,10 @@ export function PropertyRecommendationsSection({
         <h2 className="text-sm font-medium text-muted-foreground">Recomendaciones locales</h2>
         <span className="text-xs text-muted-foreground">
           {quota.remaining > 0 ? (
-            `Te quedan ${quota.remaining} de ${quota.limit} regeneraciones este mes`
+            `Te quedan ${quota.remaining} de ${quota.limit} regeneraciones este mes · Se reinician el ${quota.resetDateLabel}`
           ) : (
             <>
-              Sin generaciones disponibles · se restablecen el {quota.resetDateLabel}
+              Sin generaciones disponibles este mes · Se reinician el {quota.resetDateLabel}
               {upgradePlanLabel && (
                 <>
                   {" · "}
@@ -274,7 +320,7 @@ export function PropertyRecommendationsSection({
                   disabled={generatingCategory !== null || quota.remaining <= 0}
                   title={
                     quota.remaining <= 0
-                      ? `Sin generaciones disponibles este mes · se restablecen el ${quota.resetDateLabel}`
+                      ? `Sin generaciones disponibles este mes · Se reinician el ${quota.resetDateLabel}`
                       : undefined
                   }
                 >
@@ -288,52 +334,110 @@ export function PropertyRecommendationsSection({
                 <p className="text-xs text-muted-foreground">Sin lugares todavía.</p>
               ) : (
                 <div className="space-y-2">
-                  {items.map((rec) => (
-                    <div
-                      key={rec.id}
-                      className="flex items-center justify-between gap-2 rounded-lg border border-border p-2.5"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">{rec.name}</p>
-                        <p className="truncate text-xs text-muted-foreground">
-                          {[
-                            formatDistance(rec),
-                            rec.rating != null ? `★ ${rec.rating}` : null,
-                            rec.source === "manual" ? "Manual" : null,
-                          ]
-                            .filter(Boolean)
-                            .join(" · ")}
-                        </p>
-                        {rec.address && (
-                          <p className="truncate text-xs text-muted-foreground">{rec.address}</p>
-                        )}
-                        {rec.description && (
-                          <p className="mt-1 text-xs text-muted-foreground">{rec.description}</p>
-                        )}
-                      </div>
-                      <div className="flex shrink-0 items-center gap-1">
-                        {rec.maps_url && (
-                          <a
-                            href={rec.maps_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-1.5 text-muted-foreground hover:text-foreground"
+                  {items.map((rec) =>
+                    editingId === rec.id ? (
+                      <div key={rec.id} className="space-y-2 rounded-lg border border-border p-2.5">
+                        <div>
+                          <Label htmlFor={`edit-name-${rec.id}`} className="text-xs">
+                            Nombre
+                          </Label>
+                          <Input
+                            id={`edit-name-${rec.id}`}
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            disabled={savingEdit}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor={`edit-description-${rec.id}`} className="text-xs">
+                            Descripción
+                          </Label>
+                          <Textarea
+                            id={`edit-description-${rec.id}`}
+                            value={editDescription}
+                            onChange={(e) => setEditDescription(e.target.value)}
+                            disabled={savingEdit}
+                            rows={2}
+                          />
+                        </div>
+                        <div className="flex justify-end gap-1.5">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={cancelEdit}
+                            disabled={savingEdit}
                           >
-                            <ExternalLink size={14} strokeWidth={1.5} />
-                          </a>
-                        )}
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setConfirmDeleteId(rec.id)}
-                          disabled={deletingId === rec.id}
-                        >
-                          <Trash2 size={14} strokeWidth={1.5} />
-                        </Button>
+                            <X size={14} strokeWidth={1.5} />
+                            Cancelar
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={() => handleSaveEdit(rec.id)}
+                            disabled={savingEdit}
+                          >
+                            <Check size={14} strokeWidth={1.5} />
+                            {savingEdit ? "Guardando..." : "Guardar"}
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ) : (
+                      <div
+                        key={rec.id}
+                        className="flex items-center justify-between gap-2 rounded-lg border border-border p-2.5"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium">{rec.name}</p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {[
+                              formatDistance(rec),
+                              rec.rating != null ? `★ ${rec.rating}` : null,
+                              rec.source === "manual" ? "Manual" : null,
+                              rec.source === "ai_curated_edited" ? "Editado" : null,
+                            ]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </p>
+                          {rec.address && (
+                            <p className="truncate text-xs text-muted-foreground">{rec.address}</p>
+                          )}
+                          {rec.description && (
+                            <p className="mt-1 text-xs text-muted-foreground">{rec.description}</p>
+                          )}
+                        </div>
+                        <div className="flex shrink-0 items-center gap-1">
+                          {rec.maps_url && (
+                            <a
+                              href={rec.maps_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 text-muted-foreground hover:text-foreground"
+                            >
+                              <ExternalLink size={14} strokeWidth={1.5} />
+                            </a>
+                          )}
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => startEdit(rec)}
+                          >
+                            <Pencil size={14} strokeWidth={1.5} />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setConfirmDeleteId(rec.id)}
+                            disabled={deletingId === rec.id}
+                          >
+                            <Trash2 size={14} strokeWidth={1.5} />
+                          </Button>
+                        </div>
+                      </div>
+                    )
+                  )}
                 </div>
               )}
               <AddPlaceSearch
