@@ -34,11 +34,12 @@ export function RecommendationCategoryPanel({
   translated: TranslatablePayload | null;
 }) {
   const { t } = useGuideLocale();
-  const translatedDescriptions = useTranslatedRecommendations({
-    category,
-    recommendations,
-    translated,
-  });
+  const { descriptions: translatedDescriptions, isLoading: translationLoading } =
+    useTranslatedRecommendations({
+      category,
+      recommendations,
+      translated,
+    });
 
   if (recommendations.length === 0) {
     return (
@@ -89,9 +90,15 @@ export function RecommendationCategoryPanel({
                 )}
               </div>
               {rec.address && <p className="mt-1 text-xs text-muted-foreground">{rec.address}</p>}
-              {rec.description && (
-                <p className="mt-1.5 text-sm">{translatedDescriptions[rec.id] ?? rec.description}</p>
-              )}
+              {rec.description &&
+                (translationLoading && !translatedDescriptions[rec.id] ? (
+                  <div className="mt-1.5 space-y-1.5" aria-hidden="true">
+                    <div className="h-3.5 w-full animate-pulse rounded bg-neutral-200" />
+                    <div className="h-3.5 w-2/3 animate-pulse rounded bg-neutral-200" />
+                  </div>
+                ) : (
+                  <p className="mt-1.5 text-sm">{translatedDescriptions[rec.id] ?? rec.description}</p>
+                ))}
             </div>
           </div>
         );

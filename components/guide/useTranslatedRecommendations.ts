@@ -8,7 +8,10 @@ import type { TranslatablePayload } from "@/lib/translations/extract";
 // category: `translated` is pre-fetched server-side (the common case,
 // zero client fetch) — this only reaches the network when that cache is
 // missing (e.g. a place was just added/edited and the background
-// translation job hasn't finished yet).
+// translation job hasn't finished yet). `isLoading` covers that fallback
+// window (a real Claude call, ~3s) so callers can show a skeleton instead
+// of flashing the original-language text next to already-translated UI
+// chrome.
 export function useTranslatedRecommendations({
   category,
   recommendations,
@@ -17,9 +20,10 @@ export function useTranslatedRecommendations({
   category: string;
   recommendations: { id: string; description: string | null }[];
   translated: TranslatablePayload | null;
-}): Record<string, string> {
+}): { descriptions: Record<string, string>; isLoading: boolean } {
   const { locale, propertyId } = useGuideLocale();
   const [fallback, setFallback] = useState<TranslatablePayload | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const requestedFor = useRef<string | null>(null);
 
   useEffect(() => {
@@ -32,6 +36,7 @@ export function useTranslatedRecommendations({
     if (Object.keys(descriptions).length === 0) return;
 
     requestedFor.current = category;
+    setIsLoading(true);
 
     let cancelled = false;
     fetch("/api/guide/translate-block", {
@@ -49,7 +54,10 @@ export function useTranslatedRecommendations({
       .then((data: { translated: TranslatablePayload | null } | null) => {
         if (!cancelled && data?.translated) setFallback(data.translated);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
 
     return () => {
       cancelled = true;
@@ -57,11 +65,13 @@ export function useTranslatedRecommendations({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale, translated, category]);
 
-  if (locale === "es") return {};
+  if (locale === "es") return { descriptions: {}, isLoading: false };
 
   const effective = translated ?? fallback;
   const descriptions = effective?.fields?.descriptions;
-  return descriptions && typeof descriptions === "object"
-    ? (descriptions as Record<string, string>)
-    : {};
+  return {
+    descriptions:
+      descriptions && typeof descriptions === "object" ? (descriptions as Record<string, string>) : {},
+    isLoading,
+  };
 }

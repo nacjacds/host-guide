@@ -511,7 +511,20 @@ export interface Database {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      upsert_content_translation: {
+        Args: {
+          p_property_id: string;
+          p_block_type: string;
+          p_block_id: string | null;
+          p_source_locale: string;
+          p_target_locale: string;
+          p_source_hash: string;
+          p_translated_content: Record<string, unknown> | string;
+        };
+        Returns: unknown;
+      };
+    };
   };
 }
 

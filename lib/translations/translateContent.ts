@@ -30,14 +30,14 @@ export async function translateContent(
   const hash = hashContent(content);
   const supabase = createServiceRoleClient();
 
-  // block_id is nullable (property-level content like welcome_message has
-  // none), and Postgres unique constraints never treat two NULLs as a
-  // conflict — so ON CONFLICT upserts silently insert duplicates for the
-  // null case instead of updating. Doing a manual lookup-then-write here
-  // works correctly for both the null and non-null cases.
+  // Cheap read-only check first, purely to skip paying for a Claude call
+  // when already cached — NOT itself race-safe (two concurrent callers can
+  // both pass this before either has written). That's fine: the actual
+  // no-duplicate-rows guarantee comes from the atomic upsert RPC below,
+  // not this check.
   let existingQuery = supabase
     .from("content_translations")
-    .select("id, source_hash, translated_content")
+    .select("source_hash, translated_content")
     .eq("property_id", propertyId)
     .eq("block_type", blockType)
     .eq("target_locale", targetLocale);
@@ -58,27 +58,30 @@ export async function translateContent(
           targetLanguageName
         )) as unknown as TranslatablePayload);
 
-  const row = {
-    property_id: propertyId,
-    block_type: blockType,
-    block_id: blockId,
-    source_locale: sourceLocale,
-    target_locale: targetLocale,
-    source_hash: hash,
-    translated_content: translated,
-    updated_at: new Date().toISOString(),
-  };
-
-  const { error } = existing
-    ? await supabase.from("content_translations").update(row).eq("id", existing.id)
-    : await supabase.from("content_translations").insert(row);
+  // Atomic upsert via RPC — safe even if another request is writing the
+  // same (property_id, block_type, block_id, target_locale) key at the
+  // exact same moment (see
+  // supabase/migrations/20260713100000_content_translations_race_fix.sql).
+  // A plain select-then-insert-or-update here has a check-then-act race
+  // that silently produced duplicate rows for block_id IS NULL content
+  // (Postgres unique constraints never treat two NULLs as a conflict).
+  const { data: written, error } = await supabase.rpc("upsert_content_translation", {
+    p_property_id: propertyId,
+    p_block_type: blockType,
+    p_block_id: blockId,
+    p_source_locale: sourceLocale,
+    p_target_locale: targetLocale,
+    p_source_hash: hash,
+    p_translated_content: translated as unknown as Record<string, unknown>,
+  });
 
   if (error) {
     // Translation itself succeeded — still return it so the caller isn't
     // blocked — but caching failed, so the next request will pay for
     // another Claude call instead of hitting cache.
     console.error("[translateContent] failed to cache translation", error);
+    return translated;
   }
 
-  return translated;
+  return (written ?? translated) as string | TranslatablePayload;
 }
