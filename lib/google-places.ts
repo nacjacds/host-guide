@@ -1,3 +1,4 @@
+import fs from "fs";
 import type { PropertyRecommendationCategory } from "@/types";
 
 // Every call in this file runs server-side only (this module has no
@@ -156,11 +157,15 @@ export async function geocodeAddress(
     // even for API-level errors, so this branch (non-2xx) is the less
     // likely path, but log it fully just in case.
     const bodyText = await response.text().catch(() => "<no body>");
-    console.error("[geocodeAddress] HTTP error", {
-      httpStatus: response.status,
-      body: bodyText,
-      address,
-    });
+    const data = { httpStatus: response.status, body: bodyText, address };
+    console.error("[geocodeAddress] HTTP error", data);
+    // TEMPORARY fallback logging — console output isn't showing up in
+    // production container logs, so also write directly to a file we can
+    // `cat` from inside the container.
+    fs.appendFileSync(
+      "/tmp/debug.log",
+      `${new Date().toISOString()} - [geocodeAddress HTTP error] ${JSON.stringify(data)}\n`
+    );
     return null;
   }
 
@@ -172,12 +177,18 @@ export async function geocodeAddress(
     // (REQUEST_DENIED, ZERO_RESULTS, INVALID_REQUEST, OVER_QUERY_LIMIT,
     // etc.) and often an `error_message` explaining why — this is almost
     // certainly where the real cause is.
-    console.error("[geocodeAddress] No location in response", {
+    const logData = {
       status: data.status,
       error_message: data.error_message,
       address,
       fullResponse: data,
-    });
+    };
+    console.error("[geocodeAddress] No location in response", logData);
+    // TEMPORARY fallback logging — see note above.
+    fs.appendFileSync(
+      "/tmp/debug.log",
+      `${new Date().toISOString()} - [geocodeAddress no location] ${JSON.stringify(logData)}\n`
+    );
     return null;
   }
 

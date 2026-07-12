@@ -1,3 +1,4 @@
+import fs from "fs";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
@@ -19,6 +20,13 @@ export async function POST(
   // reaching this handler at all (routing/deploy sanity check), remove
   // once geocoding failures are understood.
   console.error("[REGENERATE] Endpoint hit, property:", propertyId);
+  // TEMPORARY fallback logging — console output isn't showing up in
+  // production container logs, so also write directly to a file we can
+  // `cat` from inside the container.
+  fs.appendFileSync(
+    "/tmp/debug.log",
+    `${new Date().toISOString()} - [REGENERATE endpoint hit] ${JSON.stringify({ propertyId })}\n`
+  );
 
   const supabase = await createClient();
   const {
@@ -81,6 +89,15 @@ export async function POST(
     // Logs the full error (stack included) so any failure here, not just
     // geocoding ones, is visible in server logs.
     console.error("[REGENERATE] generatePropertyRecommendations failed:", err);
+    // TEMPORARY fallback logging — see note above.
+    fs.appendFileSync(
+      "/tmp/debug.log",
+      `${new Date().toISOString()} - [REGENERATE catch] ${JSON.stringify({
+        propertyId,
+        message: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+      })}\n`
+    );
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "No se pudieron generar recomendaciones" },
       { status: 500 }
