@@ -33,7 +33,7 @@ export function LandingHowItWorks() {
               transition={{ duration: 0.45, delay: i * 0.12 }}
               className="relative text-center"
             >
-              <div className="relative z-10 mx-auto mb-4 flex size-12 items-center justify-center rounded-full border-2 border-[#1B4F72] bg-[#F5EFE6] font-serif text-lg font-semibold text-[#1B4F72]">
+              <div className="relative z-10 mx-auto mb-4 flex size-12 items-center justify-center rounded-full border-2 border-[#1B4F72] bg-[#F5EFE6] font-sans text-2xl font-bold text-[#1B4F72]">
                 {i + 1}
               </div>
               <h3 className="mb-1.5 text-base font-semibold text-[#1A1A18]">{step.title}</h3>
