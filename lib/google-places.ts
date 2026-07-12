@@ -130,7 +130,61 @@ export async function searchRecommendationCandidates(
   }
 
   const data = await response.json();
-  return mapPlacesResponse(data);
+
+  // TEMPORARY diagnostic logging — dumps every raw candidate Google Places
+  // returned, before our own rating/review-count filter runs (see
+  // mapPlacesResponse below), so we can tell whether well-known landmarks
+  // are missing from Google's response itself vs. getting filtered out
+  // downstream (by us or by Claude's curation).
+  const rawPlaces = (data.places ?? []).map((p: RawPlace) => ({
+    name: p.displayName?.text,
+    rating: p.rating,
+    user_ratings_total: p.userRatingCount,
+    types: p.types,
+  }));
+  const rawLog = {
+    category,
+    center,
+    query: config.query,
+    radiusMeters: config.radiusMeters,
+    rawCount: rawPlaces.length,
+    rawPlaces,
+  };
+  console.error("[searchRecommendationCandidates] raw Google Places results", rawLog);
+  fs.appendFileSync(
+    "/tmp/debug.log",
+    `${new Date().toISOString()} - [searchRecommendationCandidates raw] ${JSON.stringify(rawLog)}\n`
+  );
+
+  const filtered = mapPlacesResponse(data);
+
+  // TEMPORARY diagnostic logging — same candidates as above, after the
+  // rating >= 4.0 / reviews >= 50 filter, so a diff between this and the
+  // raw list above shows exactly what that filter removed.
+  const filteredLog = {
+    category,
+    center,
+    filteredCount: filtered.length,
+    filtered: filtered.map((p) => ({
+      name: p.name,
+      rating: p.rating,
+      user_ratings_total: p.user_ratings_total,
+    })),
+  };
+  console.error("[searchRecommendationCandidates] after rating/review filter", filteredLog);
+  fs.appendFileSync(
+    "/tmp/debug.log",
+    `${new Date().toISOString()} - [searchRecommendationCandidates filtered] ${JSON.stringify(filteredLog)}\n`
+  );
+
+  return filtered;
+}
+
+interface RawPlace {
+  displayName?: { text: string };
+  rating?: number;
+  userRatingCount?: number;
+  types?: string[];
 }
 
 function mapPlacesResponse(data: {

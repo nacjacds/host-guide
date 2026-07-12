@@ -1,3 +1,4 @@
+import fs from "fs";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import {
   searchRecommendationCandidates,
@@ -89,6 +90,25 @@ export async function generatePropertyRecommendations(
       })),
       limit: MAX_PLACES_PER_CATEGORY,
     });
+
+    // TEMPORARY diagnostic logging — shows exactly what Claude was given
+    // (candidate names) vs. what it actually selected, tagged with the
+    // property so it's easy to correlate with the raw/filtered Places
+    // logs in lib/google-places.ts for the same run.
+    const curationLog = {
+      propertyId,
+      propertyName: property.name,
+      category,
+      candidateNames: candidates.map((c) => c.name),
+      curatedNames: curated
+        .map((c) => candidates.find((p) => p.place_id === c.place_id)?.name ?? c.place_id)
+        .filter(Boolean),
+    };
+    console.error("[generatePropertyRecommendations] curation result", curationLog);
+    fs.appendFileSync(
+      "/tmp/debug.log",
+      `${new Date().toISOString()} - [curation result] ${JSON.stringify(curationLog)}\n`
+    );
 
     const selected = curated
       .map((c) => {
