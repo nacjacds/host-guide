@@ -3,16 +3,17 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { useLandingLocale, type LandingLocale } from "./LandingLocaleProvider";
+import { useLocale } from "@/components/shared/LocaleProvider";
+import { type AppLocale } from "@/lib/locale";
 
-const LANGUAGES: { code: LandingLocale; label: string }[] = [
+const LANGUAGES: { code: AppLocale; label: string }[] = [
   { code: "es", label: "ES" },
   { code: "en", label: "EN" },
 ];
 
 export function LandingHeader() {
   const t = useTranslations("landing.nav");
-  const { locale, setLocale } = useLandingLocale();
+  const { locale, setLocale } = useLocale();
 
   return (
     <header className="sticky top-0 z-30 border-b border-[#DDD8CC]/70 bg-[#FAFAF8]/90 backdrop-blur-md">

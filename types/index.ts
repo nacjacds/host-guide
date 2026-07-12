@@ -70,6 +70,7 @@ export interface Database {
           avatar_url: string | null;
           plan: Plan;
           stripe_customer_id: string | null;
+          dashboard_locale: "es" | "en";
           created_at: string;
         };
         Insert: {
@@ -79,6 +80,7 @@ export interface Database {
           avatar_url?: string | null;
           plan?: Plan;
           stripe_customer_id?: string | null;
+          dashboard_locale?: "es" | "en";
           created_at?: string;
         };
         Update: {
@@ -88,6 +90,7 @@ export interface Database {
           avatar_url?: string | null;
           plan?: Plan;
           stripe_customer_id?: string | null;
+          dashboard_locale?: "es" | "en";
           created_at?: string;
         };
         Relationships: [];

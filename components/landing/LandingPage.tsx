@@ -1,7 +1,8 @@
 "use client";
 
 import { MotionConfig } from "framer-motion";
-import { LandingLocaleProvider } from "./LandingLocaleProvider";
+import { LocaleProvider } from "@/components/shared/LocaleProvider";
+import { type AppLocale } from "@/lib/locale";
 import { LandingHeader } from "./LandingHeader";
 import { LandingHero } from "./LandingHero";
 import { LandingProblemSolution } from "./LandingProblemSolution";
@@ -11,9 +12,9 @@ import { LandingPricing } from "./LandingPricing";
 import { LandingFinalCta } from "./LandingFinalCta";
 import { LandingFooter } from "./LandingFooter";
 
-export function LandingPage() {
+export function LandingPage({ initialLocale }: { initialLocale?: AppLocale }) {
   return (
-    <LandingLocaleProvider>
+    <LocaleProvider initialLocale={initialLocale}>
       <MotionConfig reducedMotion="user">
         <div className="min-h-screen bg-[#FAFAF8]">
           <LandingHeader />
@@ -26,6 +27,6 @@ export function LandingPage() {
           <LandingFooter />
         </div>
       </MotionConfig>
-    </LandingLocaleProvider>
+    </LocaleProvider>
   );
 }

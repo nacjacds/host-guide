@@ -100,5 +100,31 @@
       "register": "Sign up",
       "copyright": "© {year} WelcoKit. All rights reserved."
     }
+  },
+  "auth": {
+    "login": {
+      "title": "Log in",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "forgotPassword": "Forgot your password?",
+      "submit": "Log in",
+      "submitLoading": "Logging in...",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Sign up"
+    },
+    "register": {
+      "title": "Create account",
+      "fullNameLabel": "Full name",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "submit": "Create account",
+      "submitLoading": "Creating account...",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Log in",
+      "networkError": "Network error",
+      "checkEmailTitle": "Check your email",
+      "checkEmailBody": "We've sent a confirmation link to <strong>{email}</strong>. Open it to confirm your account before logging in.",
+      "checkEmailLoginLink": "Go to log in"
+    }
   }
 }

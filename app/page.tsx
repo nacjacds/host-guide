@@ -1,6 +1,8 @@
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LandingPage } from "@/components/landing/LandingPage";
+import { LOCALE_COOKIE_NAME, parseLocale } from "@/lib/locale";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -10,5 +12,8 @@ export default async function Home() {
 
   if (user) redirect("/dashboard");
 
-  return <LandingPage />;
+  const cookieStore = await cookies();
+  const localeCookie = cookieStore.get(LOCALE_COOKIE_NAME)?.value;
+
+  return <LandingPage initialLocale={localeCookie ? parseLocale(localeCookie) : undefined} />;
 }
