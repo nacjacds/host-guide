@@ -13,7 +13,7 @@ export function LandingProblemSolution() {
     <section className="bg-[#F5EFE6] py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-12 text-center">
-          <span className="text-xs font-medium tracking-wide text-[#C0603A] uppercase">
+          <span className="text-xs font-medium tracking-wide text-[#FF4200] uppercase">
             {t("eyebrow")}
           </span>
           <h2 className="mt-3 font-serif text-3xl font-semibold text-balance text-[#1A1A18] sm:text-4xl">

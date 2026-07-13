@@ -7,9 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { ShareGuideDialog } from "@/components/dashboard/ShareGuideDialog";
+import { GuideActionButtons } from "./GuideActionButtons";
 import { toast } from "sonner";
-import { getAppUrl } from "@/lib/env";
 import type { Property } from "@/types";
 
 const MAX_COVER_SIZE_BYTES = 3 * 1024 * 1024;
@@ -25,8 +24,6 @@ export function PublishPanel({ property }: { property: Property }) {
   const coverInputRef = useRef<HTMLInputElement>(null);
   const [whatsappNumber, setWhatsappNumber] = useState(property.whatsapp_number ?? "");
   const [savingWhatsapp, setSavingWhatsapp] = useState(false);
-
-  const guideUrl = `${getAppUrl()}/guide/${property.slug}`;
 
   async function handleCoverFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -170,28 +167,20 @@ export function PublishPanel({ property }: { property: Property }) {
           />
         </div>
 
-        {isPublished ? (
-          <Button
-            variant="outline"
-            className="w-full"
-            render={<a href={guideUrl} target="_blank" rel="noopener noreferrer" />}
-            nativeButton={false}
-          >
-            Ver guía
-          </Button>
-        ) : (
+        {/* Mobile renders this same pair portaled above the property tabs
+            instead — see PropertyEditor.tsx. Hidden here below md to avoid
+            showing it twice. */}
+        <GuideActionButtons
+          propertyId={property.id}
+          slug={property.slug}
+          isPublished={isPublished}
+          className="hidden md:flex"
+        />
+        {!isPublished && (
           <p className="text-xs text-muted-foreground">
             Publica la guía para poder verla y compartirla con tus huéspedes.
           </p>
         )}
-
-        <ShareGuideDialog
-          propertyId={property.id}
-          guideUrl={guideUrl}
-          triggerLabel="Compartir guía"
-          triggerVariant="secondary"
-          triggerClassName="w-full"
-        />
 
         <div className="space-y-2">
           <Label>Imagen de portada</Label>

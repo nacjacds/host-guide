@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import {
   DndContext,
@@ -23,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { BlockEditor } from "./BlockEditor";
 import { BlockToolbar } from "./BlockToolbar";
 import { PublishPanel } from "./PublishPanel";
+import { GuideActionButtons } from "./GuideActionButtons";
 import { AirbnbImportPanel } from "./AirbnbImportPanel";
 import { PropertyRecommendationsSection } from "./PropertyRecommendationsSection";
 import { getAppUrl } from "@/lib/env";
@@ -63,6 +65,14 @@ export function PropertyEditor({
   const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
   const [savingAll, setSavingAll] = useState(false);
   const [newBlockIds, setNewBlockIds] = useState<Set<string>>(new Set());
+
+  // Portal target for the mobile "Ver guía"/"Compartir guía" pair — see
+  // the slot div in properties/[id]/layout.tsx. Only resolvable client-side
+  // after mount, hence the effect instead of reading it during render.
+  const [mobileActionsSlot, setMobileActionsSlot] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    setMobileActionsSlot(document.getElementById("guide-actions-mobile-slot"));
+  }, []);
 
   // Re-sync when the server component re-fetches — useState's initial value
   // is only read on mount.
@@ -188,6 +198,16 @@ export function PropertyEditor({
 
   return (
     <>
+      {mobileActionsSlot &&
+        createPortal(
+          <GuideActionButtons
+            propertyId={property.id}
+            slug={property.slug}
+            isPublished={property.is_published}
+          />,
+          mobileActionsSlot
+        )}
+
       <div
         className={cn(
           "grid grid-cols-1 gap-6 lg:grid-cols-3",

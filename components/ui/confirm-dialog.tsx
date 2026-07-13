@@ -50,7 +50,7 @@ export function ConfirmDialog({
             disabled={loading}
             className={cn(
               tone === "terracotta"
-                ? "bg-[#C0603A] text-white hover:bg-[#C0603A]/90"
+                ? "bg-[#FF4200] text-white hover:bg-[#FF4200]/90"
                 : "bg-destructive text-white hover:bg-destructive/90"
             )}
           >

@@ -20,7 +20,7 @@ export function LandingHero() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="text-center lg:text-left"
         >
-          <span className="inline-flex items-center rounded-full bg-[#C0603A]/10 px-3 py-1 text-xs font-medium tracking-wide text-[#C0603A] uppercase">
+          <span className="inline-flex items-center rounded-full bg-[#FF4200]/10 px-3 py-1 text-xs font-medium tracking-wide text-[#FF4200] uppercase">
             {t("eyebrow")}
           </span>
           <h1 className="mt-5 font-serif text-4xl leading-[1.1] font-bold text-balance text-[#1A1A18] sm:text-5xl lg:text-[3.4rem]">

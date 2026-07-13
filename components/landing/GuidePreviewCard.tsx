@@ -32,13 +32,13 @@ export function GuidePreviewCard() {
         <path
           d="M20,2 C8,18 8,38 20,52"
           fill="none"
-          stroke="#C0603A"
+          stroke="#FF4200"
           strokeWidth="1.5"
           strokeDasharray="3 3"
           strokeLinecap="round"
         />
       </svg>
-      <div className="absolute top-[-8px] left-1/2 size-4 -translate-x-1/2 rounded-full border-2 border-[#C0603A] bg-[#FAFAF8]" />
+      <div className="absolute top-[-8px] left-1/2 size-4 -translate-x-1/2 rounded-full border-2 border-[#FF4200] bg-[#FAFAF8]" />
 
       <div className="overflow-hidden rounded-3xl border border-[#DDD8CC] bg-white shadow-xl">
         {/* eslint-disable-next-line @next/next/no-img-element */}

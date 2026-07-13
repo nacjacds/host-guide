@@ -478,9 +478,9 @@ export function PropertyRecommendationsSection({
                     ) : (
                       <div
                         key={rec.id}
-                        className="flex items-center justify-between gap-2 rounded-lg border border-border p-2.5"
+                        className="rounded-lg border border-border p-2.5"
                       >
-                        <div className="min-w-0 flex-1">
+                        <div className="min-w-0">
                           <p className="truncate text-sm font-medium">{rec.name}</p>
                           <p className="truncate text-xs text-muted-foreground">
                             {[
@@ -500,33 +500,43 @@ export function PropertyRecommendationsSection({
                             <p className="mt-1 text-xs text-muted-foreground">{rec.description}</p>
                           )}
                         </div>
-                        <div className="flex shrink-0 items-center gap-1">
+                        <div
+                          className={cn(
+                            "mt-2 grid gap-1 border-t border-border pt-2",
+                            rec.maps_url ? "grid-cols-3" : "grid-cols-2"
+                          )}
+                        >
                           {rec.maps_url && (
                             <a
                               href={rec.maps_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-1.5 text-muted-foreground hover:text-foreground"
+                              className="flex items-center justify-center gap-1.5 rounded-md py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
                             >
                               <ExternalLink size={14} strokeWidth={1.5} />
+                              Abrir enlace
                             </a>
                           )}
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
+                            className="w-full"
                             onClick={() => startEdit(rec)}
                           >
                             <Pencil size={14} strokeWidth={1.5} />
+                            Editar
                           </Button>
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
+                            className="w-full"
                             onClick={() => setConfirmDeleteId(rec.id)}
                             disabled={deletingId === rec.id}
                           >
                             <Trash2 size={14} strokeWidth={1.5} />
+                            Borrar
                           </Button>
                         </div>
                       </div>
