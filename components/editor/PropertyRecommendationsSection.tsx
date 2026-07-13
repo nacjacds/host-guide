@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Trash2, ExternalLink, Sparkles, Pencil, Check, X } from "lucide-react";
+import { Trash2, ExternalLink, Sparkles, Pencil, Check, X, ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
   BASE_RECOMMENDATION_CATEGORIES,
@@ -147,6 +149,8 @@ export function PropertyRecommendationsSection({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [editEnOverrideEnabled, setEditEnOverrideEnabled] = useState(false);
+  const [editDescriptionEn, setEditDescriptionEn] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
   const [quota, setQuota] = useState(initialQuota);
   const [generatingCategory, setGeneratingCategory] = useState<PropertyRecommendationCategory | null>(
@@ -158,8 +162,39 @@ export function PropertyRecommendationsSection({
   const [manuallyRevealed, setManuallyRevealed] = useState<Set<PropertyRecommendationCategory>>(
     new Set()
   );
+  // Collapse state per category, remembered across sessions. Categories
+  // start expanded — the host needs to review AI-generated content before
+  // it's shown to guests, so hiding it by default would bury mistakes.
+  // Collapsing is for tidying up afterwards, not a starting state.
+  const [collapsedCategories, setCollapsedCategories] = useState<
+    Set<PropertyRecommendationCategory>
+  >(new Set());
 
   useEffect(() => setRecommendations(initialRecommendations), [initialRecommendations]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(`welcokit:reco-collapsed:${propertyId}`);
+    if (!stored) return;
+    try {
+      const parsed = JSON.parse(stored) as PropertyRecommendationCategory[];
+      setCollapsedCategories(new Set(parsed));
+    } catch {
+      // Ignore malformed/stale localStorage value.
+    }
+  }, [propertyId]);
+
+  function toggleCategoryCollapsed(category: PropertyRecommendationCategory) {
+    setCollapsedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(category)) next.delete(category);
+      else next.add(category);
+      localStorage.setItem(
+        `welcokit:reco-collapsed:${propertyId}`,
+        JSON.stringify(Array.from(next))
+      );
+      return next;
+    });
+  }
 
   async function handleDelete(id: string) {
     setDeletingId(id);
@@ -177,12 +212,16 @@ export function PropertyRecommendationsSection({
     setEditingId(rec.id);
     setEditName(rec.name);
     setEditDescription(rec.description ?? "");
+    setEditEnOverrideEnabled(!!rec.description_en_override);
+    setEditDescriptionEn(rec.description_en_override ?? "");
   }
 
   function cancelEdit() {
     setEditingId(null);
     setEditName("");
     setEditDescription("");
+    setEditEnOverrideEnabled(false);
+    setEditDescriptionEn("");
   }
 
   async function handleSaveEdit(id: string) {
@@ -195,7 +234,14 @@ export function PropertyRecommendationsSection({
       const response = await fetch(`/api/property-recommendations/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: editName.trim(), description: editDescription.trim() || null }),
+        body: JSON.stringify({
+          name: editName.trim(),
+          description: editDescription.trim() || null,
+          // Switch off, or on with empty text, both mean "no override" —
+          // revert to automatic translation.
+          description_en_override:
+            editEnOverrideEnabled && editDescriptionEn.trim() ? editDescriptionEn.trim() : null,
+        }),
       });
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
@@ -304,14 +350,30 @@ export function PropertyRecommendationsSection({
         const items = recommendations.filter((r) => r.category === category);
         const Icon = RECOMMENDATION_CATEGORY_ICONS[category];
         const generating = generatingCategory === category;
+        const collapsed = collapsedCategories.has(category);
         return (
           <Card key={category} className="overflow-visible">
             <CardHeader>
               <CardTitle className="flex items-center justify-between gap-2 text-base">
-                <span className="flex items-center gap-2">
-                  <Icon className="size-4" strokeWidth={1.5} />
-                  {RECOMMENDATION_CATEGORY_LABELS[category]}
-                </span>
+                <button
+                  type="button"
+                  onClick={() => toggleCategoryCollapsed(category)}
+                  className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                >
+                  <ChevronDown
+                    className={cn(
+                      "size-4 shrink-0 text-muted-foreground transition-transform",
+                      collapsed && "-rotate-90"
+                    )}
+                  />
+                  <Icon className="size-4 shrink-0" strokeWidth={1.5} />
+                  <span className="truncate">{RECOMMENDATION_CATEGORY_LABELS[category]}</span>
+                  {items.length > 0 && (
+                    <span className="text-xs font-normal text-muted-foreground">
+                      ({items.length})
+                    </span>
+                  )}
+                </button>
                 <Button
                   type="button"
                   variant="outline"
@@ -329,6 +391,7 @@ export function PropertyRecommendationsSection({
                 </Button>
               </CardTitle>
             </CardHeader>
+            {collapsed ? null : (
             <CardContent className="space-y-3">
               {items.length === 0 ? (
                 <p className="text-xs text-muted-foreground">Sin lugares todavía.</p>
@@ -360,6 +423,36 @@ export function PropertyRecommendationsSection({
                             rows={2}
                           />
                         </div>
+                        <div className="flex items-center justify-between gap-2 rounded-md border border-border bg-muted/30 px-2.5 py-2">
+                          <Label
+                            htmlFor={`edit-en-toggle-${rec.id}`}
+                            className="text-xs font-normal text-muted-foreground"
+                          >
+                            Escribir traducción en inglés a mano
+                          </Label>
+                          <Switch
+                            id={`edit-en-toggle-${rec.id}`}
+                            size="sm"
+                            checked={editEnOverrideEnabled}
+                            onCheckedChange={setEditEnOverrideEnabled}
+                            disabled={savingEdit}
+                          />
+                        </div>
+                        {editEnOverrideEnabled && (
+                          <div>
+                            <Label htmlFor={`edit-description-en-${rec.id}`} className="text-xs">
+                              Descripción en inglés
+                            </Label>
+                            <Textarea
+                              id={`edit-description-en-${rec.id}`}
+                              value={editDescriptionEn}
+                              onChange={(e) => setEditDescriptionEn(e.target.value)}
+                              disabled={savingEdit}
+                              rows={2}
+                              placeholder="Se traduce automáticamente — escribe aquí para sobrescribir"
+                            />
+                          </div>
+                        )}
                         <div className="flex justify-end gap-1.5">
                           <Button
                             type="button"
@@ -395,6 +488,7 @@ export function PropertyRecommendationsSection({
                               rec.rating != null ? `★ ${rec.rating}` : null,
                               rec.source === "manual" ? "Manual" : null,
                               rec.source === "ai_curated_edited" ? "Editado" : null,
+                              rec.description_en_override ? "EN manual" : null,
                             ]
                               .filter(Boolean)
                               .join(" · ")}
@@ -446,6 +540,7 @@ export function PropertyRecommendationsSection({
                 onAdded={(rec) => setRecommendations((prev) => [...prev, rec])}
               />
             </CardContent>
+            )}
           </Card>
         );
       })}

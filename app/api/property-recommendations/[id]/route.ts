@@ -6,6 +6,11 @@ import { triggerRecommendationsTranslation } from "@/lib/translations/translateR
 const editSchema = z.object({
   name: z.string().trim().min(1).max(200),
   description: z.string().trim().max(600).nullable().optional(),
+  // Undefined = leave whatever's already stored untouched (older callers
+  // that don't know about this field). Null = host turned the override off
+  // (or left the text empty), revert to automatic translation. A non-empty
+  // string = manual override, protected from future auto-translation.
+  description_en_override: z.string().trim().max(600).nullable().optional(),
 });
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -49,6 +54,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     .update({
       name: parsed.data.name,
       description: parsed.data.description ?? null,
+      // undefined -> field omitted entirely -> column left untouched.
+      ...(parsed.data.description_en_override !== undefined
+        ? { description_en_override: parsed.data.description_en_override || null }
+        : {}),
       source: nextSource,
     })
     .eq("id", id)
@@ -62,10 +71,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   // Refresh the cached English translation for this whole category in the
   // background — a category's descriptions are cached together (see
   // triggerRecommendationsTranslation), so any edit invalidates the whole
-  // set, not just this one row.
+  // set, not just this one row. Rows with a manual EN override are excluded
+  // there, so this can never clobber one.
   const { data: categoryRows } = await supabase
     .from("property_recommendations")
-    .select("id, description")
+    .select("id, description, description_en_override")
     .eq("property_id", updated.property_id)
     .eq("category", updated.category);
   triggerRecommendationsTranslation(updated.property_id, updated.category, categoryRows ?? []);

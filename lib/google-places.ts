@@ -373,7 +373,7 @@ export async function autocompletePlaces(
 // adds a place via autocomplete, so the row is grounded in real Google data
 // just like AI-curated ones (never the host's freehand typing).
 export async function getPlaceDetails(placeId: string): Promise<PlaceResult | null> {
-  const response = await fetch(`${PLACES_API_BASE}/${placeId}`, {
+  const response = await fetch(`${PLACES_API_BASE}/${placeId}?languageCode=es`, {
     headers: {
       "X-Goog-Api-Key": process.env.GOOGLE_MAPS_SERVER_KEY!,
       "X-Goog-FieldMask":

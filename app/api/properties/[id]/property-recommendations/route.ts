@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { getPlaceDetails, haversineDistanceMeters, getWalkingMinutes } from "@/lib/google-places";
+import { describeManualPlace } from "@/lib/claude";
+import { triggerRecommendationsTranslation } from "@/lib/translations/translateRecommendations";
 
 const addPlaceSchema = z.object({
   category: z.enum(["attractions", "restaurants", "nightlife", "beaches", "nature"]),
@@ -29,7 +31,7 @@ export async function POST(
 
   const { data: property } = await supabase
     .from("properties")
-    .select("id, lat, lng")
+    .select("id, name, address, lat, lng")
     .eq("id", propertyId)
     .eq("host_id", user.id)
     .single();
@@ -56,6 +58,24 @@ export async function POST(
     .eq("property_id", propertyId)
     .eq("category", parsed.data.category);
 
+  // Best-effort — a manually added place should still get saved even if
+  // Claude fails or is slow, just without a description (same as before).
+  const description = await describeManualPlace({
+    propertyName: property.name,
+    address: property.address ?? "",
+    category: parsed.data.category,
+    place: {
+      place_id: place.place_id,
+      name: place.name,
+      rating: place.rating,
+      user_ratings_total: place.user_ratings_total,
+      types: place.types,
+    },
+  }).catch((err) => {
+    console.error("[property-recommendations] describeManualPlace failed", err);
+    return null;
+  });
+
   const { data: recommendation, error } = await supabase
     .from("property_recommendations")
     .insert({
@@ -63,6 +83,7 @@ export async function POST(
       category: parsed.data.category,
       place_id: place.place_id,
       name: place.name,
+      description,
       address: place.address,
       lat: place.location.lat,
       lng: place.location.lng,
@@ -79,6 +100,15 @@ export async function POST(
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (description) {
+    const { data: categoryRows } = await supabase
+      .from("property_recommendations")
+      .select("id, description")
+      .eq("property_id", propertyId)
+      .eq("category", parsed.data.category);
+    triggerRecommendationsTranslation(propertyId, parsed.data.category, categoryRows ?? []);
   }
 
   return NextResponse.json({ recommendation }, { status: 201 });

@@ -13,10 +13,17 @@ import type { PropertyRecommendationCategory } from "@/types";
 export function triggerRecommendationsTranslation(
   propertyId: string,
   category: PropertyRecommendationCategory,
-  recommendations: { id: string; description: string | null }[]
+  recommendations: {
+    id: string;
+    description: string | null;
+    description_en_override?: string | null;
+  }[]
 ): void {
   const descriptions: Record<string, string> = {};
   for (const rec of recommendations) {
+    // A manually-overridden row already has its final English text — never
+    // send it to Claude, so a regeneration of its siblings can't clobber it.
+    if (rec.description_en_override?.trim()) continue;
     if (rec.description?.trim()) descriptions[rec.id] = rec.description;
   }
   if (Object.keys(descriptions).length === 0) return;

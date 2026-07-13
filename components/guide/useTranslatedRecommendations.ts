@@ -18,7 +18,7 @@ export function useTranslatedRecommendations({
   translated,
 }: {
   category: string;
-  recommendations: { id: string; description: string | null }[];
+  recommendations: { id: string; description: string | null; description_en_override?: string | null }[];
   translated: TranslatablePayload | null;
 }): { descriptions: Record<string, string>; isLoading: boolean } {
   const { locale, propertyId } = useGuideLocale();
@@ -31,6 +31,9 @@ export function useTranslatedRecommendations({
 
     const descriptions: Record<string, string> = {};
     for (const rec of recommendations) {
+      // A manually-overridden row already has its final English text —
+      // no need to ask Claude to translate it too.
+      if (rec.description_en_override?.trim()) continue;
       if (rec.description?.trim()) descriptions[rec.id] = rec.description;
     }
     if (Object.keys(descriptions).length === 0) return;
@@ -68,10 +71,15 @@ export function useTranslatedRecommendations({
   if (locale === "es") return { descriptions: {}, isLoading: false };
 
   const effective = translated ?? fallback;
-  const descriptions = effective?.fields?.descriptions;
-  return {
-    descriptions:
-      descriptions && typeof descriptions === "object" ? (descriptions as Record<string, string>) : {},
-    isLoading,
-  };
+  const cached = effective?.fields?.descriptions;
+  const descriptions: Record<string, string> =
+    cached && typeof cached === "object" ? { ...(cached as Record<string, string>) } : {};
+
+  // A manual override always wins over whatever's cached — it can never be
+  // silently replaced by a later regeneration of sibling recommendations.
+  for (const rec of recommendations) {
+    if (rec.description_en_override?.trim()) descriptions[rec.id] = rec.description_en_override;
+  }
+
+  return { descriptions, isLoading };
 }

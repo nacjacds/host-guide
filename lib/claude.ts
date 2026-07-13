@@ -175,6 +175,42 @@ Devuelve SOLO un JSON array en el orden de recomendación:
   return results.filter((r) => validIds.has(r.place_id)).slice(0, limit);
 }
 
+// Sibling of curateRecommendations for a single place a host adds manually
+// (no selection/ranking needed — the host already chose it) — same
+// no-inventing-facts and always-Spanish rules apply.
+export async function describeManualPlace(params: {
+  propertyName: string;
+  address: string;
+  category: string;
+  place: RecommendationCandidate;
+}): Promise<string> {
+  const guidance = CURATION_CATEGORY_GUIDANCE[params.category] ?? "";
+
+  const prompt = `
+Eres el asistente de ${params.propertyName}, un alojamiento en ${params.address}.
+
+El anfitrión ha añadido a mano el siguiente lugar a la categoría "${params.category}"
+(datos reales de Google Places — nombre, rating, número de reseñas, tipos):
+${JSON.stringify(params.place, null, 2)}
+
+Escribe una descripción breve (máximo 1-2 frases) que explique qué lo hace destacar — tipo de
+lugar, ambiente, qué esperar — basándote únicamente en su nombre, rating y tipos. ${guidance}
+No inventes datos factuales (precios, platos concretos, horarios) que no estén en los datos
+proporcionados.
+
+Devuelve SOLO un JSON: { "description": "..." }
+`;
+
+  const message = await anthropic.messages.create({
+    model: MODEL,
+    max_tokens: 512,
+    messages: [{ role: "user", content: prompt }],
+  });
+
+  const text = message.content[0].type === "text" ? message.content[0].text : "";
+  return extractJson<{ description: string }>(text).description;
+}
+
 export interface PlaceSuggestion {
   name: string;
   description: string;
