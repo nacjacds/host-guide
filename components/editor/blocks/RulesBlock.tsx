@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -12,6 +15,8 @@ export function RulesBlock({
   content: RulesContent;
   onChange: (content: RulesContent) => void;
 }) {
+  const t = useTranslations("dashboard.editor.blocks.rules");
+  const tCommon = useTranslations("dashboard.common");
   const rules = content.rules ?? [];
 
   function updateRule(index: number, value: string) {
@@ -30,7 +35,7 @@ export function RulesBlock({
         <div key={i} className="flex gap-2">
           <Input value={rule} onChange={(e) => updateRule(i, e.target.value)} />
           <Button variant="outline" size="sm" onClick={() => removeRule(i)}>
-            Eliminar
+            {tCommon("delete")}
           </Button>
         </div>
       ))}
@@ -39,7 +44,7 @@ export function RulesBlock({
         size="sm"
         onClick={() => onChange({ rules: [...rules, ""] })}
       >
-        Añadir norma
+        {t("addRule")}
       </Button>
     </div>
   );

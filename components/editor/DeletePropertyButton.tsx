@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,8 @@ export function DeletePropertyButton({
   propertyId: string;
   propertyName: string;
 }) {
+  const t = useTranslations("dashboard.editor.deleteProperty");
+  const tCommon = useTranslations("dashboard.common");
   const router = useRouter();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");
@@ -42,14 +45,14 @@ export function DeletePropertyButton({
       });
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo eliminar la propiedad");
+        toast.error(error ?? t("deleteError"));
         return;
       }
-      toast.success("Propiedad eliminada");
+      toast.success(t("deleted"));
       router.push("/dashboard");
       router.refresh();
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setDeleting(false);
       setConfirmOpen(false);
@@ -59,13 +62,11 @@ export function DeletePropertyButton({
   return (
     <Card className="border-destructive/30">
       <CardHeader>
-        <CardTitle className="text-destructive">Zona de peligro</CardTitle>
+        <CardTitle className="text-destructive">{t("dangerZoneTitle")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         <p className="text-sm text-muted-foreground">
-          Al eliminar &quot;{propertyName}&quot;, su guía dejará de estar disponible para tus
-          huéspedes de inmediato. Tendrás 30 días para pedirnos que la restauremos antes de que se
-          borre definitivamente.
+          {t("description", { name: propertyName })}
         </p>
         <Button
           type="button"
@@ -76,22 +77,21 @@ export function DeletePropertyButton({
             setConfirmOpen(true);
           }}
         >
-          Eliminar propiedad
+          {t("deleteProperty")}
         </Button>
       </CardContent>
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar &quot;{propertyName}&quot;?</AlertDialogTitle>
+            <AlertDialogTitle>{t("confirmTitle", { name: propertyName })}</AlertDialogTitle>
             <AlertDialogDescription>
-              Su guía dejará de estar disponible de inmediato. Para confirmar, escribe el nombre
-              exacto de la propiedad: <strong>{propertyName}</strong>
+              {t("confirmDescription", { name: propertyName })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div>
             <Label htmlFor="confirm-property-name" className="sr-only">
-              Nombre de la propiedad
+              {t("propertyNameLabel")}
             </Label>
             <Input
               id="confirm-property-name"
@@ -104,7 +104,7 @@ export function DeletePropertyButton({
           </div>
           <AlertDialogFooter>
             <AlertDialogClose render={<Button type="button" variant="ghost" disabled={deleting} />}>
-              Cancelar
+              {tCommon("cancel")}
             </AlertDialogClose>
             <Button
               type="button"
@@ -112,7 +112,7 @@ export function DeletePropertyButton({
               disabled={!nameMatches || deleting}
               className="bg-destructive text-white hover:bg-destructive/90"
             >
-              {deleting ? "Eliminando..." : "Eliminar propiedad"}
+              {deleting ? tCommon("deleting") : t("deleteProperty")}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
   DndContext,
@@ -58,6 +59,9 @@ export function PropertyEditor({
   recommendationQuota: RecommendationQuota;
   upgradePlanLabel: string | null;
 }) {
+  const t = useTranslations("dashboard.editor");
+  const tSaveAll = useTranslations("dashboard.editor.saveAll");
+  const tCommon = useTranslations("dashboard.common");
   const [blocks, setBlocks] = useState(initialBlocks);
   const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set());
   const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
@@ -123,7 +127,7 @@ export function PropertyEditor({
     });
 
     if (!ok) {
-      toast.error("No se pudo guardar el bloque");
+      toast.error(tSaveAll("blockSaveError"));
       return;
     }
     setDirtyIds((prev) => {
@@ -131,7 +135,7 @@ export function PropertyEditor({
       next.delete(id);
       return next;
     });
-    toast.success("Bloque guardado");
+    toast.success(tSaveAll("blockSaved"));
   }
 
   async function handleSaveAll() {
@@ -159,9 +163,9 @@ export function PropertyEditor({
     });
 
     if (failedCount > 0) {
-      toast.error(`${failedCount} bloque(s) no se pudieron guardar`);
+      toast.error(tSaveAll("failedCount", { count: failedCount }));
     } else {
-      toast.success(`${ids.length} bloque(s) guardado(s)`);
+      toast.success(tSaveAll("savedCount", { count: ids.length }));
     }
   }
 
@@ -189,7 +193,7 @@ export function PropertyEditor({
     });
 
     if (!response.ok) {
-      toast.error("No se pudo guardar el nuevo orden");
+      toast.error(tSaveAll("reorderError"));
       setBlocks(previousBlocks);
     }
   }
@@ -224,13 +228,17 @@ export function PropertyEditor({
               disabled={dirtyIds.size === 0 || savingAll}
               className="hidden shrink-0 md:inline-flex"
             >
-              {savingAll ? "Guardando..." : `Guardar todo${dirtyIds.size ? ` (${dirtyIds.size})` : ""}`}
+              {savingAll
+                ? tCommon("saving")
+                : dirtyIds.size
+                  ? tSaveAll("saveWithCount", { count: dirtyIds.size })
+                  : tSaveAll("save")}
             </Button>
           </div>
 
           {blocks.length === 0 ? (
             <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
-              Añade tu primer bloque con los botones de arriba.
+              {t("emptyState")}
             </p>
           ) : (
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -284,7 +292,7 @@ export function PropertyEditor({
             disabled={savingAll}
             className="w-full"
           >
-            {savingAll ? "Guardando..." : `Guardar todo (${dirtyIds.size})`}
+            {savingAll ? tCommon("saving") : tSaveAll("saveWithCount", { count: dirtyIds.size })}
           </Button>
         </div>
       )}

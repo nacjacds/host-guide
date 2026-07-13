@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,19 +21,21 @@ export function EmergencyBlock({
   content: EmergencyContent;
   onChange: (content: EmergencyContent) => void;
 }) {
+  const t = useTranslations("dashboard.editor.blocks.emergency");
+
   return (
     <div className="space-y-3">
       <div>
-        <Label htmlFor="general">Emergencias generales</Label>
+        <Label htmlFor="general">{t("general")}</Label>
         <Input
           id="general"
-          placeholder="112"
+          placeholder={t("generalPlaceholder")}
           value={content.general ?? ""}
           onChange={(e) => onChange({ ...content, general: e.target.value })}
         />
       </div>
       <div>
-        <Label htmlFor="police">Policía</Label>
+        <Label htmlFor="police">{t("police")}</Label>
         <Input
           id="police"
           value={content.police ?? ""}
@@ -38,7 +43,7 @@ export function EmergencyBlock({
         />
       </div>
       <div>
-        <Label htmlFor="ambulance">Ambulancia</Label>
+        <Label htmlFor="ambulance">{t("ambulance")}</Label>
         <Input
           id="ambulance"
           value={content.ambulance ?? ""}
@@ -46,7 +51,7 @@ export function EmergencyBlock({
         />
       </div>
       <div>
-        <Label htmlFor="firefighters">Bomberos</Label>
+        <Label htmlFor="firefighters">{t("firefighters")}</Label>
         <Input
           id="firefighters"
           value={content.firefighters ?? ""}
@@ -54,16 +59,16 @@ export function EmergencyBlock({
         />
       </div>
       <div>
-        <Label htmlFor="hospital">Hospital más cercano</Label>
+        <Label htmlFor="hospital">{t("hospital")}</Label>
         <Input
           id="hospital"
-          placeholder="Nombre y/o teléfono"
+          placeholder={t("hospitalPlaceholder")}
           value={content.hospital ?? ""}
           onChange={(e) => onChange({ ...content, hospital: e.target.value })}
         />
       </div>
       <div>
-        <Label htmlFor="notes">Notas</Label>
+        <Label htmlFor="notes">{t("notes")}</Label>
         <Textarea
           id="notes"
           value={content.notes ?? ""}

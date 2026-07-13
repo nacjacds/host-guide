@@ -1,24 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import type { BlockType, GuideBlock } from "@/types";
-
-const BLOCK_TYPE_LABELS: Record<BlockType, string> = {
-  wifi: "WiFi",
-  checkin: "Check-in",
-  checkout: "Check-out",
-  rules: "Normas",
-  parking: "Parking",
-  appliances: "Electrodomésticos",
-  pool: "Piscina",
-  drinks: "Copas y bares",
-  custom: "Personalizado",
-  emergencias: "Emergencias",
-};
 
 const BLOCK_TYPE_ICONS: Record<BlockType, string> = {
   wifi: "📶",
@@ -64,6 +52,8 @@ export function BlockToolbar({
   blocks: GuideBlock[];
   onCreated: (block: GuideBlock) => void;
 }) {
+  const t = useTranslations("dashboard.editor.toolbar");
+  const tCommon = useTranslations("dashboard.common");
   const [creatingType, setCreatingType] = useState<BlockType | null>(null);
   const existingTypes = new Set(blocks.map((b) => b.type));
 
@@ -78,14 +68,14 @@ export function BlockToolbar({
 
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo crear el bloque");
+        toast.error(error ?? t("createError"));
         return;
       }
 
       const { block } = await response.json();
       onCreated(block);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error de red");
+      toast.error(err instanceof Error ? err.message : tCommon("networkError"));
     } finally {
       setCreatingType(null);
     }
@@ -109,7 +99,7 @@ export function BlockToolbar({
             )}
           >
             <span aria-hidden>{BLOCK_TYPE_ICONS[type]}</span>
-            {creatingType === type ? "Añadiendo..." : BLOCK_TYPE_LABELS[type]}
+            {creatingType === type ? t("adding") : t(type)}
             {added && <Check className="size-3.5" strokeWidth={2} />}
           </Button>
         );

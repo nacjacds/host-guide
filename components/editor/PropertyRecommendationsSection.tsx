@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { useLocale } from "@/components/shared/LocaleProvider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,18 +21,27 @@ import {
   RECOMMENDATION_CATEGORY_ICONS,
   type RecommendationQuota,
 } from "@/lib/recommendations/constants";
+import { formatResetDate } from "@/lib/recommendations/format";
 import type { PropertyRecommendation, PropertyRecommendationCategory } from "@/types";
 
+// RECOMMENDATION_CATEGORY_LABELS (lib/recommendations/constants.ts) stays
+// hardcoded in Spanish for now — it's outside components/editor/, a
+// deliberate Fase 2 gap (same treatment as lib/plans.ts in Fase 1).
 const ALL_CATEGORIES = [...BASE_RECOMMENDATION_CATEGORIES, ...OPTIONAL_RECOMMENDATION_CATEGORIES];
 
-function formatDistance(rec: PropertyRecommendation): string | null {
+// Takes the translator as a param — plain helper called during render,
+// not a component, so it can't call useTranslations() itself.
+function formatDistance(
+  rec: PropertyRecommendation,
+  t: ReturnType<typeof useTranslations>
+): string | null {
   if (rec.distance_meters == null) return null;
   const meters =
     rec.distance_meters < 1000
       ? `${rec.distance_meters}m`
       : `${(rec.distance_meters / 1000).toFixed(1)}km`;
   return rec.distance_walking_minutes != null
-    ? `${meters} · ${rec.distance_walking_minutes} min andando`
+    ? `${meters} · ${t("walkingMinutes", { count: rec.distance_walking_minutes })}`
     : meters;
 }
 
@@ -43,6 +54,8 @@ function AddPlaceSearch({
   category: PropertyRecommendationCategory;
   onAdded: (rec: PropertyRecommendation) => void;
 }) {
+  const t = useTranslations("dashboard.editor.recommendations");
+  const tCommon = useTranslations("dashboard.common");
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<{ place_id: string; description: string }[]>([]);
   const [searching, setSearching] = useState(false);
@@ -87,16 +100,16 @@ function AddPlaceSearch({
       });
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo añadir el lugar");
+        toast.error(error ?? t("addPlaceError"));
         return;
       }
       const { recommendation } = await response.json();
       onAdded(recommendation);
       setQuery("");
       setSuggestions([]);
-      toast.success("Lugar añadido");
+      toast.success(t("placeAdded"));
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setAdding(false);
     }
@@ -105,12 +118,12 @@ function AddPlaceSearch({
   return (
     <div className="relative">
       <Input
-        placeholder="Buscar un lugar para añadir..."
+        placeholder={t("searchPlaceholder")}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         disabled={adding}
       />
-      {searching && <p className="mt-1 text-xs text-muted-foreground">Buscando...</p>}
+      {searching && <p className="mt-1 text-xs text-muted-foreground">{t("searching")}</p>}
       {suggestions.length > 0 && (
         <div className="absolute z-10 mt-1 w-full rounded-lg border border-border bg-popover shadow-md">
           {suggestions.map((s) => (
@@ -143,6 +156,8 @@ export function PropertyRecommendationsSection({
   initialQuota: RecommendationQuota;
   upgradePlanLabel: string | null;
 }) {
+  const t = useTranslations("dashboard.editor.recommendations");
+  const tCommon = useTranslations("dashboard.common");
   const [recommendations, setRecommendations] = useState(initialRecommendations);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -153,6 +168,8 @@ export function PropertyRecommendationsSection({
   const [editDescriptionEn, setEditDescriptionEn] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
   const [quota, setQuota] = useState(initialQuota);
+  const { locale } = useLocale();
+  const resetDateLabel = formatResetDate(new Date(quota.resetDate), locale);
   const [generatingCategory, setGeneratingCategory] = useState<PropertyRecommendationCategory | null>(
     null
   );
@@ -201,7 +218,7 @@ export function PropertyRecommendationsSection({
     const response = await fetch(`/api/property-recommendations/${id}`, { method: "DELETE" });
     setDeletingId(null);
     if (!response.ok) {
-      toast.error("No se pudo eliminar el lugar");
+      toast.error(t("deleteError"));
       return;
     }
     setRecommendations((prev) => prev.filter((r) => r.id !== id));
@@ -226,7 +243,7 @@ export function PropertyRecommendationsSection({
 
   async function handleSaveEdit(id: string) {
     if (!editName.trim()) {
-      toast.error("El nombre no puede estar vacío");
+      toast.error(t("nameEmpty"));
       return;
     }
     setSavingEdit(true);
@@ -245,15 +262,15 @@ export function PropertyRecommendationsSection({
       });
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo guardar el cambio");
+        toast.error(error ?? t("saveError"));
         return;
       }
       const { recommendation } = (await response.json()) as { recommendation: PropertyRecommendation };
       setRecommendations((prev) => prev.map((r) => (r.id === id ? recommendation : r)));
       cancelEdit();
-      toast.success("Cambios guardados");
+      toast.success(t("saved"));
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setSavingEdit(false);
     }
@@ -273,7 +290,7 @@ export function PropertyRecommendationsSection({
 
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudieron generar recomendaciones");
+        toast.error(error ?? t("generateError"));
         return;
       }
 
@@ -294,12 +311,12 @@ export function PropertyRecommendationsSection({
       }));
 
       if (newForCategory.length === 0) {
-        toast.error("No se encontraron lugares reales cerca para esta categoría");
+        toast.error(t("noRealPlacesFound"));
       } else {
-        toast.success(`${newForCategory.length} lugares generados`);
+        toast.success(t("placesGenerated", { count: newForCategory.length }));
       }
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setGeneratingCategory(null);
     }
@@ -324,13 +341,17 @@ export function PropertyRecommendationsSection({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-medium text-muted-foreground">Recomendaciones locales</h2>
+        <h2 className="text-sm font-medium text-muted-foreground">{t("title")}</h2>
         <span className="text-xs text-muted-foreground">
           {quota.remaining > 0 ? (
-            `Te quedan ${quota.remaining} de ${quota.limit} regeneraciones este mes · Se reinician el ${quota.resetDateLabel}`
+            t("remaining", {
+              remaining: quota.remaining,
+              limit: quota.limit,
+              resetDate: resetDateLabel,
+            })
           ) : (
             <>
-              Sin generaciones disponibles este mes · Se reinician el {quota.resetDateLabel}
+              {t("none", { resetDate: resetDateLabel })}
               {upgradePlanLabel && (
                 <>
                   {" · "}
@@ -338,7 +359,7 @@ export function PropertyRecommendationsSection({
                     href="/account"
                     className="text-primary underline underline-offset-2 hover:no-underline"
                   >
-                    Mejorar plan
+                    {t("upgradePlan")}
                   </Link>
                 </>
               )}
@@ -382,19 +403,19 @@ export function PropertyRecommendationsSection({
                   disabled={generatingCategory !== null || quota.remaining <= 0}
                   title={
                     quota.remaining <= 0
-                      ? `Sin generaciones disponibles este mes · Se reinician el ${quota.resetDateLabel}`
+                      ? t("none", { resetDate: resetDateLabel })
                       : undefined
                   }
                 >
                   <Sparkles size={14} strokeWidth={1.5} />
-                  {generating ? "Generando..." : "Generar con IA"}
+                  {generating ? t("generating") : t("generateWithAi")}
                 </Button>
               </CardTitle>
             </CardHeader>
             {collapsed ? null : (
             <CardContent className="space-y-3">
               {items.length === 0 ? (
-                <p className="text-xs text-muted-foreground">Sin lugares todavía.</p>
+                <p className="text-xs text-muted-foreground">{t("noPlacesYet")}</p>
               ) : (
                 <div className="space-y-2">
                   {items.map((rec) =>
@@ -402,7 +423,7 @@ export function PropertyRecommendationsSection({
                       <div key={rec.id} className="space-y-2 rounded-lg border border-border p-2.5">
                         <div>
                           <Label htmlFor={`edit-name-${rec.id}`} className="text-xs">
-                            Nombre
+                            {t("nameLabel")}
                           </Label>
                           <Input
                             id={`edit-name-${rec.id}`}
@@ -413,7 +434,7 @@ export function PropertyRecommendationsSection({
                         </div>
                         <div>
                           <Label htmlFor={`edit-description-${rec.id}`} className="text-xs">
-                            Descripción
+                            {t("descriptionLabel")}
                           </Label>
                           <Textarea
                             id={`edit-description-${rec.id}`}
@@ -428,7 +449,7 @@ export function PropertyRecommendationsSection({
                             htmlFor={`edit-en-toggle-${rec.id}`}
                             className="text-xs font-normal text-muted-foreground"
                           >
-                            Escribir traducción en inglés a mano
+                            {t("manualEnToggleLabel")}
                           </Label>
                           <Switch
                             id={`edit-en-toggle-${rec.id}`}
@@ -441,7 +462,7 @@ export function PropertyRecommendationsSection({
                         {editEnOverrideEnabled && (
                           <div>
                             <Label htmlFor={`edit-description-en-${rec.id}`} className="text-xs">
-                              Descripción en inglés
+                              {t("descriptionEnLabel")}
                             </Label>
                             <Textarea
                               id={`edit-description-en-${rec.id}`}
@@ -449,7 +470,7 @@ export function PropertyRecommendationsSection({
                               onChange={(e) => setEditDescriptionEn(e.target.value)}
                               disabled={savingEdit}
                               rows={2}
-                              placeholder="Se traduce automáticamente — escribe aquí para sobrescribir"
+                              placeholder={t("descriptionEnPlaceholder")}
                             />
                           </div>
                         )}
@@ -462,7 +483,7 @@ export function PropertyRecommendationsSection({
                             disabled={savingEdit}
                           >
                             <X size={14} strokeWidth={1.5} />
-                            Cancelar
+                            {tCommon("cancel")}
                           </Button>
                           <Button
                             type="button"
@@ -471,7 +492,7 @@ export function PropertyRecommendationsSection({
                             disabled={savingEdit}
                           >
                             <Check size={14} strokeWidth={1.5} />
-                            {savingEdit ? "Guardando..." : "Guardar"}
+                            {savingEdit ? tCommon("saving") : tCommon("save")}
                           </Button>
                         </div>
                       </div>
@@ -484,11 +505,11 @@ export function PropertyRecommendationsSection({
                           <p className="truncate text-sm font-medium">{rec.name}</p>
                           <p className="truncate text-xs text-muted-foreground">
                             {[
-                              formatDistance(rec),
+                              formatDistance(rec, t),
                               rec.rating != null ? `★ ${rec.rating}` : null,
-                              rec.source === "manual" ? "Manual" : null,
-                              rec.source === "ai_curated_edited" ? "Editado" : null,
-                              rec.description_en_override ? "EN manual" : null,
+                              rec.source === "manual" ? t("manualTag") : null,
+                              rec.source === "ai_curated_edited" ? t("editedTag") : null,
+                              rec.description_en_override ? t("enManualTag") : null,
                             ]
                               .filter(Boolean)
                               .join(" · ")}
@@ -514,7 +535,7 @@ export function PropertyRecommendationsSection({
                               className="flex items-center justify-center gap-1.5 rounded-md py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
                             >
                               <ExternalLink size={14} strokeWidth={1.5} />
-                              Abrir enlace
+                              {t("openLink")}
                             </a>
                           )}
                           <Button
@@ -525,7 +546,7 @@ export function PropertyRecommendationsSection({
                             onClick={() => startEdit(rec)}
                           >
                             <Pencil size={14} strokeWidth={1.5} />
-                            Editar
+                            {t("edit")}
                           </Button>
                           <Button
                             type="button"
@@ -536,7 +557,7 @@ export function PropertyRecommendationsSection({
                             disabled={deletingId === rec.id}
                           >
                             <Trash2 size={14} strokeWidth={1.5} />
-                            Borrar
+                            {t("remove")}
                           </Button>
                         </div>
                       </div>
@@ -566,7 +587,7 @@ export function PropertyRecommendationsSection({
                 setManuallyRevealed((prev) => new Set(prev).add(category))
               }
             >
-              + Añadir sección de {RECOMMENDATION_CATEGORY_LABELS[category]}
+              {t("addSection", { category: RECOMMENDATION_CATEGORY_LABELS[category] })}
             </button>
           ))}
         </div>
@@ -575,8 +596,8 @@ export function PropertyRecommendationsSection({
       <ConfirmDialog
         open={confirmDeleteId !== null}
         onOpenChange={(open) => !open && setConfirmDeleteId(null)}
-        title="¿Eliminar este lugar?"
-        description="Esta acción no se puede deshacer."
+        title={t("confirmDeleteTitle")}
+        description={t("confirmDeleteDescription")}
         onConfirm={() => confirmDeleteId && handleDelete(confirmDeleteId)}
         loading={deletingId !== null}
       />

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PropertyEditor } from "@/components/editor/PropertyEditor";
-import { getRegenerationQuotaStatus, formatResetDate } from "@/lib/recommendations/quota";
+import { getRegenerationQuotaStatus } from "@/lib/recommendations/quota";
 import { nextPlanWithMoreRegenerations } from "@/lib/plans";
 
 export default async function EditPropertyPage({
@@ -57,7 +57,7 @@ export default async function EditPropertyPage({
         limit: quotaStatus.limit,
         used: quotaStatus.used,
         remaining: quotaStatus.remaining,
-        resetDateLabel: formatResetDate(quotaStatus.resetDate),
+        resetDate: quotaStatus.resetDate.toISOString(),
       }}
       upgradePlanLabel={upgradePlan?.label ?? null}
     />

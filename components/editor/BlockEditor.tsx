@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,17 +24,20 @@ import type { BlockImage, GuideBlock } from "@/types";
 
 const PLACE_LIST_TYPES = ["drinks"] as const;
 
-function summarizeBlock(block: GuideBlock): string {
+// Takes the "dashboard.editor.blockCard.summary" translator as a param
+// rather than calling useTranslations() itself — this is a plain helper
+// called during render, not a component, so it can't use hooks directly.
+function summarizeBlock(block: GuideBlock, t: ReturnType<typeof useTranslations>): string {
   const content = block.content as Record<string, unknown>;
   switch (block.type) {
     case "wifi": {
       const c = content as unknown as WifiContent;
-      return c.network_name ? `Red: ${c.network_name}` : "Sin configurar";
+      return c.network_name ? t("networkPrefix", { name: c.network_name }) : t("notConfigured");
     }
     case "checkin":
     case "checkout": {
       const c = content as unknown as CheckinContent;
-      return c.time ? `A las ${c.time}` : "Sin hora definida";
+      return c.time ? t("atTime", { time: c.time }) : t("noTimeSet");
     }
     case "rules":
     case "parking":
@@ -41,21 +45,21 @@ function summarizeBlock(block: GuideBlock): string {
     case "pool": {
       const c = content as unknown as RulesContent;
       const count = c.rules?.length ?? 0;
-      return count === 0 ? "Sin elementos" : `${count} elemento${count === 1 ? "" : "s"}`;
+      return count === 0 ? t("noItems") : t("itemCount", { count });
     }
     case "custom": {
       const c = content as unknown as CustomContent;
-      if (!c.text) return "Sin contenido";
+      if (!c.text) return t("noContent");
       return c.text.length > 60 ? `${c.text.slice(0, 60)}…` : c.text;
     }
     case "emergencias": {
       const c = content as unknown as EmergencyContent;
-      return c.general ? `Emergencias: ${c.general}` : "Sin configurar";
+      return c.general ? t("emergencyPrefix", { value: c.general }) : t("notConfigured");
     }
     case "drinks": {
       const c = content as unknown as PlaceListContent;
       const count = c.places?.length ?? 0;
-      return count === 0 ? "Sin lugares" : `${count} lugar${count === 1 ? "" : "es"}`;
+      return count === 0 ? t("noPlaces") : t("placeCount", { count });
     }
     default:
       return "";
@@ -81,6 +85,11 @@ export function BlockEditor({
   onSave: () => void;
   onDeleted: (id: string) => void;
 }) {
+  const t = useTranslations("dashboard.editor.blockCard");
+  const tSummary = useTranslations("dashboard.editor.blockCard.summary");
+  const tBlocksCustom = useTranslations("dashboard.editor.blocks.custom");
+  const tBlocksRules = useTranslations("dashboard.editor.blocks.rules");
+  const tCommon = useTranslations("dashboard.common");
   const [open, setOpen] = useState(defaultOpen);
   const [deleting, setDeleting] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -117,7 +126,7 @@ export function BlockEditor({
             type="button"
             {...attributes}
             {...listeners}
-            aria-label="Reordenar bloque"
+            aria-label={t("reorderLabel")}
             className={cn(
               "flex shrink-0 touch-none items-center justify-center rounded-lg p-2.5 text-muted-foreground opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100",
               isDragging ? "cursor-grabbing" : "cursor-grab"
@@ -137,12 +146,14 @@ export function BlockEditor({
                 {dirty && (
                   <span
                     className="size-1.5 shrink-0 animate-pulse rounded-full bg-primary"
-                    title="Cambios sin guardar"
+                    title={t("unsavedChanges")}
                   />
                 )}
               </div>
               {!open && (
-                <p className="truncate text-xs text-muted-foreground">{summarizeBlock(block)}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {summarizeBlock(block, tSummary)}
+                </p>
               )}
             </div>
             <ChevronDown
@@ -159,7 +170,7 @@ export function BlockEditor({
                   checked={block.is_visible}
                   onCheckedChange={(checked) => onChange({ is_visible: checked })}
                 />
-                Visible en la guía
+                {t("visibleInGuide")}
               </label>
               <Button
                 variant="ghost"
@@ -167,7 +178,7 @@ export function BlockEditor({
                 onClick={() => setConfirmDeleteOpen(true)}
                 disabled={deleting}
               >
-                Eliminar
+                {tCommon("delete")}
               </Button>
             </div>
 
@@ -198,7 +209,9 @@ export function BlockEditor({
                     onGenerated={(place) => {
                       const c = block.content as unknown as RulesContent;
                       const distance =
-                        place.distance_meters != null ? `, a ${place.distance_meters}m` : "";
+                        place.distance_meters != null
+                          ? tBlocksRules("distanceSuffix", { distance: place.distance_meters })
+                          : "";
                       const line = `${place.name} — ${place.description} (${place.address}${distance}) ${place.maps_url}`;
                       updateContent({ rules: [...(c.rules ?? []), line] });
                     }}
@@ -223,7 +236,7 @@ export function BlockEditor({
             {(PLACE_LIST_TYPES as readonly string[]).includes(block.type) && (
               <div className="space-y-3">
                 <div>
-                  <Label htmlFor="title">Título</Label>
+                  <Label htmlFor="title">{tBlocksCustom("title")}</Label>
                   <Input
                     id="title"
                     value={block.title ?? ""}
@@ -249,9 +262,9 @@ export function BlockEditor({
             </div>
 
             <div className="mt-4 flex items-center justify-end gap-2 border-t border-border pt-3">
-              {dirty && <span className="text-xs text-muted-foreground">Cambios sin guardar</span>}
+              {dirty && <span className="text-xs text-muted-foreground">{t("unsavedChanges")}</span>}
               <Button size="sm" onClick={onSave} disabled={!dirty || saving}>
-                {saving ? "Guardando..." : "Guardar"}
+                {saving ? tCommon("saving") : tCommon("save")}
               </Button>
             </div>
           </CardContent>
@@ -261,8 +274,8 @@ export function BlockEditor({
       <ConfirmDialog
         open={confirmDeleteOpen}
         onOpenChange={setConfirmDeleteOpen}
-        title="¿Eliminar este bloque?"
-        description="Esta acción no se puede deshacer."
+        title={t("confirmDeleteTitle")}
+        description={t("confirmDeleteDescription")}
         onConfirm={handleDelete}
         loading={deleting}
       />

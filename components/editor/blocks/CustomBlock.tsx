@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,14 +20,16 @@ export function CustomBlock({
   onTitleChange: (title: string) => void;
   onChange: (content: CustomContent) => void;
 }) {
+  const t = useTranslations("dashboard.editor.blocks.custom");
+
   return (
     <div className="space-y-3">
       <div>
-        <Label htmlFor="title">Título</Label>
+        <Label htmlFor="title">{t("title")}</Label>
         <Input id="title" value={title} onChange={(e) => onTitleChange(e.target.value)} />
       </div>
       <div>
-        <Label htmlFor="text">Contenido</Label>
+        <Label htmlFor="text">{t("content")}</Label>
         <Textarea
           id="text"
           value={content.text ?? ""}

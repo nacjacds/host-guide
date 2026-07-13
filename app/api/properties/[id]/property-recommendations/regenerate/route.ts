@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { generatePropertyRecommendations } from "@/lib/recommendations/generateRecommendations";
-import { getRegenerationQuotaStatus, formatResetDate } from "@/lib/recommendations/quota";
+import { getRegenerationQuotaStatus } from "@/lib/recommendations/quota";
+import { formatResetDate } from "@/lib/recommendations/format";
 
 const regenerateSchema = z.object({
   // Omitted = regenerate every category (Settings' global button); present

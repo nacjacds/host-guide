@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { TriangleAlertIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,8 @@ import type { Property } from "@/types";
 const MAX_COVER_SIZE_BYTES = 3 * 1024 * 1024;
 
 export function PublishPanel({ property }: { property: Property }) {
+  const t = useTranslations("dashboard.editor.publish");
+  const tCommon = useTranslations("dashboard.common");
   const [isPublished, setIsPublished] = useState(property.is_published);
   const [updating, setUpdating] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
@@ -33,11 +36,11 @@ export function PublishPanel({ property }: { property: Property }) {
     if (!file) return;
 
     if (file.type !== "image/jpeg") {
-      toast.error("Solo se aceptan imágenes JPG");
+      toast.error(t("onlyJpg"));
       return;
     }
     if (file.size > MAX_COVER_SIZE_BYTES) {
-      toast.error("La imagen no puede superar 3MB");
+      toast.error(t("coverTooLarge"));
       return;
     }
 
@@ -51,14 +54,14 @@ export function PublishPanel({ property }: { property: Property }) {
       });
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo subir la imagen");
+        toast.error(error ?? t("coverUploadError"));
         return;
       }
       const { cover_image_url } = await response.json();
       setCoverUrl(cover_image_url);
-      toast.success("Imagen de portada actualizada");
+      toast.success(t("coverUpdated"));
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setUploadingCover(false);
     }
@@ -71,13 +74,13 @@ export function PublishPanel({ property }: { property: Property }) {
         method: "DELETE",
       });
       if (!response.ok) {
-        toast.error("No se pudo eliminar la imagen");
+        toast.error(t("coverDeleteError"));
         return;
       }
       setCoverUrl(null);
-      toast.success("Imagen de portada eliminada");
+      toast.success(t("coverDeleted"));
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setUploadingCover(false);
       setConfirmCoverDelete(false);
@@ -87,7 +90,7 @@ export function PublishPanel({ property }: { property: Property }) {
   async function handleSaveWhatsapp() {
     const sanitized = sanitizePhoneDigits(whatsappNumber);
     if (sanitized && !isValidPhoneNumber(sanitized)) {
-      toast.error("Introduce un teléfono válido: código de país + número (8-15 dígitos)");
+      toast.error(t("phoneInvalid"));
       return;
     }
     setSavingWhatsapp(true);
@@ -99,13 +102,13 @@ export function PublishPanel({ property }: { property: Property }) {
       });
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo guardar el número de WhatsApp");
+        toast.error(error ?? t("whatsappSaveError"));
         return;
       }
       setWhatsappNumber(sanitized);
-      toast.success("Número de WhatsApp guardado");
+      toast.success(t("whatsappSaved"));
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setSavingWhatsapp(false);
     }
@@ -122,13 +125,13 @@ export function PublishPanel({ property }: { property: Property }) {
       });
       if (!response.ok) {
         setIsPublished(!checked);
-        toast.error("No se pudo actualizar el estado de publicación");
+        toast.error(t("publishToggleError"));
         return;
       }
-      toast.success(checked ? "Guía publicada" : "Guía despublicada");
+      toast.success(checked ? t("publishedToast") : t("unpublishedToast"));
     } catch {
       setIsPublished(!checked);
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setUpdating(false);
     }
@@ -143,13 +146,13 @@ export function PublishPanel({ property }: { property: Property }) {
     try {
       const response = await fetch(`/api/properties/${property.id}/qr`);
       if (!response.ok) {
-        toast.error("No se pudo generar el código QR");
+        toast.error(t("qrError"));
         return;
       }
       const { dataUrl } = await response.json();
       setQrDataUrl(dataUrl);
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setLoadingQr(false);
     }
@@ -158,12 +161,12 @@ export function PublishPanel({ property }: { property: Property }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Publicación</CardTitle>
+        <CardTitle className="text-base">{t("title")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between rounded-lg bg-muted px-3 py-2.5">
           <Label htmlFor="publish-toggle" className="text-sm">
-            {isPublished ? "Publicada" : "Borrador"}
+            {isPublished ? t("published") : t("draft")}
           </Label>
           <Switch
             id="publish-toggle"
@@ -183,19 +186,17 @@ export function PublishPanel({ property }: { property: Property }) {
           className="hidden md:flex"
         />
         {!isPublished && (
-          <p className="text-xs text-muted-foreground">
-            Publica la guía para poder verla y compartirla con tus huéspedes.
-          </p>
+          <p className="text-xs text-muted-foreground">{t("publishHint")}</p>
         )}
 
         <div className="space-y-2">
-          <Label>Imagen de portada</Label>
+          <Label>{t("coverImage")}</Label>
           {coverUrl ? (
             <div className="space-y-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={coverUrl}
-                alt="Portada de la guía"
+                alt={t("coverAlt")}
                 className="h-28 w-full rounded-lg border border-border object-cover"
               />
               <div className="flex gap-2">
@@ -207,7 +208,7 @@ export function PublishPanel({ property }: { property: Property }) {
                   onClick={() => coverInputRef.current?.click()}
                   disabled={uploadingCover}
                 >
-                  {uploadingCover ? "Subiendo..." : "Cambiar"}
+                  {uploadingCover ? tCommon("saving") : t("change")}
                 </Button>
                 <Button
                   type="button"
@@ -216,7 +217,7 @@ export function PublishPanel({ property }: { property: Property }) {
                   onClick={() => setConfirmCoverDelete(true)}
                   disabled={uploadingCover}
                 >
-                  Eliminar
+                  {tCommon("delete")}
                 </Button>
               </div>
             </div>
@@ -229,7 +230,7 @@ export function PublishPanel({ property }: { property: Property }) {
               onClick={() => coverInputRef.current?.click()}
               disabled={uploadingCover}
             >
-              {uploadingCover ? "Subiendo..." : "Subir imagen JPG"}
+              {uploadingCover ? tCommon("saving") : t("uploadJpg")}
             </Button>
           )}
           <input
@@ -239,11 +240,11 @@ export function PublishPanel({ property }: { property: Property }) {
             className="hidden"
             onChange={handleCoverFileChange}
           />
-          <p className="text-xs text-muted-foreground">Formato JPG, máximo 3MB.</p>
+          <p className="text-xs text-muted-foreground">{t("coverFormatHint")}</p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="whatsapp_number">Teléfono de contacto para huéspedes</Label>
+          <Label htmlFor="whatsapp_number">{t("contactPhoneLabel")}</Label>
           <div className="flex gap-2">
             <Input
               id="whatsapp_number"
@@ -257,17 +258,14 @@ export function PublishPanel({ property }: { property: Property }) {
               onClick={handleSaveWhatsapp}
               disabled={savingWhatsapp}
             >
-              {savingWhatsapp ? "..." : "Guardar"}
+              {savingWhatsapp ? "..." : tCommon("save")}
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Código de país + número, sin espacios ni +. Ej: 34612345678.
-          </p>
+          <p className="text-xs text-muted-foreground">{t("phoneHint")}</p>
           {!whatsappNumber && (
             <p className="flex items-start gap-1.5 text-xs text-amber-600">
               <TriangleAlertIcon className="mt-0.5 size-3.5 shrink-0" strokeWidth={1.5} />
-              Sin este número (ni un teléfono personal en tu perfil), el botón de contacto
-              no aparecerá en tu guía pública.
+              {t("phoneWarning")}
             </p>
           )}
         </div>
@@ -278,7 +276,7 @@ export function PublishPanel({ property }: { property: Property }) {
           onClick={handleShowQr}
           disabled={loadingQr}
         >
-          {loadingQr ? "Generando..." : qrDataUrl ? "Ocultar QR" : "Ver código QR"}
+          {loadingQr ? t("generatingQr") : qrDataUrl ? t("hideQr") : t("viewQr")}
         </Button>
 
         <Button
@@ -292,19 +290,19 @@ export function PublishPanel({ property }: { property: Property }) {
             />
           }
         >
-          Imprimir QR
+          {t("printQr")}
         </Button>
 
         {qrDataUrl && (
           <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={qrDataUrl} alt="Código QR de la guía" className="size-40" />
+            <img src={qrDataUrl} alt={t("qrAlt")} className="size-40" />
             <a
               href={qrDataUrl}
               download={`qr-${property.slug}.png`}
               className="text-xs text-primary underline underline-offset-2"
             >
-              Descargar PNG
+              {t("downloadPng")}
             </a>
           </div>
         )}
@@ -313,8 +311,8 @@ export function PublishPanel({ property }: { property: Property }) {
       <ConfirmDialog
         open={confirmCoverDelete}
         onOpenChange={setConfirmCoverDelete}
-        title="¿Eliminar imagen de portada?"
-        description="Esta acción no se puede deshacer."
+        title={t("confirmCoverDeleteTitle")}
+        description={t("confirmDeleteDescription")}
         onConfirm={handleRemoveCover}
         loading={uploadingCover}
       />

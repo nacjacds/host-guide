@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,6 +45,8 @@ export function PlaceListBlock({
   content: PlaceListContent;
   onChange: (content: PlaceListContent) => void;
 }) {
+  const t = useTranslations("dashboard.editor.blocks.placeList");
+  const tCommon = useTranslations("dashboard.common");
   const places = content.places ?? [];
   const showPrice = blockType === "drinks";
   const [skippedImageIds, setSkippedImageIds] = useState<Set<string>>(new Set());
@@ -73,14 +76,16 @@ export function PlaceListBlock({
       {places.map((place, i) => (
         <div key={place.id} className="space-y-2.5 rounded-lg border border-border p-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Lugar {i + 1}</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              {t("place", { n: i + 1 })}
+            </span>
             <Button variant="ghost" size="sm" onClick={() => removePlace(i)}>
-              Eliminar
+              {tCommon("delete")}
             </Button>
           </div>
 
           <div>
-            <Label>Nombre</Label>
+            <Label>{t("name")}</Label>
             <Input
               value={place.name}
               onChange={(e) => updatePlace(i, { name: e.target.value })}
@@ -88,16 +93,16 @@ export function PlaceListBlock({
           </div>
 
           <div>
-            <Label>Descripción</Label>
+            <Label>{t("description")}</Label>
             <Textarea
               value={place.description}
               onChange={(e) => updatePlace(i, { description: e.target.value })}
-              placeholder="2 frases sobre qué hace especial a este sitio"
+              placeholder={t("descriptionPlaceholder")}
             />
           </div>
 
           <div>
-            <Label>Dirección</Label>
+            <Label>{t("address")}</Label>
             <Input
               value={place.address}
               onChange={(e) => updatePlace(i, { address: e.target.value })}
@@ -105,7 +110,7 @@ export function PlaceListBlock({
           </div>
 
           <div>
-            <Label>Distancia (metros)</Label>
+            <Label>{t("distance")}</Label>
             <Input
               type="number"
               min={0}
@@ -119,7 +124,7 @@ export function PlaceListBlock({
           </div>
 
           <div>
-            <Label>Enlace de Google Maps</Label>
+            <Label>{t("mapsLink")}</Label>
             <Input
               value={place.maps_url}
               onChange={(e) => updatePlace(i, { maps_url: e.target.value })}
@@ -130,7 +135,7 @@ export function PlaceListBlock({
           {showPrice && (
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <Label>Precio</Label>
+                <Label>{t("price")}</Label>
                 <Select
                   value={place.price_level ?? ""}
                   onValueChange={(value) =>
@@ -138,7 +143,7 @@ export function PlaceListBlock({
                   }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Sin definir" />
+                    <SelectValue placeholder={t("priceUndefined")} />
                   </SelectTrigger>
                   <SelectContent>
                     {PRICE_LEVELS.map((level) => (
@@ -153,11 +158,11 @@ export function PlaceListBlock({
           )}
 
           <div>
-            <Label>ID de Google Places (opcional)</Label>
+            <Label>{t("placeId")}</Label>
             <Input
               value={place.google_place_id ?? ""}
               onChange={(e) => updatePlace(i, { google_place_id: e.target.value || null })}
-              placeholder="Se rellenará automáticamente en el futuro"
+              placeholder={t("placeIdPlaceholder")}
             />
           </div>
 
@@ -178,7 +183,7 @@ export function PlaceListBlock({
                   setSkippedImageIds((prev) => new Set(prev).add(place.id))
                 }
               >
-                Omitir
+                {t("skip")}
               </Button>
             )}
           </div>
@@ -187,7 +192,7 @@ export function PlaceListBlock({
 
       {canAddAnotherPlace && (
         <Button variant="secondary" size="sm" onClick={addPlace}>
-          + Añadir lugar
+          {t("addPlace")}
         </Button>
       )}
     </div>

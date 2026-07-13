@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,10 +17,12 @@ export function CheckinBlock({
   content: CheckinContent;
   onChange: (content: CheckinContent) => void;
 }) {
+  const t = useTranslations("dashboard.editor.blocks.checkin");
+
   return (
     <div className="space-y-3">
       <div>
-        <Label htmlFor="time">Hora de check-in</Label>
+        <Label htmlFor="time">{t("time")}</Label>
         <Input
           id="time"
           type="time"
@@ -26,7 +31,7 @@ export function CheckinBlock({
         />
       </div>
       <div>
-        <Label htmlFor="instructions">Instrucciones</Label>
+        <Label htmlFor="instructions">{t("instructions")}</Label>
         <Textarea
           id="instructions"
           value={content.instructions ?? ""}

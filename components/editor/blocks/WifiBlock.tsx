@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -13,10 +16,12 @@ export function WifiBlock({
   content: WifiContent;
   onChange: (content: WifiContent) => void;
 }) {
+  const t = useTranslations("dashboard.editor.blocks.wifi");
+
   return (
     <div className="space-y-3">
       <div>
-        <Label htmlFor="network_name">Nombre de la red</Label>
+        <Label htmlFor="network_name">{t("networkName")}</Label>
         <Input
           id="network_name"
           value={content.network_name ?? ""}
@@ -24,7 +29,7 @@ export function WifiBlock({
         />
       </div>
       <div>
-        <Label htmlFor="password">Contraseña</Label>
+        <Label htmlFor="password">{t("password")}</Label>
         <Input
           id="password"
           value={content.password ?? ""}

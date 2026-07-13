@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -22,6 +23,7 @@ export function AIPlaceGenerateButton({
   onGenerated: (place: PlaceEntry) => void;
 }) {
   const [loading, setLoading] = useState(false);
+  const t = useTranslations("dashboard.editor.blocks.aiGenerate");
 
   async function handleGenerate() {
     setLoading(true);
@@ -34,7 +36,7 @@ export function AIPlaceGenerateButton({
 
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo generar una sugerencia");
+        toast.error(error ?? t("error"));
         return;
       }
 
@@ -48,9 +50,9 @@ export function AIPlaceGenerateButton({
         maps_url: buildGoogleMapsUrl(suggestion.name, suggestion.address),
         google_place_id: null,
       });
-      toast.success("Lugar sugerido — revísalo antes de guardar");
+      toast.success(t("suggested"));
     } catch {
-      toast.error("Error de red al generar con IA");
+      toast.error(t("networkError"));
     } finally {
       setLoading(false);
     }
@@ -59,7 +61,7 @@ export function AIPlaceGenerateButton({
   return (
     <Button type="button" variant="outline" size="sm" onClick={handleGenerate} disabled={loading}>
       <Sparkles className="size-3.5" strokeWidth={1.5} />
-      {loading ? "Generando..." : "Generar con IA 🤖"}
+      {loading ? t("generating") : t("generate")}
     </Button>
   );
 }

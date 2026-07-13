@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -28,6 +29,8 @@ export function PlaceImageUploader({
   const [uploading, setUploading] = useState(false);
   const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
   const [pendingDeleteUrl, setPendingDeleteUrl] = useState<string | null>(null);
+  const t = useTranslations("dashboard.editor.blocks.imageUploader");
+  const tCommon = useTranslations("dashboard.common");
 
   async function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -35,11 +38,11 @@ export function PlaceImageUploader({
     if (!file) return;
 
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      toast.error("Solo se aceptan imágenes JPG, PNG o WebP");
+      toast.error(t("onlyJpgPngWebp"));
       return;
     }
     if (file.size > MAX_SIZE_BYTES) {
-      toast.error("La imagen no puede superar 2MB");
+      toast.error(t("tooLarge2mb"));
       return;
     }
 
@@ -55,14 +58,14 @@ export function PlaceImageUploader({
 
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo subir la imagen");
+        toast.error(error ?? t("uploadError"));
         return;
       }
 
       const { image } = await response.json();
       onUploaded([...images, image]);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error de red");
+      toast.error(err instanceof Error ? err.message : tCommon("networkError"));
     } finally {
       setUploading(false);
     }
@@ -76,7 +79,7 @@ export function PlaceImageUploader({
         { method: "DELETE" }
       );
       if (!response.ok) {
-        toast.error("No se pudo eliminar la imagen");
+        toast.error(t("deleteError"));
         return;
       }
       onUploaded(images.filter((img) => img.url !== url));
@@ -93,7 +96,7 @@ export function PlaceImageUploader({
   return (
     <div className="space-y-2">
       <p className="text-xs font-medium text-muted-foreground">
-        Imágenes del lugar ({images.length}/{MAX_IMAGES})
+        {t("placeImages", { count: images.length, max: MAX_IMAGES })}
       </p>
 
       {images.length > 0 && (
@@ -113,7 +116,7 @@ export function PlaceImageUploader({
                 </button>
               </div>
               <Input
-                placeholder="Leyenda (opcional)"
+                placeholder={t("captionPlaceholder")}
                 maxLength={120}
                 value={img.caption}
                 onChange={(e) => handleCaption(img.url, e.target.value)}
@@ -140,7 +143,7 @@ export function PlaceImageUploader({
             disabled={uploading}
             onClick={() => fileInputRef.current?.click()}
           >
-            {uploading ? "Subiendo..." : "+ Añadir imágenes"}
+            {uploading ? tCommon("saving") : t("addImages")}
           </Button>
         </>
       )}
@@ -148,8 +151,8 @@ export function PlaceImageUploader({
       <ConfirmDialog
         open={pendingDeleteUrl !== null}
         onOpenChange={(open) => !open && setPendingDeleteUrl(null)}
-        title="¿Eliminar imagen?"
-        description="Esta acción no se puede deshacer."
+        title={t("confirmDeleteTitle")}
+        description={t("confirmDeleteDescription")}
         onConfirm={() => pendingDeleteUrl && handleDelete(pendingDeleteUrl)}
         loading={deletingUrl !== null}
       />

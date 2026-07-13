@@ -2,16 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { cn, isActiveNavLink } from "@/lib/utils";
 
 const TABS = [
-  { key: "edit", label: "Editor", href: (id: string) => `/properties/${id}/edit` },
-  { key: "settings", label: "Ajustes", href: (id: string) => `/properties/${id}/settings` },
-  { key: "stats", label: "Estadísticas", href: (id: string) => `/properties/${id}/stats` },
+  { key: "edit", labelKey: "editor", href: (id: string) => `/properties/${id}/edit` },
+  { key: "settings", labelKey: "settings", href: (id: string) => `/properties/${id}/settings` },
+  { key: "stats", labelKey: "stats", href: (id: string) => `/properties/${id}/stats` },
 ] as const;
 
 export function PropertyNav({ propertyId }: { propertyId: string }) {
   const pathname = usePathname();
+  const t = useTranslations("dashboard.editor.nav");
 
   return (
     <nav className="flex gap-1 overflow-x-auto border-b border-border">
@@ -29,7 +31,7 @@ export function PropertyNav({ propertyId }: { propertyId: string }) {
                 : "border-transparent text-muted-foreground hover:text-foreground"
             )}
           >
-            {tab.label}
+            {t(tab.labelKey)}
           </Link>
         );
       })}

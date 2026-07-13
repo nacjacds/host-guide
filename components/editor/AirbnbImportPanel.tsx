@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -32,17 +33,17 @@ type FieldKey =
   | "checkout_time"
   | "house_rules";
 
-const FIELD_LABELS: Record<FieldKey, string> = {
-  title: "Nombre del alojamiento",
-  description: "Descripción",
-  address: "Dirección",
-  max_guests: "Huéspedes máximos",
-  bedrooms: "Habitaciones",
-  bathrooms: "Baños",
-  checkin_time: "Hora de check-in",
-  checkout_time: "Hora de check-out",
-  house_rules: "Normas de la casa",
-};
+const FIELD_KEYS: FieldKey[] = [
+  "title",
+  "description",
+  "address",
+  "max_guests",
+  "bedrooms",
+  "bathrooms",
+  "checkin_time",
+  "checkout_time",
+  "house_rules",
+];
 
 // Airbnb sometimes serves a computed summary ("Rental unit in Seville · ★5.0
 // · 3 bedrooms · 3 beds · 1 private bath") as the page's og:title instead of
@@ -92,6 +93,9 @@ export function AirbnbImportPanel({
   onBlockCreated: (block: GuideBlock) => void;
   onBlockSynced: (id: string, patch: Partial<GuideBlock>) => void;
 }) {
+  const t = useTranslations("dashboard.editor.airbnbImport");
+  const tFields = useTranslations("dashboard.editor.airbnbImport.fields");
+  const tCommon = useTranslations("dashboard.common");
   const [airbnbUrl, setAirbnbUrl] = useState(property.airbnb_url ?? "");
   const [importing, setImporting] = useState(false);
   const [applying, setApplying] = useState(false);
@@ -112,7 +116,7 @@ export function AirbnbImportPanel({
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        toast.error(data.error ?? "No se pudo importar el anuncio. Rellena los datos manualmente.");
+        toast.error(data.error ?? t("importError"));
         return;
       }
 
@@ -120,7 +124,7 @@ export function AirbnbImportPanel({
       setResult(imported);
       const found = new Set<FieldKey>();
       let hadSuspicious = false;
-      (Object.keys(FIELD_LABELS) as FieldKey[]).forEach((key) => {
+      FIELD_KEYS.forEach((key) => {
         const value = imported[key];
         const hasValue = Array.isArray(value) ? value.length > 0 : value !== null && value !== "";
         if (!hasValue) return;
@@ -131,13 +135,9 @@ export function AirbnbImportPanel({
         found.add(key);
       });
       setSelected(found);
-      toast.success(
-        hadSuspicious
-          ? "Datos importados — revisa el nombre/dirección, no se han preseleccionado porque parecen texto genérico de Airbnb."
-          : "Datos importados — revísalos y confirma qué aplicar."
-      );
+      toast.success(hadSuspicious ? t("importedSuspicious") : t("imported"));
     } catch {
-      toast.error("Error de red al importar. Rellena los datos manualmente.");
+      toast.error(t("networkError"));
     } finally {
       setImporting(false);
     }
@@ -178,7 +178,7 @@ export function AirbnbImportPanel({
         body: JSON.stringify(propertyPatch),
       });
       if (!propertyResponse.ok) {
-        toast.error("No se pudieron guardar los datos básicos");
+        toast.error(t("basicSaveError"));
       }
 
       if (selected.has("checkin_time") && result.checkin_time) {
@@ -210,10 +210,10 @@ export function AirbnbImportPanel({
         }
       }
 
-      toast.success("Datos aplicados");
+      toast.success(t("applied"));
       setResult(null);
     } catch {
-      toast.error("Error de red al guardar los datos importados");
+      toast.error(t("applyNetworkError"));
     } finally {
       setApplying(false);
     }
@@ -222,11 +222,11 @@ export function AirbnbImportPanel({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm">Importar desde Airbnb</CardTitle>
+        <CardTitle className="text-sm">{t("title")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="space-y-2">
-          <Label htmlFor="airbnb_url">URL de tu anuncio de Airbnb</Label>
+          <Label htmlFor="airbnb_url">{t("urlLabel")}</Label>
           <div className="flex gap-2">
             <Input
               id="airbnb_url"
@@ -240,21 +240,18 @@ export function AirbnbImportPanel({
               onClick={handleImport}
               disabled={importing || !airbnbUrl}
             >
-              {importing ? "Importando..." : "Importar datos"}
+              {importing ? t("importing") : t("importData")}
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Best-effort: si Airbnb bloquea el acceso o no encontramos algún dato, podrás
-            rellenarlo manualmente en los bloques de abajo.
-          </p>
+          <p className="text-xs text-muted-foreground">{t("bestEffortHint")}</p>
         </div>
 
         {result && (
           <div className="space-y-2 rounded-lg border border-border p-3">
             <p className="text-xs font-medium text-muted-foreground">
-              Datos extraídos — desmarca lo que no quieras aplicar
+              {t("extractedDataHint")}
             </p>
-            {(Object.keys(FIELD_LABELS) as FieldKey[]).map((key) => {
+            {FIELD_KEYS.map((key) => {
               const value = result[key];
               const hasValue = Array.isArray(value) ? value.length > 0 : value !== null && value !== "";
               if (!hasValue) return null;
@@ -267,10 +264,10 @@ export function AirbnbImportPanel({
                 <label key={key} className="flex items-start justify-between gap-3 text-sm">
                   <span className="min-w-0">
                     <span className="block font-medium">
-                      {FIELD_LABELS[key]}
+                      {tFields(key)}
                       {suspicious && (
                         <span className="ml-1.5 text-xs font-normal text-amber-600">
-                          ⚠ parece texto genérico de Airbnb, revisa antes de aplicar
+                          {t("suspiciousWarning")}
                         </span>
                       )}
                     </span>
@@ -282,7 +279,7 @@ export function AirbnbImportPanel({
             })}
             <div className="flex justify-end gap-2 pt-1">
               <Button type="button" variant="ghost" size="sm" onClick={() => setResult(null)}>
-                Descartar
+                {t("discard")}
               </Button>
               <Button
                 type="button"
@@ -290,7 +287,7 @@ export function AirbnbImportPanel({
                 onClick={handleConfirm}
                 disabled={applying || selected.size === 0}
               >
-                {applying ? "Guardando..." : "Confirmar y guardar"}
+                {applying ? tCommon("saving") : t("confirmAndSave")}
               </Button>
             </div>
           </div>

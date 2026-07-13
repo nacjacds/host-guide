@@ -43,22 +43,3 @@ export async function getRegenerationQuotaStatus(
     resetDate: startOfNextMonth(),
   };
 }
-
-// Pinned to UTC explicitly — resetDate is always exactly UTC midnight (see
-// startOfNextMonth above), and without an explicit timeZone here,
-// toLocaleString would render it in the server process's local timezone,
-// which could show a time other than "00:00" depending on where it runs.
-export function formatResetDate(date: Date): string {
-  const datePart = date.toLocaleDateString("es-ES", {
-    day: "numeric",
-    month: "long",
-    timeZone: "UTC",
-  });
-  const timePart = date.toLocaleTimeString("es-ES", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "UTC",
-  });
-  return `${datePart} a las ${timePart}`;
-}

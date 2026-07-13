@@ -25,11 +25,14 @@ export const MAX_PLACES_PER_CATEGORY = 10;
 // Shared shape for the host's monthly manual-regeneration quota status —
 // used by the Settings page's global button and the Editor's per-section
 // "Generar con IA" buttons alike (see lib/recommendations/quota.ts).
+// resetDate is an ISO string, formatted client-side (lib/recommendations/format.ts)
+// so it reacts instantly to a dashboard locale switch instead of being baked
+// into Spanish/English at server-render time.
 export interface RecommendationQuota {
   limit: number;
   used: number;
   remaining: number;
-  resetDateLabel: string;
+  resetDate: string;
 }
 
 export const RECOMMENDATION_CATEGORY_LABELS: Record<PropertyRecommendationCategory, string> = {
