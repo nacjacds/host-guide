@@ -1,14 +1,13 @@
 {
   "landing": {
     "nav": {
-      "login": "Iniciar sesión",
-      "cta": "Empezar gratis"
+      "login": "Iniciar sesión"
     },
     "hero": {
       "eyebrow": "Guías digitales para alojamientos",
       "headline": "Todo lo que tu huésped necesita saber, en un solo enlace",
       "subhead": "Crea la guía digital de tu alojamiento en minutos: WiFi, check-in, normas y recomendaciones locales curadas con IA — traducida automáticamente al idioma de cada huésped.",
-      "ctaPrimary": "Crear mi primera guía",
+      "ctaPrimary": "Crear mi primera guía gratis",
       "ctaSecondary": "Ver cómo funciona",
       "previewHost": "Carmen & Nacho",
       "previewGreeting": "¡Bienvenido a Carihuela Cristal!"

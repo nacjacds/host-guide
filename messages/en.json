@@ -1,14 +1,13 @@
 {
   "landing": {
     "nav": {
-      "login": "Log in",
-      "cta": "Start for free"
+      "login": "Log in"
     },
     "hero": {
       "eyebrow": "Digital guides for short-term stays",
       "headline": "Everything your guest needs to know, in one link",
       "subhead": "Build your stay's digital guide in minutes: WiFi, check-in, house rules, and AI-curated local recommendations — automatically translated for every guest.",
-      "ctaPrimary": "Create my first guide",
+      "ctaPrimary": "Create my first guide for free",
       "ctaSecondary": "See how it works",
       "previewHost": "Carmen & Nacho",
       "previewGreeting": "Welcome to Carihuela Cristal!"

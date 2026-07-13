@@ -45,19 +45,11 @@ export function LandingHeader() {
           <Button
             variant="ghost"
             size="sm"
-            className="hidden text-[#1B4F72] hover:bg-[#1B4F72]/5 hover:text-[#1B4F72] sm:inline-flex"
+            className="text-[#1B4F72] hover:bg-[#1B4F72]/5 hover:text-[#1B4F72]"
             nativeButton={false}
             render={<Link href="/login" />}
           >
             {t("login")}
-          </Button>
-          <Button
-            size="sm"
-            className="bg-[#FF4200] text-white hover:bg-[#e03a00]"
-            nativeButton={false}
-            render={<Link href="/register" />}
-          >
-            {t("cta")}
           </Button>
         </div>
       </div>
