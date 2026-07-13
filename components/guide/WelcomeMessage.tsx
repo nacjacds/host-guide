@@ -16,7 +16,7 @@ export function WelcomeMessage({
   hostAvatarUrl?: string | null;
   translated: string | null;
 }) {
-  const { locale, propertyId } = useGuideLocale();
+  const { locale, propertyId, t } = useGuideLocale();
   const [fallback, setFallback] = useState<string | null>(null);
   const requested = useRef(false);
 
@@ -61,7 +61,9 @@ export function WelcomeMessage({
       )}
       <div className="min-w-0">
         {hostName && (
-          <p className="text-sm font-medium text-neutral-600">Hola, soy {hostName}</p>
+          <p className="text-sm font-medium text-neutral-600">
+            {t("hostIntroLabel")}: {hostName}
+          </p>
         )}
         <p className={cn("text-base text-neutral-600 italic", hostName && "mt-1")}>
           {displayMessage}
