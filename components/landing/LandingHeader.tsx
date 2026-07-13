@@ -4,12 +4,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "@/components/shared/LocaleProvider";
-import { type AppLocale } from "@/lib/locale";
-
-const LANGUAGES: { code: AppLocale; label: string }[] = [
-  { code: "es", label: "ES" },
-  { code: "en", label: "EN" },
-];
+import { LocalePillSwitcher } from "@/components/shared/LocalePillSwitcher";
 
 export function LandingHeader() {
   const t = useTranslations("landing.nav");
@@ -24,23 +19,7 @@ export function LandingHeader() {
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex rounded-full border border-[#DDD8CC] bg-white p-0.5 text-xs font-medium">
-            {LANGUAGES.map((lang) => (
-              <button
-                key={lang.code}
-                type="button"
-                onClick={() => setLocale(lang.code)}
-                aria-pressed={locale === lang.code}
-                className={`rounded-full px-2.5 py-1 transition-colors ${
-                  locale === lang.code
-                    ? "bg-[#1B4F72] text-white"
-                    : "text-[#6B6B67] hover:text-[#1A1A18]"
-                }`}
-              >
-                {lang.label}
-              </button>
-            ))}
-          </div>
+          <LocalePillSwitcher locale={locale} onChange={setLocale} />
 
           <Button
             variant="ghost"

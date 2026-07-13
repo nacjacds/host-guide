@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -8,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 // navs stay in sync — styled to match the regular nav links rather than
 // the standalone <Button> version this replaced on /account.
 export function SidebarLogoutButton({ onBeforeNavigate }: { onBeforeNavigate?: () => void }) {
+  const t = useTranslations("dashboard.nav");
   const [loading, setLoading] = useState(false);
 
   async function handleLogout() {
@@ -27,7 +29,7 @@ export function SidebarLogoutButton({ onBeforeNavigate }: { onBeforeNavigate?: (
       className="flex items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-sidebar-accent disabled:opacity-60"
     >
       <LogOut className="size-4" strokeWidth={1.5} />
-      {loading ? "Cerrando sesión..." : "Cerrar sesión"}
+      {loading ? t("loggingOut") : t("logout")}
     </button>
   );
 }

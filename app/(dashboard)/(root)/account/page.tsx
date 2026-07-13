@@ -1,9 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageHeader } from "@/components/dashboard/PageHeader";
+import { AccountHeader } from "@/components/account/AccountHeader";
+import { CurrentPlanCard } from "@/components/account/CurrentPlanCard";
 import { ProfileForm } from "@/components/account/ProfileForm";
-import { ChangePlanDialog } from "@/components/account/ChangePlanDialog";
 import { DeleteAccountButton } from "@/components/account/DeleteAccountButton";
 import { getPlan } from "@/lib/plans";
 
@@ -29,26 +28,9 @@ export default async function AccountPage() {
 
   return (
     <div className="mx-auto max-w-lg space-y-6">
-      <PageHeader
-        title="Mi cuenta"
-        action={
-          <ChangePlanDialog
-            currentPlan={plan.id}
-            hasStripeCustomer={Boolean(profile?.stripe_customer_id)}
-          />
-        }
-      />
+      <AccountHeader currentPlan={plan.id} hasStripeCustomer={Boolean(profile?.stripe_customer_id)} />
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base font-normal">
-            Plan actual:
-            <span className="inline-flex items-center rounded-full border border-[#DDD8CC] bg-[#F5EFE6] px-3 py-1 text-sm font-medium text-[#1B4F72]">
-              {plan.label} — {plan.priceEurMonth}€/mes
-            </span>
-          </CardTitle>
-        </CardHeader>
-      </Card>
+      <CurrentPlanCard planLabel={plan.label} priceEurMonth={plan.priceEurMonth} />
 
       <ProfileForm profile={profile} email={user.email ?? ""} />
 

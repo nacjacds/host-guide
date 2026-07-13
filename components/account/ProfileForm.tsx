@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,8 @@ import { isValidPhoneNumber } from "@/lib/phone";
 import type { Profile } from "@/types";
 
 export function ProfileForm({ profile, email }: { profile: Profile | null; email: string }) {
+  const t = useTranslations("dashboard.account");
+  const tCommon = useTranslations("dashboard.common");
   const [fullName, setFullName] = useState(profile?.full_name ?? "");
   const [phone, setPhone] = useState(profile?.phone ?? "");
   const [editing, setEditing] = useState(false);
@@ -33,7 +36,7 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (phone && !isValidPhoneNumber(phone)) {
-      toast.error("Introduce un teléfono válido: código de país + número (8-15 dígitos)");
+      toast.error(t("phoneInvalid"));
       return;
     }
     setSaving(true);
@@ -49,14 +52,14 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
 
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo guardar el perfil");
+        toast.error(error ?? t("profileSaveError"));
         return;
       }
 
-      toast.success("Perfil guardado");
+      toast.success(t("profileSaved"));
       setEditing(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error de red");
+      toast.error(err instanceof Error ? err.message : tCommon("networkError"));
     } finally {
       setSaving(false);
     }
@@ -65,14 +68,14 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Perfil</CardTitle>
+        <CardTitle>{t("profileTitle")}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <AvatarUpload initialAvatarUrl={profile?.avatar_url ?? null} fullName={fullName} />
 
           <div>
-            <Label htmlFor="full_name">Nombre completo</Label>
+            <Label htmlFor="full_name">{t("fullNameLabel")}</Label>
             {editing ? (
               <Input
                 id="full_name"
@@ -80,17 +83,17 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
                 onChange={(e) => setFullName(e.target.value)}
               />
             ) : (
-              <p className="text-sm text-foreground">{fullName || "Sin especificar"}</p>
+              <p className="text-sm text-foreground">{fullName || tCommon("notSpecified")}</p>
             )}
           </div>
 
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("emailLabel")}</Label>
             <p className="text-sm text-muted-foreground">{email}</p>
           </div>
 
           <div>
-            <Label htmlFor="phone">Teléfono/WhatsApp personal</Label>
+            <Label htmlFor="phone">{t("phoneLabel")}</Label>
             {editing ? (
               <>
                 <Input
@@ -99,20 +102,17 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+34 600 000 000"
                 />
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Se usa como respaldo del botón de contacto en tus guías que no tengan su
-                  propio teléfono configurado.
-                </p>
+                <p className="mt-1 text-xs text-muted-foreground">{t("phoneHelp")}</p>
               </>
             ) : (
-              <p className="text-sm text-foreground">{phone || "Sin especificar"}</p>
+              <p className="text-sm text-foreground">{phone || tCommon("notSpecified")}</p>
             )}
           </div>
 
           {editing ? (
             <div className="flex items-center gap-2">
               <Button type="submit" disabled={saving}>
-                {saving ? "Guardando..." : "Guardar cambios"}
+                {saving ? t("saving") : t("saveChanges")}
               </Button>
               <Button
                 type="button"
@@ -121,7 +121,7 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
                 onClick={handleCancel}
                 disabled={saving}
               >
-                Cancelar
+                {tCommon("cancel")}
               </Button>
             </div>
           ) : (
@@ -131,7 +131,7 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
               className="border-[#1B4F72] text-[#1B4F72] hover:bg-[#1B4F72]/5 hover:text-[#1B4F72]"
               onClick={handleEdit}
             >
-              Editar perfil
+              {t("editProfile")}
             </Button>
           )}
         </form>

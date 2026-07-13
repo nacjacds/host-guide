@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   AlertDialog,
   AlertDialogClose,
@@ -17,8 +18,8 @@ export function ConfirmDialog({
   onOpenChange,
   title,
   description,
-  confirmLabel = "Eliminar",
-  cancelLabel = "Cancelar",
+  confirmLabel,
+  cancelLabel,
   onConfirm,
   loading = false,
   tone = "destructive",
@@ -33,6 +34,14 @@ export function ConfirmDialog({
   loading?: boolean;
   tone?: "destructive" | "terracotta";
 }) {
+  // Only ever rendered inside (dashboard), which is wrapped in LocaleProvider
+  // — safe to translate the default labels here so every caller gets a
+  // correctly-localized Cancel/Delete/Deleting for free, even call sites
+  // not yet migrated to next-intl themselves.
+  const t = useTranslations("dashboard.common");
+  const resolvedConfirmLabel = confirmLabel ?? t("delete");
+  const resolvedCancelLabel = cancelLabel ?? t("cancel");
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -42,7 +51,7 @@ export function ConfirmDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogClose render={<Button type="button" variant="ghost" disabled={loading} />}>
-            {cancelLabel}
+            {resolvedCancelLabel}
           </AlertDialogClose>
           <Button
             type="button"
@@ -54,7 +63,7 @@ export function ConfirmDialog({
                 : "bg-destructive text-white hover:bg-destructive/90"
             )}
           >
-            {loading ? "Eliminando..." : confirmLabel}
+            {loading ? t("deleting") : resolvedConfirmLabel}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

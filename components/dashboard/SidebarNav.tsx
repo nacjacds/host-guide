@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { cn, isActiveNavLink } from "@/lib/utils";
 import { SidebarLogoutButton } from "./SidebarLogoutButton";
 import type { NavLinkGroup } from "./MobileTopbar";
 
 export function SidebarNav({ navGroups }: { navGroups: NavLinkGroup[] }) {
   const pathname = usePathname();
+  const t = useTranslations("dashboard.nav");
 
   return (
     <nav className="mt-8 flex flex-col text-sm">
@@ -28,7 +30,7 @@ export function SidebarNav({ navGroups }: { navGroups: NavLinkGroup[] }) {
                         : "hover:bg-sidebar-accent"
                     )}
                   >
-                    {link.label}
+                    {t(link.labelKey)}
                     {link.badge ? (
                       <span className="flex size-5 items-center justify-center rounded-full bg-destructive text-[11px] font-medium text-white">
                         {link.badge}

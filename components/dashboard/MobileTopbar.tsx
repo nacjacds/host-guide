@@ -3,15 +3,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Menu } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { SidebarLogoutButton } from "./SidebarLogoutButton";
+import { DashboardLocaleSwitcher } from "./DashboardLocaleSwitcher";
 import { cn, getInitials, isActiveNavLink } from "@/lib/utils";
 
 export interface NavLinkItem {
   href: string;
-  label: string;
+  // Key into the "dashboard.nav" messages namespace, resolved client-side
+  // (via useTranslations) rather than baked into a literal string
+  // server-side — so switching the locale re-renders it instantly instead
+  // of only after the next full page load.
+  labelKey: string;
   badge?: number;
 }
 
@@ -28,6 +34,7 @@ export function MobileTopbar({
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const t = useTranslations("dashboard.nav");
 
   return (
     <div className="grid grid-cols-3 items-center border-b border-sidebar-border bg-sidebar px-4 py-3 text-sidebar-foreground md:hidden">
@@ -46,7 +53,7 @@ export function MobileTopbar({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          aria-label="Abrir menú"
+          aria-label={t("openMenu")}
           className="flex size-9 shrink-0 items-center justify-center justify-self-end rounded-lg hover:bg-sidebar-accent"
         >
           <Menu size={26} strokeWidth={1.5} />
@@ -55,7 +62,7 @@ export function MobileTopbar({
           showCloseButton={false}
           className="top-0 left-0 flex h-dvh max-h-dvh w-72 max-w-[85vw] translate-x-0 translate-y-0 flex-col gap-0 overflow-y-auto rounded-none border-r border-sidebar-border bg-sidebar p-4 text-sidebar-foreground ring-0 sm:max-w-[85vw] data-open:slide-in-from-left data-open:zoom-in-100 data-closed:slide-out-to-left data-closed:zoom-out-100"
         >
-          <DialogTitle className="sr-only">Menú de navegación</DialogTitle>
+          <DialogTitle className="sr-only">{t("menuTitle")}</DialogTitle>
 
           <Link
             href="/account"
@@ -68,10 +75,14 @@ export function MobileTopbar({
                 {getInitials(fullName)}
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium">{fullName ?? "Mi cuenta"}</span>
+            <span className="text-sm font-medium">{fullName ?? t("myAccount")}</span>
           </Link>
 
-          <hr className="mt-6 mb-2 border-[#DDD8CC]" />
+          <div className="mt-3 flex justify-center">
+            <DashboardLocaleSwitcher />
+          </div>
+
+          <hr className="mt-4 mb-2 border-[#DDD8CC]" />
 
           <nav className="mt-2 flex flex-col text-sm">
             {navGroups.map((group, groupIndex) => (
@@ -92,7 +103,7 @@ export function MobileTopbar({
                               : "hover:bg-sidebar-accent"
                           )}
                         >
-                          {link.label}
+                          {t(link.labelKey)}
                           {link.badge ? (
                             <span className="flex size-5 items-center justify-center rounded-full bg-destructive text-[11px] font-medium text-white">
                               {link.badge}

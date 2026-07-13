@@ -125,5 +125,78 @@
       "checkEmailBody": "Te hemos enviado un enlace de confirmación a <strong>{email}</strong>. Ábrelo para confirmar tu cuenta antes de iniciar sesión.",
       "checkEmailLoginLink": "Ir a iniciar sesión"
     }
+  },
+  "dashboard": {
+    "nav": {
+      "properties": "Propiedades",
+      "admin": "Admin",
+      "myAccount": "Mi cuenta",
+      "openMenu": "Abrir menú",
+      "menuTitle": "Menú de navegación",
+      "logout": "Cerrar sesión",
+      "loggingOut": "Cerrando sesión..."
+    },
+    "layout": {
+      "emailNotConfirmed": "Todavía no has confirmado tu email ({email}). Revisa tu bandeja de entrada y confirma tu cuenta para poder publicar tu guía."
+    },
+    "common": {
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "deleting": "Eliminando...",
+      "networkError": "Error de red",
+      "notSpecified": "Sin especificar"
+    },
+    "account": {
+      "title": "Mi cuenta",
+      "currentPlan": "Plan actual:",
+      "perMonth": "/mes",
+      "profileTitle": "Perfil",
+      "fullNameLabel": "Nombre completo",
+      "emailLabel": "Email",
+      "phoneLabel": "Teléfono/WhatsApp personal",
+      "phoneHelp": "Se usa como respaldo del botón de contacto en tus guías que no tengan su propio teléfono configurado.",
+      "phoneInvalid": "Introduce un teléfono válido: código de país + número (8-15 dígitos)",
+      "saveChanges": "Guardar cambios",
+      "saving": "Guardando...",
+      "editProfile": "Editar perfil",
+      "profileSaved": "Perfil guardado",
+      "profileSaveError": "No se pudo guardar el perfil",
+      "avatar": {
+        "change": "Cambiar",
+        "remove": "Eliminar",
+        "uploading": "Subiendo...",
+        "invalidType": "Solo se aceptan imágenes JPG, PNG o WebP",
+        "tooLarge": "La imagen no puede superar 1MB",
+        "uploadError": "No se pudo subir la foto",
+        "updated": "Foto de perfil actualizada",
+        "removeError": "No se pudo eliminar la foto",
+        "removed": "Foto de perfil eliminada",
+        "confirmDeleteTitle": "¿Eliminar foto de perfil?",
+        "confirmDeleteDescription": "Esta acción no se puede deshacer."
+      },
+      "dangerZone": {
+        "title": "Zona de peligro",
+        "description": "Eliminar tu cuenta borra permanentemente tu perfil, todas tus propiedades, guías, bloques de contenido y recomendaciones.",
+        "deleteAccount": "Eliminar cuenta",
+        "confirmTitle": "¿Eliminar tu cuenta?",
+        "confirmDescription": "Esta acción no se puede deshacer. Se eliminarán permanentemente tu perfil, todas tus propiedades, guías y recomendaciones.",
+        "deleteError": "No se pudo eliminar la cuenta"
+      },
+      "plan": {
+        "managePlan": "Gestionar suscripción",
+        "opening": "Abriendo...",
+        "changePlan": "Cambiar de plan",
+        "choosePlan": "Elige tu plan",
+        "currentPlanLabel": "Plan actual",
+        "changeToFree": "Cambiar a Free",
+        "changing": "Cambiando...",
+        "update": "Actualizar",
+        "redirecting": "Redirigiendo...",
+        "checkoutError": "No se pudo iniciar el pago",
+        "portalError": "No se pudo abrir el portal de facturación",
+        "downgradeError": "No se pudo cambiar al plan Free",
+        "downgradeSuccess": "Has cambiado al plan Free"
+      }
+    }
   }
 }

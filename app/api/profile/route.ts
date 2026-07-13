@@ -16,6 +16,9 @@ const updateProfileSchema = z.object({
     .refine((value) => !value || isValidPhoneNumber(value), {
       message: "Introduce un teléfono válido: código de país + número (8-15 dígitos)",
     }),
+  // Dashboard UI language — independent from properties.language/
+  // content_translations, which control the guest-facing guide instead.
+  dashboard_locale: z.enum(["es", "en"]).optional(),
 });
 
 export async function PATCH(request: NextRequest) {

@@ -125,5 +125,78 @@
       "checkEmailBody": "We've sent a confirmation link to <strong>{email}</strong>. Open it to confirm your account before logging in.",
       "checkEmailLoginLink": "Go to log in"
     }
+  },
+  "dashboard": {
+    "nav": {
+      "properties": "Properties",
+      "admin": "Admin",
+      "myAccount": "My account",
+      "openMenu": "Open menu",
+      "menuTitle": "Navigation menu",
+      "logout": "Log out",
+      "loggingOut": "Logging out..."
+    },
+    "layout": {
+      "emailNotConfirmed": "You haven't confirmed your email yet ({email}). Check your inbox and confirm your account to be able to publish your guide."
+    },
+    "common": {
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "networkError": "Network error",
+      "notSpecified": "Not specified"
+    },
+    "account": {
+      "title": "My account",
+      "currentPlan": "Current plan:",
+      "perMonth": "/mo",
+      "profileTitle": "Profile",
+      "fullNameLabel": "Full name",
+      "emailLabel": "Email",
+      "phoneLabel": "Personal phone/WhatsApp",
+      "phoneHelp": "Used as a fallback for the contact button on your guides that don't have their own phone configured.",
+      "phoneInvalid": "Enter a valid phone number: country code + number (8-15 digits)",
+      "saveChanges": "Save changes",
+      "saving": "Saving...",
+      "editProfile": "Edit profile",
+      "profileSaved": "Profile saved",
+      "profileSaveError": "Couldn't save the profile",
+      "avatar": {
+        "change": "Change",
+        "remove": "Remove",
+        "uploading": "Uploading...",
+        "invalidType": "Only JPG, PNG, or WebP images are accepted",
+        "tooLarge": "The image can't be larger than 1MB",
+        "uploadError": "Couldn't upload the photo",
+        "updated": "Profile photo updated",
+        "removeError": "Couldn't remove the photo",
+        "removed": "Profile photo removed",
+        "confirmDeleteTitle": "Remove profile photo?",
+        "confirmDeleteDescription": "This action can't be undone."
+      },
+      "dangerZone": {
+        "title": "Danger zone",
+        "description": "Deleting your account permanently removes your profile, all your properties, guides, content blocks, and recommendations.",
+        "deleteAccount": "Delete account",
+        "confirmTitle": "Delete your account?",
+        "confirmDescription": "This action can't be undone. Your profile, all your properties, guides, and recommendations will be permanently deleted.",
+        "deleteError": "Couldn't delete the account"
+      },
+      "plan": {
+        "managePlan": "Manage subscription",
+        "opening": "Opening...",
+        "changePlan": "Change plan",
+        "choosePlan": "Choose your plan",
+        "currentPlanLabel": "Current plan",
+        "changeToFree": "Switch to Free",
+        "changing": "Switching...",
+        "update": "Upgrade",
+        "redirecting": "Redirecting...",
+        "checkoutError": "Couldn't start the payment",
+        "portalError": "Couldn't open the billing portal",
+        "downgradeError": "Couldn't switch to the Free plan",
+        "downgradeSuccess": "You've switched to the Free plan"
+      }
+    }
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -17,6 +18,8 @@ export function AvatarUpload({
   initialAvatarUrl: string | null;
   fullName: string;
 }) {
+  const t = useTranslations("dashboard.account.avatar");
+  const tCommon = useTranslations("dashboard.common");
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
   const [uploading, setUploading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -28,11 +31,11 @@ export function AvatarUpload({
     if (!file) return;
 
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      toast.error("Solo se aceptan imágenes JPG, PNG o WebP");
+      toast.error(t("invalidType"));
       return;
     }
     if (file.size > MAX_SIZE_BYTES) {
-      toast.error("La imagen no puede superar 1MB");
+      toast.error(t("tooLarge"));
       return;
     }
 
@@ -47,15 +50,15 @@ export function AvatarUpload({
 
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo subir la foto");
+        toast.error(error ?? t("uploadError"));
         return;
       }
 
       const { avatar_url } = await response.json();
       setAvatarUrl(avatar_url);
-      toast.success("Foto de perfil actualizada");
+      toast.success(t("updated"));
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setUploading(false);
     }
@@ -66,13 +69,13 @@ export function AvatarUpload({
     try {
       const response = await fetch("/api/profile/avatar", { method: "DELETE" });
       if (!response.ok) {
-        toast.error("No se pudo eliminar la foto");
+        toast.error(t("removeError"));
         return;
       }
       setAvatarUrl(null);
-      toast.success("Foto de perfil eliminada");
+      toast.success(t("removed"));
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setUploading(false);
       setConfirmOpen(false);
@@ -95,7 +98,7 @@ export function AvatarUpload({
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
         >
-          {uploading ? "Subiendo..." : "Cambiar"}
+          {uploading ? t("uploading") : t("change")}
         </Button>
         {avatarUrl && (
           <Button
@@ -105,7 +108,7 @@ export function AvatarUpload({
             onClick={() => setConfirmOpen(true)}
             disabled={uploading}
           >
-            Eliminar
+            {t("remove")}
           </Button>
         )}
       </div>
@@ -119,8 +122,8 @@ export function AvatarUpload({
       <ConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title="¿Eliminar foto de perfil?"
-        description="Esta acción no se puede deshacer."
+        title={t("confirmDeleteTitle")}
+        description={t("confirmDeleteDescription")}
         onConfirm={handleRemove}
         loading={uploading}
         tone="terracotta"
