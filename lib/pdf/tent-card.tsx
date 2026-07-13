@@ -43,15 +43,16 @@ const COLORS = {
   cream: "#FAFAF8",
 };
 
+// The scan instruction is short enough to show in both languages at once —
+// simpler and more useful for guests than guessing/detecting one. The fold
+// hint stays single-language (tied to the property's language) since it's
+// host-facing, not guest-facing.
+const SCAN_TEXT_ES = "Escanea para ver la guía de tu alojamiento";
+const SCAN_TEXT_EN = "Scan to view your stay guide";
+
 const copy = {
-  es: {
-    scan: "Escanea para ver la guía de tu alojamiento",
-    fold: "dobla aquí",
-  },
-  en: {
-    scan: "Scan to view your stay guide",
-    fold: "fold here",
-  },
+  es: { fold: "dobla aquí" },
+  en: { fold: "fold here" },
 } as const;
 
 // Long property names would otherwise overflow or wrap awkwardly next to the
@@ -92,10 +93,16 @@ const styles = StyleSheet.create({
     color: COLORS.navy,
     textAlign: "center",
   },
+  scanBlock: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 1,
+  },
   scanText: {
     fontFamily: "Inter",
     fontWeight: 500,
-    fontSize: 13,
+    fontSize: 10.5,
     color: COLORS.textSecondary,
     textAlign: "center",
   },
@@ -151,8 +158,7 @@ interface PanelProps {
   logoDataUrl: string;
 }
 
-function Panel({ propertyName, guideUrl, language, qrDataUrl, logoDataUrl }: PanelProps) {
-  const t = copy[language];
+function Panel({ propertyName, guideUrl, qrDataUrl, logoDataUrl }: PanelProps) {
   const displayUrl = guideUrl.replace(/^https?:\/\//, "");
 
   return (
@@ -164,7 +170,10 @@ function Panel({ propertyName, guideUrl, language, qrDataUrl, logoDataUrl }: Pan
         <Text style={[styles.propertyName, { fontSize: nameFontSize(propertyName) }]}>
           {propertyName}
         </Text>
-        <Text style={styles.scanText}>{t.scan}</Text>
+        <View style={styles.scanBlock}>
+          <Text style={styles.scanText}>{SCAN_TEXT_ES}</Text>
+          <Text style={styles.scanText}>{SCAN_TEXT_EN}</Text>
+        </View>
       </View>
 
       <View style={styles.qrBlock}>
