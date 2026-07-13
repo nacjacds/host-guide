@@ -9,7 +9,7 @@ export const GUIDE_TRANSLATIONS = {
     recommendationsTile: "Recomendaciones",
     recommendationsEmpty: "Todavía no hay recomendaciones.",
     viewOnMap: "Ver en mapa",
-    contactHost: "Contactar con el anfitrión",
+    contactHost: "Contactar anfitrión",
     category_supermarket: "Supermercados",
     category_pharmacy: "Farmacias",
     category_transport: "Transporte",
