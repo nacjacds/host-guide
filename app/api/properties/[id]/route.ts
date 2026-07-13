@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { triggerWelcomeMessageTranslation } from "@/lib/translations/trigger";
 import { geocodeAddress } from "@/lib/google-places";
+import { isValidPhoneNumber } from "@/lib/phone";
 
 const updatePropertySchema = z.object({
   name: z.string().min(1).max(120).optional(),
@@ -10,7 +11,17 @@ const updatePropertySchema = z.object({
   accent_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
   host_tone: z.enum(["friendly", "formal"]).optional(),
   language: z.string().min(2).max(5).optional(),
-  whatsapp_number: z.string().max(20).nullable().optional(),
+  // Guest-facing contact phone — gates the WhatsApp button in the public
+  // guide (see WhatsAppFab.tsx: renders nothing at all if this, and the
+  // profiles.phone fallback, are both empty).
+  whatsapp_number: z
+    .string()
+    .max(20)
+    .nullable()
+    .optional()
+    .refine((value) => !value || isValidPhoneNumber(value), {
+      message: "Introduce un teléfono válido: código de país + número (8-15 dígitos)",
+    }),
   welcome_message: z.string().max(500).nullable().optional(),
   airbnb_url: z.string().max(500).nullable().optional(),
   bedrooms: z.number().int().min(0).max(50).nullable().optional(),

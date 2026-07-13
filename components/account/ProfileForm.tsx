@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AvatarUpload } from "./AvatarUpload";
 import { toast } from "sonner";
+import { isValidPhoneNumber } from "@/lib/phone";
 import type { Profile } from "@/types";
 
 export function ProfileForm({ profile, email }: { profile: Profile | null; email: string }) {
@@ -31,6 +32,10 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (phone && !isValidPhoneNumber(phone)) {
+      toast.error("Introduce un teléfono válido: código de país + número (8-15 dígitos)");
+      return;
+    }
     setSaving(true);
     try {
       const response = await fetch("/api/profile", {
@@ -87,12 +92,18 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
           <div>
             <Label htmlFor="phone">Teléfono/WhatsApp personal</Label>
             {editing ? (
-              <Input
-                id="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+34 600 000 000"
-              />
+              <>
+                <Input
+                  id="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+34 600 000 000"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Se usa como respaldo del botón de contacto en tus guías que no tengan su
+                  propio teléfono configurado.
+                </p>
+              </>
             ) : (
               <p className="text-sm text-foreground">{phone || "Sin especificar"}</p>
             )}

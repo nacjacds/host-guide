@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { TriangleAlertIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -9,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { GuideActionButtons } from "./GuideActionButtons";
 import { toast } from "sonner";
+import { sanitizePhoneDigits, isValidPhoneNumber } from "@/lib/phone";
 import type { Property } from "@/types";
 
 const MAX_COVER_SIZE_BYTES = 3 * 1024 * 1024;
@@ -83,7 +85,11 @@ export function PublishPanel({ property }: { property: Property }) {
   }
 
   async function handleSaveWhatsapp() {
-    const sanitized = whatsappNumber.replace(/\D/g, "");
+    const sanitized = sanitizePhoneDigits(whatsappNumber);
+    if (sanitized && !isValidPhoneNumber(sanitized)) {
+      toast.error("Introduce un teléfono válido: código de país + número (8-15 dígitos)");
+      return;
+    }
     setSavingWhatsapp(true);
     try {
       const response = await fetch(`/api/properties/${property.id}`, {
@@ -237,7 +243,7 @@ export function PublishPanel({ property }: { property: Property }) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="whatsapp_number">Número de WhatsApp del anfitrión</Label>
+          <Label htmlFor="whatsapp_number">Teléfono de contacto para huéspedes</Label>
           <div className="flex gap-2">
             <Input
               id="whatsapp_number"
@@ -255,9 +261,15 @@ export function PublishPanel({ property }: { property: Property }) {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            Sin espacios ni +. Ej: 34612345678. Si lo rellenas, aparecerá un botón de
-            WhatsApp flotante en la guía pública.
+            Código de país + número, sin espacios ni +. Ej: 34612345678.
           </p>
+          {!whatsappNumber && (
+            <p className="flex items-start gap-1.5 text-xs text-amber-600">
+              <TriangleAlertIcon className="mt-0.5 size-3.5 shrink-0" strokeWidth={1.5} />
+              Sin este número (ni un teléfono personal en tu perfil), el botón de contacto
+              no aparecerá en tu guía pública.
+            </p>
+          )}
         </div>
 
         <Button

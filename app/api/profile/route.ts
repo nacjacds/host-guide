@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { isValidPhoneNumber } from "@/lib/phone";
 
 const updateProfileSchema = z.object({
   full_name: z.string().max(120).nullable().optional(),
-  phone: z.string().max(30).nullable().optional(),
+  // Fallback source for the guest-facing WhatsApp button when a property
+  // has no whatsapp_number of its own (see app/guide/[slug]/layout.tsx) —
+  // validated the same way as that field.
+  phone: z
+    .string()
+    .max(30)
+    .nullable()
+    .optional()
+    .refine((value) => !value || isValidPhoneNumber(value), {
+      message: "Introduce un teléfono válido: código de país + número (8-15 dígitos)",
+    }),
 });
 
 export async function PATCH(request: NextRequest) {
