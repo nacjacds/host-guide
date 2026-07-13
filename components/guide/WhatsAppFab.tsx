@@ -25,7 +25,7 @@ export function WhatsAppFab({ whatsappNumber }: { whatsappNumber: string | null 
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 sm:justify-end sm:px-6"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 sm:justify-end sm:px-6"
       style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
     >
       <a
@@ -34,7 +34,7 @@ export function WhatsAppFab({ whatsappNumber }: { whatsappNumber: string | null 
         rel="noopener noreferrer"
         onClick={handleClick}
         style={{ backgroundColor: WHATSAPP_GREEN }}
-        className="flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-white shadow-lg shadow-black/25 transition-transform hover:scale-105"
+        className="pointer-events-auto flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-white shadow-lg shadow-black/25 transition-transform hover:scale-105"
       >
         <MessageCircle size={20} strokeWidth={1.5} />
         {t("contactHost")}
