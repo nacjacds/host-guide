@@ -269,6 +269,20 @@ export function PublishPanel({ property }: { property: Property }) {
           {loadingQr ? "Generando..." : qrDataUrl ? "Ocultar QR" : "Ver código QR"}
         </Button>
 
+        <Button
+          variant="outline"
+          className="w-full"
+          nativeButton={false}
+          render={
+            <a
+              href={`/api/properties/${property.id}/qr-print`}
+              download={`qr-imprimir-${property.slug}.pdf`}
+            />
+          }
+        >
+          Imprimir QR
+        </Button>
+
         {qrDataUrl && (
           <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
