@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { SidebarLogoutButton } from "./SidebarLogoutButton";
 import { cn, getInitials, isActiveNavLink } from "@/lib/utils";
 
 export interface NavLinkItem {
@@ -104,6 +105,8 @@ export function MobileTopbar({
                 </div>
               </div>
             ))}
+            <hr className="my-3 border-[#DDD8CC]" />
+            <SidebarLogoutButton onBeforeNavigate={() => setOpen(false)} />
           </nav>
         </DialogContent>
       </Dialog>

@@ -2,14 +2,17 @@
 
 import { useState } from "react";
 import { LogOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 
-export function LogoutButton() {
+// Shared between SidebarNav (desktop) and MobileTopbar (mobile) so both
+// navs stay in sync — styled to match the regular nav links rather than
+// the standalone <Button> version this replaced on /account.
+export function SidebarLogoutButton({ onBeforeNavigate }: { onBeforeNavigate?: () => void }) {
   const [loading, setLoading] = useState(false);
 
   async function handleLogout() {
     setLoading(true);
+    onBeforeNavigate?.();
     await createClient().auth.signOut();
     // Full reload (not router.push) so every client-held auth/session
     // state is dropped, not just the visible route.
@@ -17,9 +20,14 @@ export function LogoutButton() {
   }
 
   return (
-    <Button type="button" variant="outline" onClick={handleLogout} disabled={loading}>
+    <button
+      type="button"
+      onClick={handleLogout}
+      disabled={loading}
+      className="flex items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-sidebar-accent disabled:opacity-60"
+    >
       <LogOut className="size-4" strokeWidth={1.5} />
       {loading ? "Cerrando sesión..." : "Cerrar sesión"}
-    </Button>
+    </button>
   );
 }

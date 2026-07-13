@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn, isActiveNavLink } from "@/lib/utils";
+import { SidebarLogoutButton } from "./SidebarLogoutButton";
 import type { NavLinkGroup } from "./MobileTopbar";
 
 export function SidebarNav({ navGroups }: { navGroups: NavLinkGroup[] }) {
@@ -40,6 +41,8 @@ export function SidebarNav({ navGroups }: { navGroups: NavLinkGroup[] }) {
           </div>
         </div>
       ))}
+      <hr className="my-3 border-[#DDD8CC]" />
+      <SidebarLogoutButton />
     </nav>
   );
 }
