@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Check, Copy, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +27,7 @@ export function ShareGuideDialog({
   triggerSize?: "sm" | "default";
   triggerClassName?: string;
 }) {
+  const t = useTranslations("dashboard.shareGuide");
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
@@ -55,7 +57,7 @@ export function ShareGuideDialog({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error("No se pudo copiar el enlace");
+      toast.error(t("copyError"));
     }
   }
 
@@ -72,11 +74,11 @@ export function ShareGuideDialog({
       </Button>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Compartir guía</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-1">
-            <p className="text-xs font-medium text-muted-foreground">Enlace directo</p>
+            <p className="text-xs font-medium text-muted-foreground">{t("directLink")}</p>
             <a
               href={guideUrl}
               target="_blank"
@@ -95,12 +97,12 @@ export function ShareGuideDialog({
               {copied ? (
                 <>
                   <Check size={14} className="mr-1.5" />
-                  ¡Copiado!
+                  {t("copied")}
                 </>
               ) : (
                 <>
                   <Copy size={14} className="mr-1.5" />
-                  Copiar enlace
+                  {t("copyLink")}
                 </>
               )}
             </Button>
@@ -108,13 +110,13 @@ export function ShareGuideDialog({
 
           <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-card p-3">
             {loadingQr ? (
-              <p className="py-8 text-xs text-muted-foreground">Generando QR...</p>
+              <p className="py-8 text-xs text-muted-foreground">{t("generatingQr")}</p>
             ) : qrDataUrl ? (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={qrDataUrl}
-                  alt="Código QR de la guía"
+                  alt={t("qrAlt")}
                   className="size-40"
                 />
                 <a
@@ -123,13 +125,11 @@ export function ShareGuideDialog({
                   className="flex items-center gap-1 text-xs text-primary underline underline-offset-2"
                 >
                   <Download size={12} />
-                  Descargar QR
+                  {t("downloadQr")}
                 </a>
               </>
             ) : (
-              <p className="py-8 text-xs text-muted-foreground">
-                No se pudo generar el QR
-              </p>
+              <p className="py-8 text-xs text-muted-foreground">{t("qrError")}</p>
             )}
           </div>
         </div>

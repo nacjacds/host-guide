@@ -1,10 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Property } from "@/types";
 
 export function PropertyCard({ property }: { property: Property }) {
+  const t = useTranslations("dashboard.properties.card");
   const hasCover = Boolean(property.cover_image_url);
 
   return (
@@ -41,7 +45,7 @@ export function PropertyCard({ property }: { property: Property }) {
               : "bg-neutral-100 text-neutral-600"
           )}
         >
-          {property.is_published ? "Publicada" : "Borrador"}
+          {property.is_published ? t("published") : t("draft")}
         </span>
         <div
           className="absolute inset-x-0 bottom-0 p-3 text-white"
@@ -55,7 +59,7 @@ export function PropertyCard({ property }: { property: Property }) {
           href={`/properties/${property.id}/edit`}
           className="flex-1 rounded-lg border border-border px-3 py-1.5 text-center text-sm font-medium transition-colors hover:bg-accent/40"
         >
-          Editar
+          {t("edit")}
         </Link>
         {property.is_published && (
           <a
@@ -64,7 +68,7 @@ export function PropertyCard({ property }: { property: Property }) {
             rel="noopener noreferrer"
             className="flex-1 rounded-lg border border-border px-3 py-1.5 text-center text-sm font-medium transition-colors hover:bg-accent/40"
           >
-            Ver guía
+            {t("viewGuide")}
           </a>
         )}
       </div>

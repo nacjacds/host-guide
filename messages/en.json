@@ -508,6 +508,104 @@
           "Priority support"
         ]
       }
+    },
+    "properties": {
+      "title": "My properties",
+      "addNew": "Add new",
+      "card": {
+        "published": "Published",
+        "draft": "Draft",
+        "edit": "Edit",
+        "viewGuide": "View guide"
+      },
+      "limitNotice": {
+        "message": "You've reached your {plan} plan's property limit ({count}/{max})",
+        "upgradePlan": "Upgrade plan",
+        "backToProperties": "Back to my properties"
+      },
+      "newForm": {
+        "title": "New property",
+        "nameLabel": "Property name",
+        "namePlaceholder": "Triana Apartment",
+        "addressLabel": "Address",
+        "create": "Create property",
+        "creating": "Creating...",
+        "createError": "Couldn't create the property",
+        "created": "Property created",
+        "limitReachedTitle": "Property limit reached",
+        "limitReachedDescription": "You've reached your plan's property limit. Upgrade your plan to create this property — your data hasn't been lost, it's still filled in the form.",
+        "keepEditing": "Keep editing",
+        "upgradePlan": "Upgrade plan"
+      }
+    },
+    "onboarding": {
+      "progressBar": {
+        "step": "Step {step} of 3"
+      },
+      "emptyState": {
+        "message": "You don't have any properties yet. Create your first one to generate your digital guide.",
+        "createProperty": "Create property"
+      },
+      "step1": {
+        "title": "Tell us about your place",
+        "subtitle": "This is enough for us to draft your digital guide.",
+        "airbnbLabel": "Already have an Airbnb listing? (optional)",
+        "importing": "...",
+        "import": "Import",
+        "airbnbHint": "We'll fill in the name and address for you — you can edit them below.",
+        "importError": "Couldn't import. Fill in the details manually.",
+        "imported": "Data imported — review it before continuing.",
+        "importNetworkError": "Network error while importing. Fill in the details manually.",
+        "onlyJpg": "Only JPG images are accepted",
+        "tooLarge3mb": "The image can't be larger than 3MB",
+        "nameLabel": "Property name",
+        "namePlaceholder": "Triana Apartment",
+        "addressLabel": "Address",
+        "coverLabel": "Cover photo (optional)",
+        "coverAlt": "Cover",
+        "change": "Change",
+        "uploadJpg": "Upload JPG image",
+        "createError": "Couldn't create the property",
+        "continue": "Continue",
+        "creating": "Creating..."
+      },
+      "step2": {
+        "title": "Add the essential information",
+        "subtitle": "Turn on what you need — you can edit it right here or later in the editor.",
+        "networkName": "Network name",
+        "password": "Password",
+        "time": "Time",
+        "instructions": "Instructions",
+        "checkinInstructionsPlaceholder": "How to pick up the keys, access code...",
+        "checkoutInstructionsPlaceholder": "Where to leave the keys, what to check before leaving...",
+        "rulesLabel": "House rules",
+        "defaultRules": [
+          "No parties or events",
+          "No smoking indoors",
+          "Please respect quiet hours from 10pm"
+        ],
+        "continue": "Continue"
+      },
+      "step3": {
+        "title": "Ready to publish!",
+        "subtitle": "This is how your guide will look. You can publish it now or keep editing first.",
+        "noBlocksYet": "No blocks yet",
+        "publish": "Publish and view my guide",
+        "publishing": "Publishing...",
+        "publishError": "Couldn't publish the guide",
+        "keepEditing": "Keep editing"
+      }
+    },
+    "shareGuide": {
+      "title": "Share guide",
+      "directLink": "Direct link",
+      "copied": "Copied!",
+      "copyLink": "Copy link",
+      "copyError": "Couldn't copy the link",
+      "generatingQr": "Generating QR...",
+      "qrAlt": "Guide QR code",
+      "downloadQr": "Download QR",
+      "qrError": "Couldn't generate the QR"
     }
   }
 }

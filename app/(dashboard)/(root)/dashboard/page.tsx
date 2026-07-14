@@ -1,8 +1,6 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Button } from "@/components/ui/button";
-import { PageHeader } from "@/components/dashboard/PageHeader";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { PropertyCard } from "@/components/dashboard/PropertyCard";
 import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
 import { UpgradedToast } from "@/components/dashboard/UpgradedToast";
@@ -31,16 +29,7 @@ export default async function DashboardPage() {
   return (
     <>
       <UpgradedToast />
-      <PageHeader
-        title="Mis propiedades"
-        action={
-          hasProperties ? (
-            <Button nativeButton={false} render={<Link href="/properties/new" />}>
-              Añadir nueva
-            </Button>
-          ) : undefined
-        }
-      />
+      <DashboardHeader hasProperties={hasProperties} />
 
       {hasProperties ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

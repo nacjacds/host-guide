@@ -508,6 +508,104 @@
           "Soporte prioritario"
         ]
       }
+    },
+    "properties": {
+      "title": "Mis propiedades",
+      "addNew": "Añadir nueva",
+      "card": {
+        "published": "Publicada",
+        "draft": "Borrador",
+        "edit": "Editar",
+        "viewGuide": "Ver guía"
+      },
+      "limitNotice": {
+        "message": "Has alcanzado el límite de propiedades de tu plan {plan} ({count}/{max})",
+        "upgradePlan": "Mejorar plan",
+        "backToProperties": "Volver a mis propiedades"
+      },
+      "newForm": {
+        "title": "Nueva propiedad",
+        "nameLabel": "Nombre del alojamiento",
+        "namePlaceholder": "Apartamento Triana",
+        "addressLabel": "Dirección",
+        "create": "Crear propiedad",
+        "creating": "Creando...",
+        "createError": "No se pudo crear la propiedad",
+        "created": "Propiedad creada",
+        "limitReachedTitle": "Límite de propiedades alcanzado",
+        "limitReachedDescription": "Has alcanzado el límite de propiedades de tu plan. Mejora tu plan para crear esta propiedad — tus datos no se han perdido, siguen rellenos en el formulario.",
+        "keepEditing": "Seguir editando",
+        "upgradePlan": "Mejorar plan"
+      }
+    },
+    "onboarding": {
+      "progressBar": {
+        "step": "Paso {step} de 3"
+      },
+      "emptyState": {
+        "message": "Todavía no tienes propiedades. Crea la primera para generar tu guía digital.",
+        "createProperty": "Crear propiedad"
+      },
+      "step1": {
+        "title": "Cuéntanos sobre tu alojamiento",
+        "subtitle": "Con esto ya podemos crear el borrador de tu guía digital.",
+        "airbnbLabel": "¿Ya tienes anuncio en Airbnb? (opcional)",
+        "importing": "...",
+        "import": "Importar",
+        "airbnbHint": "Rellenamos el nombre y la dirección por ti — puedes editarlos abajo.",
+        "importError": "No se pudo importar. Rellena los datos manualmente.",
+        "imported": "Datos importados — revísalos antes de continuar.",
+        "importNetworkError": "Error de red al importar. Rellena los datos manualmente.",
+        "onlyJpg": "Solo se aceptan imágenes JPG",
+        "tooLarge3mb": "La imagen no puede superar 3MB",
+        "nameLabel": "Nombre del alojamiento",
+        "namePlaceholder": "Apartamento Triana",
+        "addressLabel": "Dirección",
+        "coverLabel": "Foto de portada (opcional)",
+        "coverAlt": "Portada",
+        "change": "Cambiar",
+        "uploadJpg": "Subir imagen JPG",
+        "createError": "No se pudo crear la propiedad",
+        "continue": "Continuar",
+        "creating": "Creando..."
+      },
+      "step2": {
+        "title": "Añade la información esencial",
+        "subtitle": "Activa lo que necesites — puedes editarlo aquí mismo o más tarde en el editor.",
+        "networkName": "Nombre de la red",
+        "password": "Contraseña",
+        "time": "Hora",
+        "instructions": "Instrucciones",
+        "checkinInstructionsPlaceholder": "Cómo recoger las llaves, código de acceso...",
+        "checkoutInstructionsPlaceholder": "Dónde dejar las llaves, qué revisar antes de salir...",
+        "rulesLabel": "Normas de la casa",
+        "defaultRules": [
+          "No se admiten fiestas ni eventos",
+          "Prohibido fumar en el interior",
+          "Respeta el descanso a partir de las 22:00"
+        ],
+        "continue": "Continuar"
+      },
+      "step3": {
+        "title": "¡Listo para publicar!",
+        "subtitle": "Así se verá tu guía. Puedes publicarla ya o seguir editando primero.",
+        "noBlocksYet": "Sin bloques todavía",
+        "publish": "Publicar y ver mi guía",
+        "publishing": "Publicando...",
+        "publishError": "No se pudo publicar la guía",
+        "keepEditing": "Seguir editando"
+      }
+    },
+    "shareGuide": {
+      "title": "Compartir guía",
+      "directLink": "Enlace directo",
+      "copied": "¡Copiado!",
+      "copyLink": "Copiar enlace",
+      "copyError": "No se pudo copiar el enlace",
+      "generatingQr": "Generando QR...",
+      "qrAlt": "Código QR de la guía",
+      "downloadQr": "Descargar QR",
+      "qrError": "No se pudo generar el QR"
     }
   }
 }

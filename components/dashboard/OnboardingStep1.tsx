@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,8 @@ export function OnboardingStep1({
 }: {
   onCreated: (property: Property) => void;
 }) {
+  const t = useTranslations("dashboard.onboarding.step1");
+  const tCommon = useTranslations("dashboard.common");
   const [airbnbUrl, setAirbnbUrl] = useState("");
   const [importing, setImporting] = useState(false);
   const [name, setName] = useState("");
@@ -37,16 +40,16 @@ export function OnboardingStep1({
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        toast.error(data.error ?? "No se pudo importar. Rellena los datos manualmente.");
+        toast.error(data.error ?? t("importError"));
         return;
       }
 
       if (data.title) setName(data.title);
       if (data.address) setAddress(data.address);
       if (data.description) setWelcomeMessage(data.description.slice(0, WELCOME_MESSAGE_MAX));
-      toast.success("Datos importados — revísalos antes de continuar.");
+      toast.success(t("imported"));
     } catch {
-      toast.error("Error de red al importar. Rellena los datos manualmente.");
+      toast.error(t("importNetworkError"));
     } finally {
       setImporting(false);
     }
@@ -57,12 +60,12 @@ export function OnboardingStep1({
     if (!file) return;
 
     if (file.type !== "image/jpeg") {
-      toast.error("Solo se aceptan imágenes JPG");
+      toast.error(t("onlyJpg"));
       e.target.value = "";
       return;
     }
     if (file.size > MAX_COVER_SIZE_BYTES) {
-      toast.error("La imagen no puede superar 3MB");
+      toast.error(t("tooLarge3mb"));
       e.target.value = "";
       return;
     }
@@ -84,7 +87,7 @@ export function OnboardingStep1({
 
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo crear la propiedad");
+        toast.error(error ?? t("createError"));
         setLoading(false);
         return;
       }
@@ -121,7 +124,7 @@ export function OnboardingStep1({
 
       onCreated(property);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error de red");
+      toast.error(err instanceof Error ? err.message : tCommon("networkError"));
       setLoading(false);
     }
   }
@@ -129,15 +132,13 @@ export function OnboardingStep1({
   return (
     <div className="space-y-6">
       <div className="space-y-1 text-center">
-        <h1 className="text-2xl font-semibold">Cuéntanos sobre tu alojamiento</h1>
-        <p className="text-sm text-muted-foreground">
-          Con esto ya podemos crear el borrador de tu guía digital.
-        </p>
+        <h1 className="text-2xl font-semibold">{t("title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <div className="mx-auto max-w-sm space-y-4">
         <div className="rounded-lg border border-dashed border-border p-3">
-          <Label htmlFor="onboarding-airbnb">¿Ya tienes anuncio en Airbnb? (opcional)</Label>
+          <Label htmlFor="onboarding-airbnb">{t("airbnbLabel")}</Label>
           <div className="mt-1 flex gap-2">
             <Input
               id="onboarding-airbnb"
@@ -151,27 +152,25 @@ export function OnboardingStep1({
               onClick={handleImportAirbnb}
               disabled={importing || !airbnbUrl}
             >
-              {importing ? "..." : "Importar"}
+              {importing ? t("importing") : t("import")}
             </Button>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Rellenamos el nombre y la dirección por ti — puedes editarlos abajo.
-          </p>
+          <p className="mt-1 text-xs text-muted-foreground">{t("airbnbHint")}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="onboarding-name">Nombre del alojamiento</Label>
+            <Label htmlFor="onboarding-name">{t("nameLabel")}</Label>
             <Input
               id="onboarding-name"
               required
-              placeholder="Apartamento Triana"
+              placeholder={t("namePlaceholder")}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
           <div>
-            <Label htmlFor="onboarding-address">Dirección</Label>
+            <Label htmlFor="onboarding-address">{t("addressLabel")}</Label>
             <Input
               id="onboarding-address"
               required
@@ -180,13 +179,13 @@ export function OnboardingStep1({
             />
           </div>
           <div>
-            <Label>Foto de portada (opcional)</Label>
+            <Label>{t("coverLabel")}</Label>
             {coverPreview ? (
               <div className="space-y-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={coverPreview}
-                  alt="Portada"
+                  alt={t("coverAlt")}
                   className="h-32 w-full rounded-lg border border-border object-cover"
                 />
                 <Button
@@ -196,7 +195,7 @@ export function OnboardingStep1({
                   className="w-full"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  Cambiar
+                  {t("change")}
                 </Button>
               </div>
             ) : (
@@ -207,7 +206,7 @@ export function OnboardingStep1({
                 className="w-full"
                 onClick={() => fileInputRef.current?.click()}
               >
-                Subir imagen JPG
+                {t("uploadJpg")}
               </Button>
             )}
             <input
@@ -219,7 +218,7 @@ export function OnboardingStep1({
             />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Creando..." : "Continuar"}
+            {loading ? t("creating") : t("continue")}
           </Button>
         </form>
       </div>

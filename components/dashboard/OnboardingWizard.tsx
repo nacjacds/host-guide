@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { OnboardingProgressBar } from "./OnboardingProgressBar";
 import { OnboardingStep1 } from "./OnboardingStep1";
 import { OnboardingStep2 } from "./OnboardingStep2";
@@ -13,6 +14,7 @@ const PROPERTY_KEY = "onboarding_property_id";
 const COMPLETED_KEY = "onboarding_completed";
 
 export function OnboardingWizard() {
+  const t = useTranslations("dashboard.onboarding.emptyState");
   const [ready, setReady] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -70,11 +72,9 @@ export function OnboardingWizard() {
   if (completed) {
     return (
       <div className="space-y-2 text-center">
-        <p className="text-muted-foreground">
-          Todavía no tienes propiedades. Crea la primera para generar tu guía digital.
-        </p>
+        <p className="text-muted-foreground">{t("message")}</p>
         <Link href="/properties/new" className="text-sm font-medium underline underline-offset-2">
-          Crear propiedad
+          {t("createProperty")}
         </Link>
       </div>
     );

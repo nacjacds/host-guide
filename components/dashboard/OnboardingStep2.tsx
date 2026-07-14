@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { useLocale } from "@/components/shared/LocaleProvider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,12 +22,6 @@ interface SuggestedBlockState {
   rules?: string[];
 }
 
-const DEFAULT_RULES = [
-  "No se admiten fiestas ni eventos",
-  "Prohibido fumar en el interior",
-  "Respeta el descanso a partir de las 22:00",
-];
-
 export function OnboardingStep2({
   propertyId,
   onDone,
@@ -33,6 +29,10 @@ export function OnboardingStep2({
   propertyId: string;
   onDone: (blocks: GuideBlock[]) => void;
 }) {
+  const t = useTranslations("dashboard.onboarding.step2");
+  const tCommon = useTranslations("dashboard.common");
+  const tRules = useTranslations("dashboard.editor.blocks.rules");
+  const { locale } = useLocale();
   const [wifi, setWifi] = useState<SuggestedBlockState>({ enabled: true });
   const [checkin, setCheckin] = useState<SuggestedBlockState>({
     enabled: true,
@@ -44,7 +44,7 @@ export function OnboardingStep2({
   });
   const [rules, setRules] = useState<SuggestedBlockState>({
     enabled: true,
-    rules: DEFAULT_RULES,
+    rules: t.raw("defaultRules") as string[],
   });
   const [loading, setLoading] = useState(false);
 
@@ -52,7 +52,7 @@ export function OnboardingStep2({
     const response = await fetch(`/api/properties/${propertyId}/blocks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type }),
+      body: JSON.stringify({ type, locale }),
     });
     if (!response.ok) return null;
     const { block } = await response.json();
@@ -102,7 +102,7 @@ export function OnboardingStep2({
 
       onDone(created);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error de red");
+      toast.error(err instanceof Error ? err.message : tCommon("networkError"));
     } finally {
       setLoading(false);
     }
@@ -123,10 +123,8 @@ export function OnboardingStep2({
   return (
     <div className="space-y-6">
       <div className="space-y-1 text-center">
-        <h1 className="text-2xl font-semibold">Añade la información esencial</h1>
-        <p className="text-sm text-muted-foreground">
-          Activa lo que necesites — puedes editarlo aquí mismo o más tarde en el editor.
-        </p>
+        <h1 className="text-2xl font-semibold">{t("title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <div className="mx-auto max-w-sm space-y-4">
@@ -141,14 +139,14 @@ export function OnboardingStep2({
           {wifi.enabled && (
             <div className="mt-3 space-y-2">
               <div>
-                <Label>Nombre de la red</Label>
+                <Label>{t("networkName")}</Label>
                 <Input
                   value={wifi.wifiNetwork ?? ""}
                   onChange={(e) => setWifi((prev) => ({ ...prev, wifiNetwork: e.target.value }))}
                 />
               </div>
               <div>
-                <Label>Contraseña</Label>
+                <Label>{t("password")}</Label>
                 <Input
                   value={wifi.wifiPassword ?? ""}
                   onChange={(e) => setWifi((prev) => ({ ...prev, wifiPassword: e.target.value }))}
@@ -169,7 +167,7 @@ export function OnboardingStep2({
           {checkin.enabled && (
             <div className="mt-3 space-y-2">
               <div>
-                <Label>Hora</Label>
+                <Label>{t("time")}</Label>
                 <Input
                   type="time"
                   value={checkin.checkinTime ?? ""}
@@ -179,13 +177,13 @@ export function OnboardingStep2({
                 />
               </div>
               <div>
-                <Label>Instrucciones</Label>
+                <Label>{t("instructions")}</Label>
                 <Textarea
                   value={checkin.checkinInstructions ?? ""}
                   onChange={(e) =>
                     setCheckin((prev) => ({ ...prev, checkinInstructions: e.target.value }))
                   }
-                  placeholder="Cómo recoger las llaves, código de acceso..."
+                  placeholder={t("checkinInstructionsPlaceholder")}
                 />
               </div>
             </div>
@@ -205,7 +203,7 @@ export function OnboardingStep2({
           {checkout.enabled && (
             <div className="mt-3 space-y-2">
               <div>
-                <Label>Hora</Label>
+                <Label>{t("time")}</Label>
                 <Input
                   type="time"
                   value={checkout.checkoutTime ?? ""}
@@ -215,13 +213,13 @@ export function OnboardingStep2({
                 />
               </div>
               <div>
-                <Label>Instrucciones</Label>
+                <Label>{t("instructions")}</Label>
                 <Textarea
                   value={checkout.checkoutInstructions ?? ""}
                   onChange={(e) =>
                     setCheckout((prev) => ({ ...prev, checkoutInstructions: e.target.value }))
                   }
-                  placeholder="Dónde dejar las llaves, qué revisar antes de salir..."
+                  placeholder={t("checkoutInstructionsPlaceholder")}
                 />
               </div>
             </div>
@@ -230,7 +228,7 @@ export function OnboardingStep2({
 
         <div className="rounded-lg border border-border p-3">
           <label className="flex items-center justify-between gap-2">
-            <span className="text-sm font-medium">📋 Normas de la casa</span>
+            <span className="text-sm font-medium">📋 {t("rulesLabel")}</span>
             <Switch
               checked={rules.enabled}
               onCheckedChange={(checked) => setRules((prev) => ({ ...prev, enabled: checked }))}
@@ -242,7 +240,7 @@ export function OnboardingStep2({
                 <div key={i} className="flex gap-2">
                   <Input value={rule} onChange={(e) => updateRule(i, e.target.value)} />
                   <Button variant="ghost" size="sm" onClick={() => removeRule(i)}>
-                    Eliminar
+                    {tCommon("delete")}
                   </Button>
                 </div>
               ))}
@@ -251,14 +249,14 @@ export function OnboardingStep2({
                 size="sm"
                 onClick={() => setRules((prev) => ({ ...prev, rules: [...(prev.rules ?? []), ""] }))}
               >
-                + Añadir norma
+                + {tRules("addRule")}
               </Button>
             </div>
           )}
         </div>
 
         <Button className="w-full" onClick={handleContinue} disabled={loading}>
-          {loading ? "Guardando..." : "Continuar"}
+          {loading ? tCommon("saving") : t("continue")}
         </Button>
       </div>
     </div>

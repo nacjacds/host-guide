@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +18,8 @@ import {
 import { toast } from "sonner";
 
 export function NewPropertyForm() {
+  const t = useTranslations("dashboard.properties.newForm");
+  const tCommon = useTranslations("dashboard.common");
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,15 +47,15 @@ export function NewPropertyForm() {
           return;
         }
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo crear la propiedad");
+        toast.error(error ?? t("createError"));
         return;
       }
 
       const { property } = await response.json();
-      toast.success("Propiedad creada");
+      toast.success(t("created"));
       window.location.href = `/properties/${property.id}/edit`;
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error de red");
+      toast.error(err instanceof Error ? err.message : tCommon("networkError"));
     } finally {
       setLoading(false);
     }
@@ -62,22 +65,22 @@ export function NewPropertyForm() {
     <div className="mx-auto max-w-md">
       <Card>
         <CardHeader>
-          <CardTitle>Nueva propiedad</CardTitle>
+          <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="name">Nombre del alojamiento</Label>
+              <Label htmlFor="name">{t("nameLabel")}</Label>
               <Input
                 id="name"
                 required
-                placeholder="Apartamento Triana"
+                placeholder={t("namePlaceholder")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
             <div>
-              <Label htmlFor="address">Dirección</Label>
+              <Label htmlFor="address">{t("addressLabel")}</Label>
               <Input
                 id="address"
                 required
@@ -86,7 +89,7 @@ export function NewPropertyForm() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Creando..." : "Crear propiedad"}
+              {loading ? t("creating") : t("create")}
             </Button>
           </form>
         </CardContent>
@@ -95,11 +98,8 @@ export function NewPropertyForm() {
       <AlertDialog open={limitReached} onOpenChange={setLimitReached}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Límite de propiedades alcanzado</AlertDialogTitle>
-            <AlertDialogDescription>
-              Has alcanzado el límite de propiedades de tu plan. Mejora tu plan para crear
-              esta propiedad — tus datos no se han perdido, siguen rellenos en el formulario.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("limitReachedTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("limitReachedDescription")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <Button
@@ -107,10 +107,10 @@ export function NewPropertyForm() {
               variant="ghost"
               onClick={() => setLimitReached(false)}
             >
-              Seguir editando
+              {t("keepEditing")}
             </Button>
             <Button nativeButton={false} render={<Link href="/account" />}>
-              Mejorar plan
+              {t("upgradePlan")}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

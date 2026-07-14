@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import type { GuideBlock, Property } from "@/types";
@@ -15,6 +16,8 @@ export function OnboardingStep3({
   blocks: GuideBlock[];
   onFinish: () => void;
 }) {
+  const t = useTranslations("dashboard.onboarding.step3");
+  const tCommon = useTranslations("dashboard.common");
   const router = useRouter();
   const [publishing, setPublishing] = useState(false);
 
@@ -28,7 +31,7 @@ export function OnboardingStep3({
       });
 
       if (!response.ok) {
-        toast.error("No se pudo publicar la guía");
+        toast.error(t("publishError"));
         setPublishing(false);
         return;
       }
@@ -38,7 +41,7 @@ export function OnboardingStep3({
       router.push("/dashboard");
       router.refresh();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error de red");
+      toast.error(err instanceof Error ? err.message : tCommon("networkError"));
       setPublishing(false);
     }
   }
@@ -51,10 +54,8 @@ export function OnboardingStep3({
   return (
     <div className="space-y-6">
       <div className="space-y-1 text-center">
-        <h1 className="text-2xl font-semibold">¡Listo para publicar!</h1>
-        <p className="text-sm text-muted-foreground">
-          Así se verá tu guía. Puedes publicarla ya o seguir editando primero.
-        </p>
+        <h1 className="text-2xl font-semibold">{t("title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <div className="flex justify-center">
@@ -84,7 +85,7 @@ export function OnboardingStep3({
           <div className="grid grid-cols-2 gap-1.5 bg-neutral-50 p-2">
             {blocks.length === 0 ? (
               <p className="col-span-2 py-4 text-center text-[10px] text-muted-foreground">
-                Sin bloques todavía
+                {t("noBlocksYet")}
               </p>
             ) : (
               blocks.map((block) => (
@@ -105,7 +106,7 @@ export function OnboardingStep3({
 
       <div className="mx-auto flex max-w-sm flex-col gap-2">
         <Button className="w-full" onClick={handlePublish} disabled={publishing}>
-          {publishing ? "Publicando..." : "Publicar y ver mi guía"}
+          {publishing ? t("publishing") : t("publish")}
         </Button>
         <Button
           variant="outline"
@@ -113,7 +114,7 @@ export function OnboardingStep3({
           onClick={handleKeepEditing}
           disabled={publishing}
         >
-          Seguir editando
+          {t("keepEditing")}
         </Button>
       </div>
     </div>
