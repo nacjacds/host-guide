@@ -3,6 +3,9 @@ import { z } from "zod";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { isSuperAdmin } from "@/lib/admin";
 import { PLAN_ORDER } from "@/lib/plans";
+import { notAuthorizedResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { commonApiMessages, pick } from "@/lib/apiMessages";
 import type { Plan } from "@/types";
 
 const updatePlanSchema = z.object({
@@ -20,12 +23,13 @@ export async function PATCH(
   } = await supabase.auth.getUser();
 
   if (!isSuperAdmin(user?.email)) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    return notAuthorizedResponse(request, supabase, user?.id ?? null);
   }
 
   const parsed = updatePlanSchema.safeParse(await request.json());
   if (!parsed.success) {
-    return NextResponse.json({ error: "Plan inválido" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user!.id);
+    return NextResponse.json({ error: commonApiMessages.invalidPlan[locale] }, { status: 400 });
   }
 
   const serviceClient = createServiceRoleClient();
@@ -37,7 +41,11 @@ export async function PATCH(
     .single();
 
   if (error || !profile) {
-    return NextResponse.json({ error: "No se pudo actualizar el plan" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user!.id);
+    return NextResponse.json(
+      { error: pick(locale, "No se pudo actualizar el plan", "Couldn't update the plan") },
+      { status: 400 }
+    );
   }
 
   return NextResponse.json({ profile });

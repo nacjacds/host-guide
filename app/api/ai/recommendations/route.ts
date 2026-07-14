@@ -3,6 +3,9 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { searchNearbyPlaces } from "@/lib/google-places";
 import { generateRecommendationDescriptions } from "@/lib/claude";
+import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { pick } from "@/lib/apiMessages";
 
 const requestSchema = z.object({
   propertyId: z.string().uuid(),
@@ -17,7 +20,7 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const parsed = requestSchema.safeParse(await request.json());
@@ -32,8 +35,15 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (profile?.plan === "free") {
+    const locale = await getApiLocale(request, supabase, user.id);
     return NextResponse.json(
-      { error: "Las recomendaciones con IA requieren un plan de pago" },
+      {
+        error: pick(
+          locale,
+          "Las recomendaciones con IA requieren un plan de pago",
+          "AI recommendations require a paid plan"
+        ),
+      },
       { status: 403 }
     );
   }
@@ -48,7 +58,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (!property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "property");
   }
 
   const places = await searchNearbyPlaces(property.address ?? "", category);

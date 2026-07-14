@@ -8,6 +8,9 @@ import {
   IMPERSONATION_COOKIE_NAME,
   IMPERSONATION_MAX_AGE_SECONDS,
 } from "@/lib/impersonation";
+import { notAuthorizedResponse, notFoundResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { pick } from "@/lib/apiMessages";
 
 const bodySchema = z.object({ userId: z.string().uuid() });
 
@@ -18,18 +21,20 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!isSuperAdmin(admin?.email)) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    return notAuthorizedResponse(request, supabase, admin?.id ?? null);
   }
 
   const parsed = bodySchema.safeParse(await request.json());
   if (!parsed.success) {
-    return NextResponse.json({ error: "Usuario inválido" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, admin!.id);
+    return NextResponse.json({ error: pick(locale, "Usuario inválido", "Invalid user") }, { status: 400 });
   }
   const { userId } = parsed.data;
 
   if (userId === admin!.id) {
+    const locale = await getApiLocale(request, supabase, admin!.id);
     return NextResponse.json(
-      { error: "No puedes impersonar tu propia cuenta" },
+      { error: pick(locale, "No puedes impersonar tu propia cuenta", "You can't impersonate your own account") },
       { status: 400 }
     );
   }
@@ -38,19 +43,30 @@ export async function POST(request: NextRequest) {
     data: { session: adminSession },
   } = await supabase.auth.getSession();
   if (!adminSession?.refresh_token) {
-    return NextResponse.json({ error: "No se pudo leer la sesión actual" }, { status: 500 });
+    const locale = await getApiLocale(request, supabase, admin!.id);
+    return NextResponse.json(
+      { error: pick(locale, "No se pudo leer la sesión actual", "Couldn't read the current session") },
+      { status: 500 }
+    );
   }
 
   const serviceClient = createServiceRoleClient();
   const { data: targetUserData, error: targetUserError } =
     await serviceClient.auth.admin.getUserById(userId);
   if (targetUserError || !targetUserData.user?.email) {
-    return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
+    return notFoundResponse(request, supabase, admin!.id, "user");
   }
 
   if (isSuperAdmin(targetUserData.user.email)) {
+    const locale = await getApiLocale(request, supabase, admin!.id);
     return NextResponse.json(
-      { error: "No se puede impersonar a otro administrador" },
+      {
+        error: pick(
+          locale,
+          "No se puede impersonar a otro administrador",
+          "You can't impersonate another administrator"
+        ),
+      },
       { status: 400 }
     );
   }
@@ -60,7 +76,11 @@ export async function POST(request: NextRequest) {
     email: targetUserData.user.email,
   });
   if (linkError || !linkData?.properties?.hashed_token) {
-    return NextResponse.json({ error: "No se pudo generar el acceso" }, { status: 500 });
+    const locale = await getApiLocale(request, supabase, admin!.id);
+    return NextResponse.json(
+      { error: pick(locale, "No se pudo generar el acceso", "Couldn't generate access") },
+      { status: 500 }
+    );
   }
 
   const { error: verifyError } = await supabase.auth.verifyOtp({
@@ -68,7 +88,11 @@ export async function POST(request: NextRequest) {
     type: "email",
   });
   if (verifyError) {
-    return NextResponse.json({ error: "No se pudo iniciar la impersonación" }, { status: 500 });
+    const locale = await getApiLocale(request, supabase, admin!.id);
+    return NextResponse.json(
+      { error: pick(locale, "No se pudo iniciar la impersonación", "Couldn't start impersonation") },
+      { status: 500 }
+    );
   }
 
   const cookieStore = await cookies();

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { blockImageStoragePath } from "@/lib/utils";
 import { triggerBlockTranslation } from "@/lib/translations/trigger";
+import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
 
 const blockImageSchema = z.object({
   url: z.string().url(),
@@ -32,7 +33,7 @@ export async function PATCH(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const parsed = updateBlockSchema.safeParse(await request.json());
@@ -48,7 +49,7 @@ export async function PATCH(
     .single();
 
   if (error || !block) {
-    return NextResponse.json({ error: "Bloque no encontrado" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "block");
   }
 
   // Fire-and-forget: only re-translate when content/title actually changed,
@@ -67,7 +68,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -77,7 +78,7 @@ export async function DELETE(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const { data: existing } = await supabase

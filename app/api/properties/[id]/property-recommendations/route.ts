@@ -4,6 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getPlaceDetails, haversineDistanceMeters, getWalkingMinutes } from "@/lib/google-places";
 import { describeManualPlace } from "@/lib/claude";
 import { triggerRecommendationsTranslation } from "@/lib/translations/translateRecommendations";
+import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { pick } from "@/lib/apiMessages";
 
 const addPlaceSchema = z.object({
   category: z.enum(["attractions", "restaurants", "nightlife", "beaches", "nature"]),
@@ -21,7 +24,7 @@ export async function POST(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const parsed = addPlaceSchema.safeParse(await request.json());
@@ -37,12 +40,16 @@ export async function POST(
     .single();
 
   if (!property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "property");
   }
 
   const place = await getPlaceDetails(parsed.data.place_id);
   if (!place) {
-    return NextResponse.json({ error: "No se encontró ese lugar en Google" }, { status: 404 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json(
+      { error: pick(locale, "No se encontró ese lugar en Google", "Couldn't find that place on Google") },
+      { status: 404 }
+    );
   }
 
   const center = property.lat != null && property.lng != null

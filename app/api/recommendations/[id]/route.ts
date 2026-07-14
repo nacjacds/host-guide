@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
 
 const updateRecommendationSchema = z.object({
   name: z.string().min(1).max(120).optional(),
@@ -20,7 +21,7 @@ export async function PATCH(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const parsed = updateRecommendationSchema.safeParse(await request.json());
@@ -36,14 +37,14 @@ export async function PATCH(
     .single();
 
   if (error || !recommendation) {
-    return NextResponse.json({ error: "Recomendación no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "recommendation");
   }
 
   return NextResponse.json({ recommendation });
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -53,7 +54,7 @@ export async function DELETE(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const { error } = await supabase.from("recommendations").delete().eq("id", id);

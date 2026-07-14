@@ -3,6 +3,9 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { generateGuideContent } from "@/lib/claude";
 import { triggerBlockTranslation } from "@/lib/translations/trigger";
+import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { pick } from "@/lib/apiMessages";
 import type { Database } from "@/types";
 
 type GuideBlockInsert = Database["public"]["Tables"]["guide_blocks"]["Insert"];
@@ -16,7 +19,7 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const parsed = requestSchema.safeParse(await request.json());
@@ -31,8 +34,15 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (profile?.plan === "free") {
+    const locale = await getApiLocale(request, supabase, user.id);
     return NextResponse.json(
-      { error: "La generación de contenido con IA requiere un plan de pago" },
+      {
+        error: pick(
+          locale,
+          "La generación de contenido con IA requiere un plan de pago",
+          "AI content generation requires a paid plan"
+        ),
+      },
       { status: 403 }
     );
   }
@@ -45,7 +55,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (!property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "property");
   }
 
   const content = await generateGuideContent({

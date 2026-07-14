@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
 
 const createRecommendationSchema = z.object({
   category: z.enum(["supermarket", "pharmacy", "transport"]),
@@ -20,7 +21,7 @@ export async function POST(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const parsed = createRecommendationSchema.safeParse(await request.json());
@@ -36,7 +37,7 @@ export async function POST(
     .single();
 
   if (!property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "property");
   }
 
   const { count } = await supabase

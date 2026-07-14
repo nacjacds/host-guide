@@ -5,6 +5,9 @@ import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { generatePropertyRecommendations } from "@/lib/recommendations/generateRecommendations";
 import { getRegenerationQuotaStatus } from "@/lib/recommendations/quota";
 import { formatResetDate } from "@/lib/recommendations/format";
+import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { pick } from "@/lib/apiMessages";
 
 const regenerateSchema = z.object({
   // Omitted = regenerate every category (Settings' global button); present
@@ -35,13 +38,14 @@ export async function POST(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const body = await request.json().catch(() => ({}));
   const parsed = regenerateSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Categoría inválida" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json({ error: pick(locale, "Categoría inválida", "Invalid category") }, { status: 400 });
   }
 
   const { data: profile } = await supabase
@@ -58,14 +62,19 @@ export async function POST(
     .single();
 
   if (!property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "property");
   }
 
   const quota = await getRegenerationQuotaStatus(user.id, profile?.plan);
   if (quota.remaining <= 0) {
+    const locale = await getApiLocale(request, supabase, user.id);
     return NextResponse.json(
       {
-        error: `Has usado tus ${quota.limit} regeneraciones manuales de este mes. Se restablecen el ${formatResetDate(quota.resetDate)}.`,
+        error: pick(
+          locale,
+          `Has usado tus ${quota.limit} regeneraciones manuales de este mes. Se restablecen el ${formatResetDate(quota.resetDate, locale)}.`,
+          `You've used your ${quota.limit} manual regenerations for this month. They reset on ${formatResetDate(quota.resetDate, locale)}.`
+        ),
       },
       { status: 429 }
     );
@@ -99,8 +108,14 @@ export async function POST(
         stack: err instanceof Error ? err.stack : undefined,
       })}\n`
     );
+    const locale = await getApiLocale(request, supabase, user.id);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "No se pudieron generar recomendaciones" },
+      {
+        error:
+          err instanceof Error
+            ? err.message
+            : pick(locale, "No se pudieron generar recomendaciones", "Couldn't generate recommendations"),
+      },
       { status: 500 }
     );
   }

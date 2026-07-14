@@ -4,6 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { triggerWelcomeMessageTranslation } from "@/lib/translations/trigger";
 import { geocodeAddress } from "@/lib/google-places";
 import { isValidPhoneNumber } from "@/lib/phone";
+import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { pick } from "@/lib/apiMessages";
 
 const updatePropertySchema = z.object({
   name: z.string().min(1).max(120).optional(),
@@ -31,7 +34,7 @@ const updatePropertySchema = z.object({
 });
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -44,7 +47,7 @@ export async function GET(
     .single();
 
   if (error || !property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, null, "property");
   }
 
   return NextResponse.json({ property });
@@ -61,7 +64,7 @@ export async function PATCH(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const parsed = updatePropertySchema.safeParse(await request.json());
@@ -91,7 +94,7 @@ export async function PATCH(
     .single();
 
   if (error || !property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "property");
   }
 
   if (parsed.data.welcome_message !== undefined) {
@@ -120,12 +123,22 @@ export async function DELETE(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const parsed = deleteRequestSchema.safeParse(await request.json().catch(() => ({})));
   if (!parsed.success) {
-    return NextResponse.json({ error: "Falta confirmar el nombre de la propiedad" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json(
+      {
+        error: pick(
+          locale,
+          "Falta confirmar el nombre de la propiedad",
+          "Missing confirmation of the property name"
+        ),
+      },
+      { status: 400 }
+    );
   }
 
   const { data: property } = await supabase
@@ -137,11 +150,15 @@ export async function DELETE(
     .single();
 
   if (!property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "property");
   }
 
   if (parsed.data.confirmName !== property.name) {
-    return NextResponse.json({ error: "El nombre no coincide" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json(
+      { error: pick(locale, "El nombre no coincide", "The name doesn't match") },
+      { status: 400 }
+    );
   }
 
   // Soft delete only — see supabase/migrations/20260714090000_properties_soft_delete.sql.

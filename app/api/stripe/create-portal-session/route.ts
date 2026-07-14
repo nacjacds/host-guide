@@ -1,16 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe";
 import { getAppUrl } from "@/lib/env";
+import { notAuthenticatedResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { pick } from "@/lib/apiMessages";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const { data: profile } = await supabase
@@ -20,8 +23,9 @@ export async function POST() {
     .single();
 
   if (!profile?.stripe_customer_id) {
+    const locale = await getApiLocale(request, supabase, user.id);
     return NextResponse.json(
-      { error: "Todavía no tienes una suscripción activa" },
+      { error: pick(locale, "Todavía no tienes una suscripción activa", "You don't have an active subscription yet") },
       { status: 400 }
     );
   }
@@ -36,7 +40,13 @@ export async function POST() {
 
     return NextResponse.json({ url: session.url });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "No se pudo abrir el portal";
-    return NextResponse.json({ error: message }, { status: 500 });
+    if (err instanceof Error) {
+      return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json(
+      { error: pick(locale, "No se pudo abrir el portal", "Couldn't open the billing portal") },
+      { status: 500 }
+    );
   }
 }

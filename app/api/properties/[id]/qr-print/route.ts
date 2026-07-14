@@ -4,9 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import { generatePrintQrCodeDataUrl, getGuideUrl } from "@/lib/qr";
 import { getLogoDataUrl } from "@/lib/pdf/logo";
 import { TentCardDocument } from "@/lib/pdf/tent-card";
+import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -16,7 +17,7 @@ export async function GET(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const { data: property } = await supabase
@@ -27,7 +28,7 @@ export async function GET(
     .single();
 
   if (!property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "property");
   }
 
   const [qrDataUrl, logoDataUrl] = await Promise.all([

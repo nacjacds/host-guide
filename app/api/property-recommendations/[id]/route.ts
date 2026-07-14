@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { triggerRecommendationsTranslation } from "@/lib/translations/translateRecommendations";
+import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { commonApiMessages } from "@/lib/apiMessages";
 
 const editSchema = z.object({
   name: z.string().trim().min(1).max(200),
@@ -21,13 +24,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const body = await request.json().catch(() => ({}));
   const parsed = editSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json({ error: commonApiMessages.invalidData[locale] }, { status: 400 });
   }
 
   // RLS (property_recommendations_select_own) already restricts this to
@@ -39,7 +43,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     .single();
 
   if (!existing) {
-    return NextResponse.json({ error: "Recomendación no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "recommendation");
   }
 
   // Only a plain AI-curated row moves to "edited" — manual entries stay
@@ -84,7 +88,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -94,7 +98,7 @@ export async function DELETE(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   // RLS (property_recommendations_delete_own) already restricts this to

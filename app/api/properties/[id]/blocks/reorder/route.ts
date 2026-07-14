@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { pick } from "@/lib/apiMessages";
 
 const reorderSchema = z.object({
   blockIds: z.array(z.string().uuid()).min(1),
@@ -17,12 +20,13 @@ export async function POST(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const parsed = reorderSchema.safeParse(await request.json());
   if (!parsed.success) {
-    return NextResponse.json({ error: "Petición inválida" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json({ error: pick(locale, "Petición inválida", "Invalid request") }, { status: 400 });
   }
 
   const { data: property } = await supabase
@@ -33,7 +37,7 @@ export async function POST(
     .single();
 
   if (!property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "property");
   }
 
   const { blockIds } = parsed.data;
@@ -48,8 +52,15 @@ export async function POST(
     blockIds.length === existingIds.size && blockIds.every((id) => existingIds.has(id));
 
   if (!isSameSet) {
+    const locale = await getApiLocale(request, supabase, user.id);
     return NextResponse.json(
-      { error: "La lista de bloques no coincide con los de la propiedad" },
+      {
+        error: pick(
+          locale,
+          "La lista de bloques no coincide con los de la propiedad",
+          "The block list doesn't match the property's blocks"
+        ),
+      },
       { status: 400 }
     );
   }

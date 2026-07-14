@@ -1,15 +1,18 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe";
+import { notAuthenticatedResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { pick } from "@/lib/apiMessages";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const { data: profile } = await supabase
@@ -31,8 +34,14 @@ export async function POST() {
           .map((sub) => stripe.subscriptions.cancel(sub.id))
       );
     } catch (err) {
-      const message = err instanceof Error ? err.message : "No se pudo cancelar la suscripción";
-      return NextResponse.json({ error: message }, { status: 500 });
+      if (err instanceof Error) {
+        return NextResponse.json({ error: err.message }, { status: 500 });
+      }
+      const locale = await getApiLocale(request, supabase, user.id);
+      return NextResponse.json(
+        { error: pick(locale, "No se pudo cancelar la suscripción", "Couldn't cancel the subscription") },
+        { status: 500 }
+      );
     }
   }
 

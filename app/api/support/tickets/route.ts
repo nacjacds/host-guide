@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { sendSupportTicketNotification } from "@/lib/email";
+import { notAuthenticatedResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { commonApiMessages, pick } from "@/lib/apiMessages";
 
 const MAX_SCREENSHOT_BYTES = 2 * 1024 * 1024;
 const ACCEPTED_SCREENSHOT_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -20,7 +23,7 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const formData = await request.formData();
@@ -31,7 +34,8 @@ export async function POST(request: NextRequest) {
   });
 
   if (!parsed.success) {
-    return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json({ error: commonApiMessages.invalidData[locale] }, { status: 400 });
   }
 
   const screenshot = formData.get("screenshot");
@@ -39,20 +43,26 @@ export async function POST(request: NextRequest) {
 
   if (screenshot instanceof File && screenshot.size > 0) {
     if (!ACCEPTED_SCREENSHOT_TYPES.includes(screenshot.type)) {
+      const locale = await getApiLocale(request, supabase, user.id);
       return NextResponse.json(
-        { error: "La captura debe ser JPG, PNG o WebP" },
+        { error: pick(locale, "La captura debe ser JPG, PNG o WebP", "The screenshot must be JPG, PNG, or WebP") },
         { status: 400 }
       );
     }
     if (screenshot.size > MAX_SCREENSHOT_BYTES) {
-      return NextResponse.json({ error: "La captura no puede superar 2MB" }, { status: 400 });
+      const locale = await getApiLocale(request, supabase, user.id);
+      return NextResponse.json(
+        { error: pick(locale, "La captura no puede superar 2MB", "The screenshot can't be larger than 2MB") },
+        { status: 400 }
+      );
     }
 
     const inputBuffer = Buffer.from(await screenshot.arrayBuffer());
     try {
       await sharp(inputBuffer).metadata();
     } catch {
-      return NextResponse.json({ error: "El archivo no es una imagen válida" }, { status: 400 });
+      const locale = await getApiLocale(request, supabase, user.id);
+      return NextResponse.json({ error: commonApiMessages.notValidImage[locale] }, { status: 400 });
     }
 
     const extension = screenshot.type === "image/png" ? "png" : screenshot.type === "image/webp" ? "webp" : "jpg";
@@ -87,7 +97,11 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error || !ticket) {
-    return NextResponse.json({ error: "No se pudo enviar el ticket" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json(
+      { error: pick(locale, "No se pudo enviar el ticket", "Couldn't send the ticket") },
+      { status: 400 }
+    );
   }
 
   try {

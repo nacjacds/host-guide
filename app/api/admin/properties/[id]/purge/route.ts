@@ -3,6 +3,9 @@ import { z } from "zod";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { isSuperAdmin } from "@/lib/admin";
 import { coverImageStoragePath } from "@/lib/utils";
+import { notAuthorizedResponse, notFoundResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { pick } from "@/lib/apiMessages";
 
 const PURGE_CONFIRM_PHRASE = "BORRAR PERMANENTEMENTE";
 
@@ -18,13 +21,17 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   } = await supabase.auth.getUser();
 
   if (!isSuperAdmin(user?.email)) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    return notAuthorizedResponse(request, supabase, user?.id ?? null);
   }
 
   // Re-checked server-side, not just client-side — this is irreversible.
   const parsed = purgeSchema.safeParse(await request.json().catch(() => ({})));
   if (!parsed.success) {
-    return NextResponse.json({ error: "Falta la confirmación exacta" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user!.id);
+    return NextResponse.json(
+      { error: pick(locale, "Falta la confirmación exacta", "Missing the exact confirmation") },
+      { status: 400 }
+    );
   }
 
   const serviceClient = createServiceRoleClient();
@@ -35,15 +42,22 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     .single();
 
   if (!property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user!.id, "property");
   }
 
   // Only ever purge something already soft-deleted — forces the two-step
   // flow (host deletes, then admin purges) rather than letting a single
   // click destroy a live property no one asked to remove.
   if (!property.deleted_at) {
+    const locale = await getApiLocale(request, supabase, user!.id);
     return NextResponse.json(
-      { error: "Solo se pueden purgar propiedades ya borradas por el host" },
+      {
+        error: pick(
+          locale,
+          "Solo se pueden purgar propiedades ya borradas por el host",
+          "Only properties already deleted by the host can be purged"
+        ),
+      },
       { status: 400 }
     );
   }

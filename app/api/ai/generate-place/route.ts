@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { generatePlaceSuggestion, type PlaceSuggestion } from "@/lib/claude";
+import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { pick } from "@/lib/apiMessages";
 import type { PlaceEntry } from "@/types";
 
 const requestSchema = z.object({
@@ -22,12 +25,13 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const parsed = requestSchema.safeParse(await request.json());
   if (!parsed.success) {
-    return NextResponse.json({ error: "Petición inválida" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json({ error: pick(locale, "Petición inválida", "Invalid request") }, { status: 400 });
   }
 
   const { data: profile } = await supabase
@@ -37,8 +41,15 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (!profile || profile.plan === "free") {
+    const locale = await getApiLocale(request, supabase, user.id);
     return NextResponse.json(
-      { error: "Generar lugares con IA requiere un plan Starter o superior" },
+      {
+        error: pick(
+          locale,
+          "Generar lugares con IA requiere un plan Starter o superior",
+          "Generating places with AI requires a Starter plan or higher"
+        ),
+      },
       { status: 403 }
     );
   }
@@ -50,7 +61,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (!block || !CACHEABLE_TYPES.has(block.type)) {
-    return NextResponse.json({ error: "Bloque no encontrado" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "block");
   }
 
   const { data: property } = await supabase
@@ -61,7 +72,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (!property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "property");
   }
 
   const existingNames =
@@ -93,7 +104,11 @@ export async function POST(request: NextRequest) {
       excludeNames: existingNames,
     });
   } catch {
-    return NextResponse.json({ error: "No se pudo generar una sugerencia con IA" }, { status: 500 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json(
+      { error: pick(locale, "No se pudo generar una sugerencia con IA", "Couldn't generate an AI suggestion") },
+      { status: 500 }
+    );
   }
 
   await serviceClient.from("translations_cache").insert({

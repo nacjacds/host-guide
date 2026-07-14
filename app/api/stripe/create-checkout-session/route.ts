@@ -3,6 +3,9 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { getStripe, getPlanPriceId, type PaidPlanId } from "@/lib/stripe";
 import { getAppUrl } from "@/lib/env";
+import { notAuthenticatedResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { commonApiMessages, pick } from "@/lib/apiMessages";
 
 const createCheckoutSchema = z.object({
   plan: z.enum(["starter", "pro", "agency"]),
@@ -15,12 +18,13 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const parsed = createCheckoutSchema.safeParse(await request.json());
   if (!parsed.success) {
-    return NextResponse.json({ error: "Plan inválido" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json({ error: commonApiMessages.invalidPlan[locale] }, { status: 400 });
   }
   const plan: PaidPlanId = parsed.data.plan;
 
@@ -60,12 +64,22 @@ export async function POST(request: NextRequest) {
     });
 
     if (!session.url) {
-      return NextResponse.json({ error: "No se pudo crear la sesión de pago" }, { status: 500 });
+      const locale = await getApiLocale(request, supabase, user.id);
+      return NextResponse.json(
+        { error: pick(locale, "No se pudo crear la sesión de pago", "Couldn't create the checkout session") },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ url: session.url });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "No se pudo iniciar el pago";
-    return NextResponse.json({ error: message }, { status: 500 });
+    if (err instanceof Error) {
+      return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json(
+      { error: pick(locale, "No se pudo iniciar el pago", "Couldn't start the checkout") },
+      { status: 500 }
+    );
   }
 }

@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { isSuperAdmin } from "@/lib/admin";
+import { notAuthorizedResponse, notFoundResponse } from "@/lib/apiResponses";
 
-export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
   const {
@@ -10,7 +11,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   } = await supabase.auth.getUser();
 
   if (!isSuperAdmin(user?.email)) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    return notAuthorizedResponse(request, supabase, user?.id ?? null);
   }
 
   const serviceClient = createServiceRoleClient();
@@ -22,7 +23,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     .single();
 
   if (error || !property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user!.id, "property");
   }
 
   return NextResponse.json({ property });

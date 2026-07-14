@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { isValidPhoneNumber } from "@/lib/phone";
+import { notAuthenticatedResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { pick } from "@/lib/apiMessages";
 
 const updateProfileSchema = z.object({
   full_name: z.string().max(120).nullable().optional(),
@@ -28,7 +31,7 @@ export async function PATCH(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const parsed = updateProfileSchema.safeParse(await request.json());
@@ -44,7 +47,11 @@ export async function PATCH(request: NextRequest) {
     .single();
 
   if (error || !profile) {
-    return NextResponse.json({ error: "No se pudo guardar el perfil" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json(
+      { error: pick(locale, "No se pudo guardar el perfil", "Couldn't save the profile") },
+      { status: 400 }
+    );
   }
 
   return NextResponse.json({ profile });

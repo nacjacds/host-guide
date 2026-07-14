@@ -3,6 +3,9 @@ import { z } from "zod";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { slugifyPropertyName } from "@/lib/utils";
 import { planPropertyLimit } from "@/lib/plans";
+import { notAuthenticatedResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { pick } from "@/lib/apiMessages";
 import type { User } from "@supabase/supabase-js";
 
 const createPropertySchema = z.object({
@@ -34,14 +37,14 @@ async function ensureProfile(user: User) {
   return created;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const { data, error } = await supabase
@@ -65,7 +68,7 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const parsed = createPropertySchema.safeParse(await request.json());
@@ -77,8 +80,9 @@ export async function POST(request: NextRequest) {
   try {
     profile = await ensureProfile(user);
   } catch {
+    const locale = await getApiLocale(request, supabase, user.id);
     return NextResponse.json(
-      { error: "No se pudo preparar tu perfil de anfitrión" },
+      { error: pick(locale, "No se pudo preparar tu perfil de anfitrión", "Couldn't prepare your host profile") },
       { status: 500 }
     );
   }
@@ -91,8 +95,9 @@ export async function POST(request: NextRequest) {
 
   const limit = planPropertyLimit(profile?.plan);
   if ((count ?? 0) >= limit) {
+    const locale = await getApiLocale(request, supabase, user.id);
     return NextResponse.json(
-      { error: "Has alcanzado el límite de propiedades de tu plan" },
+      { error: pick(locale, "Has alcanzado el límite de propiedades de tu plan", "You've reached your plan's property limit") },
       { status: 403 }
     );
   }

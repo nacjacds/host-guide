@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { notAuthenticatedResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import { pick } from "@/lib/apiMessages";
 
 const importSchema = z.object({ url: z.string().url() });
 
@@ -38,18 +41,26 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const parsed = importSchema.safeParse(await request.json());
   if (!parsed.success) {
-    return NextResponse.json({ error: "URL inválida" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json({ error: pick(locale, "URL inválida", "Invalid URL") }, { status: 400 });
   }
 
   const { url } = parsed.data;
   if (!isAirbnbUrl(url)) {
+    const locale = await getApiLocale(request, supabase, user.id);
     return NextResponse.json(
-      { error: "Introduce una URL de un anuncio de Airbnb (airbnb.com/...)" },
+      {
+        error: pick(
+          locale,
+          "Introduce una URL de un anuncio de Airbnb (airbnb.com/...)",
+          "Enter the URL of an Airbnb listing (airbnb.com/...)"
+        ),
+      },
       { status: 400 }
     );
   }
@@ -65,18 +76,29 @@ export async function POST(request: NextRequest) {
     clearTimeout(timeout);
 
     if (!response.ok) {
+      const locale = await getApiLocale(request, supabase, user.id);
       return NextResponse.json(
         {
-          error:
+          error: pick(
+            locale,
             "Airbnb no respondió correctamente (puede estar bloqueando el acceso). Rellena los datos manualmente.",
+            "Airbnb didn't respond correctly (it may be blocking access). Fill in the details manually."
+          ),
         },
         { status: 502 }
       );
     }
     html = await response.text();
   } catch {
+    const locale = await getApiLocale(request, supabase, user.id);
     return NextResponse.json(
-      { error: "No se pudo acceder a la URL. Rellena los datos manualmente." },
+      {
+        error: pick(
+          locale,
+          "No se pudo acceder a la URL. Rellena los datos manualmente.",
+          "Couldn't access the URL. Fill in the details manually."
+        ),
+      },
       { status: 502 }
     );
   }
@@ -92,19 +114,28 @@ export async function POST(request: NextRequest) {
   // Airbnb serves these with a 200 status (SPA shell), so response.ok above
   // doesn't catch them — the room ID doesn't exist or the listing is gone.
   if (rawTitle && /^\s*(404|page not found|not found)\b/i.test(rawTitle)) {
+    const locale = await getApiLocale(request, supabase, user.id);
     return NextResponse.json(
       {
-        error: "Este anuncio no existe o ya no está disponible. Rellena los datos manualmente.",
+        error: pick(
+          locale,
+          "Este anuncio no existe o ya no está disponible. Rellena los datos manualmente.",
+          "This listing doesn't exist or is no longer available. Fill in the details manually."
+        ),
       },
       { status: 422 }
     );
   }
 
   if (!rawTitle) {
+    const locale = await getApiLocale(request, supabase, user.id);
     return NextResponse.json(
       {
-        error:
+        error: pick(
+          locale,
           "No se pudo extraer información de este anuncio. Airbnb puede estar bloqueando el acceso — rellena los datos manualmente.",
+          "Couldn't extract information from this listing. Airbnb may be blocking access — fill in the details manually."
+        ),
       },
       { status: 422 }
     );

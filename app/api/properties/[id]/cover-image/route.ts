@@ -2,6 +2,14 @@ import sharp from "sharp";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { coverImageStoragePath } from "@/lib/utils";
+import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
+import { getApiLocale } from "@/lib/apiLocale";
+import {
+  commonApiMessages,
+  acceptedImageTypesMessage,
+  imageTooLargeMessage,
+  JPG_ONLY_LABEL,
+} from "@/lib/apiMessages";
 
 const MAX_SIZE_BYTES = 3 * 1024 * 1024;
 const MAX_WIDTH = 1920;
@@ -32,27 +40,33 @@ export async function POST(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const property = await getOwnedProperty(supabase, id, user.id);
   if (!property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "property");
   }
 
   const formData = await request.formData();
   const file = formData.get("file");
 
   if (!(file instanceof File)) {
-    return NextResponse.json({ error: "No se recibió ningún archivo" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json({ error: commonApiMessages.noFileReceived[locale] }, { status: 400 });
   }
 
   if (file.type !== "image/jpeg") {
-    return NextResponse.json({ error: "Solo se aceptan imágenes JPG" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json(
+      { error: acceptedImageTypesMessage(JPG_ONLY_LABEL, locale) },
+      { status: 400 }
+    );
   }
 
   if (file.size > MAX_SIZE_BYTES) {
-    return NextResponse.json({ error: "La imagen no puede superar 3MB" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json({ error: imageTooLargeMessage(3, locale) }, { status: 400 });
   }
 
   const inputBuffer = Buffer.from(await file.arrayBuffer());
@@ -65,7 +79,8 @@ export async function POST(
       .jpeg({ quality: 80 })
       .toBuffer();
   } catch {
-    return NextResponse.json({ error: "El archivo no es una imagen válida" }, { status: 400 });
+    const locale = await getApiLocale(request, supabase, user.id);
+    return NextResponse.json({ error: commonApiMessages.notValidImage[locale] }, { status: 400 });
   }
 
   const path = `${id}/cover.jpg`;
@@ -96,7 +111,7 @@ export async function POST(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -106,12 +121,12 @@ export async function DELETE(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    return notAuthenticatedResponse(request, supabase);
   }
 
   const property = await getOwnedProperty(supabase, id, user.id);
   if (!property) {
-    return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
+    return notFoundResponse(request, supabase, user.id, "property");
   }
 
   if (property.cover_image_url) {
