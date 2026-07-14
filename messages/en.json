@@ -651,7 +651,8 @@
         "impersonateError": "Couldn't impersonate this user",
         "entering": "Entering...",
         "enterAsUser": "Log in as this user",
-        "goToMyDashboard": "Go to my dashboard"
+        "goToMyDashboard": "Go to my dashboard",
+        "planChangeDbOnlyWarning": "This changes the plan only in the database — it doesn't create, modify, or cancel any Stripe subscription"
       },
       "propertiesPage": {
         "title": "Properties",

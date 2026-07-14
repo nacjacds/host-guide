@@ -651,7 +651,8 @@
         "impersonateError": "No se pudo impersonar a este usuario",
         "entering": "Entrando...",
         "enterAsUser": "Entrar como este usuario",
-        "goToMyDashboard": "Ir a mi panel"
+        "goToMyDashboard": "Ir a mi panel",
+        "planChangeDbOnlyWarning": "Esto cambia el plan solo en la base de datos — no crea, modifica ni cancela ninguna suscripción de Stripe"
       },
       "propertiesPage": {
         "title": "Propiedades",

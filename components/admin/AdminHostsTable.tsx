@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { TriangleAlertIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -96,18 +97,32 @@ function HostRow({ host, isCurrentUser }: { host: AdminHostRow; isCurrentUser: b
     <tr className="border-b border-border last:border-0">
       <td className="py-2 pr-4 text-sm">{host.email}</td>
       <td className="py-2 pr-4">
-        <Select value={plan} onValueChange={handlePlanChange} disabled={saving}>
-          <SelectTrigger className="w-36" size="sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {PLAN_ORDER.map((planId) => (
-              <SelectItem key={planId} value={planId}>
-                {tPlans(`${planId}.label`)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-1.5">
+          <Select value={plan} onValueChange={handlePlanChange} disabled={saving}>
+            <SelectTrigger className="w-36" size="sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {PLAN_ORDER.map((planId) => (
+                <SelectItem key={planId} value={planId}>
+                  {tPlans(`${planId}.label`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {/* Informational, not an error — same amber/TriangleAlert
+              convention as the WhatsApp-number notice in PublishPanel.tsx.
+              Native title attribute (no dedicated Tooltip component exists
+              in this UI kit yet) so this stays a single small icon per row
+              instead of repeating a full sentence next to every host. */}
+          <span title={t("planChangeDbOnlyWarning")} className="inline-flex shrink-0">
+            <TriangleAlertIcon
+              className="size-3.5 text-amber-600"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
+          </span>
+        </div>
       </td>
       <td className="py-2 pr-4 text-sm">{host.propertyCount}</td>
       <td className="py-2 pr-4 text-sm text-muted-foreground">
