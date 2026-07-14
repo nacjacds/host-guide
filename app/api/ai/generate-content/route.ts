@@ -58,18 +58,20 @@ export async function POST(request: NextRequest) {
     return notFoundResponse(request, supabase, user.id, "property");
   }
 
-  const content = await generateGuideContent({
-    name: property.name,
-    address: property.address ?? "",
-    hostTone: property.host_tone,
-  });
-
   // Seeded in the host's active dashboard locale (same mechanism as
   // getApiLocale everywhere else) rather than always Spanish — same bug
   // class as the block-title-locale fix for new guide_blocks (see
   // app/api/properties/[id]/blocks/route.ts). "Check-in"/"Check-out" stay
   // as-is: those words are identical in both locales throughout the app.
   const locale = await getApiLocale(request, supabase, user.id);
+
+  const content = await generateGuideContent({
+    name: property.name,
+    address: property.address ?? "",
+    hostTone: property.host_tone,
+    locale,
+  });
+
   const blocksToInsert: GuideBlockInsert[] = [
     {
       property_id: property.id,
@@ -106,6 +108,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  // Content was just written directly in `locale` (not Spanish-then-
+  // translated) — record it as this property's source language so the
+  // rest of the translation pipeline (useTranslatedBlock, translate-block
+  // fallback, etc.) knows which direction to translate for this property
+  // going forward. Best-effort: a failure here shouldn't block the
+  // response, since the generated content/blocks are already saved.
+  await supabase.from("properties").update({ language: locale }).eq("id", property.id);
+
   for (const block of blocks ?? []) {
     triggerBlockTranslation({
       propertyId: property.id,
@@ -113,6 +123,7 @@ export async function POST(request: NextRequest) {
       blockId: block.id,
       title: block.title,
       content: block.content,
+      sourceLocale: locale,
     });
   }
 

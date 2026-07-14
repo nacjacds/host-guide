@@ -1,20 +1,38 @@
-// The set of languages guests can view the guide in, beyond the host's
-// source language. Adding a new language later means adding one entry
-// here — no schema change needed (content_translations.target_locale is a
-// plain text column, not a DB enum).
-export const TARGET_LOCALES = ["en"] as const;
-export type TargetLocale = (typeof TARGET_LOCALES)[number];
+import type { GuideLocale } from "@/lib/guide-i18n";
 
-export function isTargetLocale(value: string): value is TargetLocale {
-  return (TARGET_LOCALES as readonly string[]).includes(value);
+export type { GuideLocale };
+
+export function isGuideLocale(value: string): value is GuideLocale {
+  return value === "es" || value === "en";
 }
 
-// Host-authored content is always written in Spanish today. If WelcoKit
-// ever supports hosts writing in another source language, this — and the
-// "es" assumption in extract.ts's prompts — would need to become
-// per-property (properties.language) instead of a constant.
-export const SOURCE_LOCALE = "es";
+// properties.language is the authoritative record of which language a
+// given property's guide_blocks/welcome_message were actually authored
+// in (see app/api/ai/generate-content/route.ts, which now writes it at
+// generation time). Defaults to "es" for any row where it's missing —
+// matches the DB column default, so pre-existing properties keep working
+// exactly as before this per-property source-locale system existed.
+export function resolvePropertySourceLocale(language: string | null | undefined): GuideLocale {
+  return language === "en" ? "en" : "es";
+}
 
-export const LOCALE_NAMES: Record<TargetLocale, string> = {
+// Only two guide locales exist today, so "the target" is simply whichever
+// one isn't the source. Adding a third locale later would turn this into
+// a real list rather than a single opposite value.
+export function guideTargetLocaleFor(sourceLocale: GuideLocale): GuideLocale {
+  return sourceLocale === "es" ? "en" : "es";
+}
+
+export const LOCALE_NAMES: Record<GuideLocale, string> = {
+  es: "Spanish",
   en: "English",
 };
+
+// property_recommendations descriptions are written by
+// curateRecommendations()/describeManualPlace() (lib/claude.ts), which are
+// deliberately hardcoded to always write in Spanish regardless of the
+// host's dashboard_locale (see the comment on curateRecommendations) — so
+// unlike guide_blocks/welcome_message, this pathway's source/target does
+// NOT follow properties.language.
+export const RECOMMENDATIONS_SOURCE_LOCALE: GuideLocale = "es";
+export const RECOMMENDATIONS_TARGET_LOCALE: GuideLocale = "en";

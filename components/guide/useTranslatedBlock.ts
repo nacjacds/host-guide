@@ -27,12 +27,12 @@ export function useTranslatedBlock({
   translated: TranslatablePayload | null;
   skip?: boolean;
 }): { title: string | null; content: Record<string, unknown> } {
-  const { locale, propertyId } = useGuideLocale();
+  const { locale, propertyId, sourceLocale } = useGuideLocale();
   const [fallback, setFallback] = useState<TranslatablePayload | null>(null);
   const requestedFor = useRef<string | null>(null);
 
   useEffect(() => {
-    if (skip || locale === "es" || translated || requestedFor.current === blockId) return;
+    if (skip || locale === sourceLocale || translated || requestedFor.current === blockId) return;
     requestedFor.current = blockId;
 
     let cancelled = false;
@@ -51,9 +51,9 @@ export function useTranslatedBlock({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [skip, locale, translated, blockId]);
+  }, [skip, locale, sourceLocale, translated, blockId]);
 
-  if (skip || locale === "es") {
+  if (skip || locale === sourceLocale) {
     return { title: title ?? null, content };
   }
 

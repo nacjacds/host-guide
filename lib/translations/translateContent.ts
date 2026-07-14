@@ -1,15 +1,15 @@
 import { createHash } from "crypto";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { translateContentJson, translateContentText } from "@/lib/claude";
-import { LOCALE_NAMES, type TargetLocale } from "./constants";
+import { LOCALE_NAMES, type GuideLocale } from "./constants";
 import type { TranslatablePayload } from "./extract";
 
 export interface TranslateContentParams {
   propertyId: string;
   blockType: string;
   blockId: string | null;
-  sourceLocale: string;
-  targetLocale: TargetLocale;
+  sourceLocale: GuideLocale;
+  targetLocale: GuideLocale;
   content: string | TranslatablePayload;
 }
 

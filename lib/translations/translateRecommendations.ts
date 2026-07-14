@@ -1,5 +1,5 @@
 import { translateContent } from "./translateContent";
-import { SOURCE_LOCALE, TARGET_LOCALES } from "./constants";
+import { RECOMMENDATIONS_SOURCE_LOCALE, RECOMMENDATIONS_TARGET_LOCALE } from "./constants";
 import type { PropertyRecommendationCategory } from "@/types";
 
 // Fire-and-forget, same pattern as triggerBlockTranslation in trigger.ts —
@@ -28,20 +28,18 @@ export function triggerRecommendationsTranslation(
   }
   if (Object.keys(descriptions).length === 0) return;
 
-  for (const targetLocale of TARGET_LOCALES) {
-    translateContent({
-      propertyId,
-      blockType: category,
-      blockId: null,
-      sourceLocale: SOURCE_LOCALE,
-      targetLocale,
-      content: { fields: { descriptions } },
-    }).catch((err) => {
-      console.error(
-        "[translations] background recommendations translation failed",
-        category,
-        err
-      );
-    });
-  }
+  translateContent({
+    propertyId,
+    blockType: category,
+    blockId: null,
+    sourceLocale: RECOMMENDATIONS_SOURCE_LOCALE,
+    targetLocale: RECOMMENDATIONS_TARGET_LOCALE,
+    content: { fields: { descriptions } },
+  }).catch((err) => {
+    console.error(
+      "[translations] background recommendations translation failed",
+      category,
+      err
+    );
+  });
 }

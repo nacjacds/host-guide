@@ -1,7 +1,7 @@
 import type { BlockType } from "@/types";
 import { extractTranslatable } from "./extract";
 import { translateContent } from "./translateContent";
-import { SOURCE_LOCALE, TARGET_LOCALES } from "./constants";
+import { guideTargetLocaleFor, type GuideLocale } from "./constants";
 
 // Fire-and-forget: callers must NOT await this, so the host's save request
 // returns immediately. Runs in the background against the same serverless
@@ -16,37 +16,40 @@ export function triggerBlockTranslation(params: {
   blockId: string;
   title: string | null;
   content: Record<string, unknown>;
+  sourceLocale: GuideLocale;
 }): void {
   const extracted = extractTranslatable(params.blockType, params.content, params.title);
   if (!extracted) return;
 
-  for (const targetLocale of TARGET_LOCALES) {
-    translateContent({
-      propertyId: params.propertyId,
-      blockType: params.blockType,
-      blockId: params.blockId,
-      sourceLocale: SOURCE_LOCALE,
-      targetLocale,
-      content: extracted,
-    }).catch((err) => {
-      console.error("[translations] background block translation failed", params.blockType, params.blockId, err);
-    });
-  }
+  const targetLocale = guideTargetLocaleFor(params.sourceLocale);
+  translateContent({
+    propertyId: params.propertyId,
+    blockType: params.blockType,
+    blockId: params.blockId,
+    sourceLocale: params.sourceLocale,
+    targetLocale,
+    content: extracted,
+  }).catch((err) => {
+    console.error("[translations] background block translation failed", params.blockType, params.blockId, err);
+  });
 }
 
-export function triggerWelcomeMessageTranslation(propertyId: string, welcomeMessage: string | null): void {
+export function triggerWelcomeMessageTranslation(
+  propertyId: string,
+  welcomeMessage: string | null,
+  sourceLocale: GuideLocale
+): void {
   if (!welcomeMessage?.trim()) return;
 
-  for (const targetLocale of TARGET_LOCALES) {
-    translateContent({
-      propertyId,
-      blockType: "welcome_message",
-      blockId: null,
-      sourceLocale: SOURCE_LOCALE,
-      targetLocale,
-      content: welcomeMessage,
-    }).catch((err) => {
-      console.error("[translations] background welcome_message translation failed", propertyId, err);
-    });
-  }
+  const targetLocale = guideTargetLocaleFor(sourceLocale);
+  translateContent({
+    propertyId,
+    blockType: "welcome_message",
+    blockId: null,
+    sourceLocale,
+    targetLocale,
+    content: welcomeMessage,
+  }).catch((err) => {
+    console.error("[translations] background welcome_message translation failed", propertyId, err);
+  });
 }

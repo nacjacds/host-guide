@@ -7,7 +7,7 @@ import { EmptyGuideState } from "@/components/guide/EmptyGuideState";
 import { GuideUnavailable } from "@/components/guide/GuideUnavailable";
 import { logAnalyticsEvent } from "@/lib/analytics";
 import { fetchPropertyTranslations, lookupTranslation } from "@/lib/translations/fetchTranslations";
-import { TARGET_LOCALES } from "@/lib/translations/constants";
+import { guideTargetLocaleFor, resolvePropertySourceLocale } from "@/lib/translations/constants";
 import { classifyGuideAvailability } from "@/lib/properties";
 
 export default async function GuidePage({
@@ -80,7 +80,11 @@ export default async function GuidePage({
   // See app/guide/[slug]/[type]/page.tsx — locale is guest-selected
   // client-side, so both the welcome message and (for custom blocks) tile
   // titles are pre-fetched here regardless of which language ends up shown.
-  const translations = await fetchPropertyTranslations(property.id, TARGET_LOCALES[0]);
+  // Target is whichever locale ISN'T this property's own source language
+  // (properties.language) — only two guide locales exist today, so there's
+  // exactly one target to pre-fetch.
+  const sourceLocale = resolvePropertySourceLocale(property.language);
+  const translations = await fetchPropertyTranslations(property.id, guideTargetLocaleFor(sourceLocale));
   const translatedWelcomeMessage = lookupTranslation<string>(
     translations,
     "welcome_message",

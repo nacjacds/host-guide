@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { blockImageStoragePath } from "@/lib/utils";
 import { triggerBlockTranslation } from "@/lib/translations/trigger";
+import { resolvePropertySourceLocale } from "@/lib/translations/constants";
 import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
 
 const blockImageSchema = z.object({
@@ -55,12 +56,19 @@ export async function PATCH(
   // Fire-and-forget: only re-translate when content/title actually changed,
   // not on a plain visibility/order toggle.
   if (parsed.data.content !== undefined || parsed.data.title !== undefined) {
+    const { data: property } = await supabase
+      .from("properties")
+      .select("language")
+      .eq("id", block.property_id)
+      .single();
+
     triggerBlockTranslation({
       propertyId: block.property_id,
       blockType: block.type,
       blockId: block.id,
       title: block.title,
       content: block.content,
+      sourceLocale: resolvePropertySourceLocale(property?.language),
     });
   }
 

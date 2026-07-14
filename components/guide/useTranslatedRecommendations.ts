@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useGuideLocale } from "./GuideLocaleProvider";
+import { RECOMMENDATIONS_SOURCE_LOCALE } from "@/lib/translations/constants";
 import type { TranslatablePayload } from "@/lib/translations/extract";
 
 // Mirrors useTranslatedBlock.ts's pattern for a whole recommendation
@@ -12,6 +13,13 @@ import type { TranslatablePayload } from "@/lib/translations/extract";
 // window (a real Claude call, ~3s) so callers can show a skeleton instead
 // of flashing the original-language text next to already-translated UI
 // chrome.
+//
+// Unlike useTranslatedBlock, this intentionally checks against the fixed
+// RECOMMENDATIONS_SOURCE_LOCALE ("es"), not the property's own
+// sourceLocale from GuideLocaleProvider — recommendation descriptions are
+// always Claude-written in Spanish regardless of properties.language (see
+// curateRecommendations in lib/claude.ts), so this stays correct even for
+// an English-authored property.
 export function useTranslatedRecommendations({
   category,
   recommendations,
@@ -27,7 +35,7 @@ export function useTranslatedRecommendations({
   const requestedFor = useRef<string | null>(null);
 
   useEffect(() => {
-    if (locale === "es" || translated || requestedFor.current === category) return;
+    if (locale === RECOMMENDATIONS_SOURCE_LOCALE || translated || requestedFor.current === category) return;
 
     const descriptions: Record<string, string> = {};
     for (const rec of recommendations) {
@@ -68,7 +76,7 @@ export function useTranslatedRecommendations({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale, translated, category]);
 
-  if (locale === "es") return { descriptions: {}, isLoading: false };
+  if (locale === RECOMMENDATIONS_SOURCE_LOCALE) return { descriptions: {}, isLoading: false };
 
   const effective = translated ?? fallback;
   const cached = effective?.fields?.descriptions;

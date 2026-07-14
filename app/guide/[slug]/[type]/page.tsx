@@ -17,7 +17,11 @@ import { BLOCK_ICONS } from "@/lib/guide-icons";
 import { RECOMMENDATION_CATEGORY_ICONS } from "@/lib/recommendations/constants";
 import { logAnalyticsEvent } from "@/lib/analytics";
 import { fetchPropertyTranslations, lookupTranslation } from "@/lib/translations/fetchTranslations";
-import { TARGET_LOCALES } from "@/lib/translations/constants";
+import {
+  guideTargetLocaleFor,
+  resolvePropertySourceLocale,
+  RECOMMENDATIONS_TARGET_LOCALE,
+} from "@/lib/translations/constants";
 import { classifyGuideAvailability } from "@/lib/properties";
 import type { TranslatablePayload } from "@/lib/translations/extract";
 import type { BlockType, PropertyRecommendationCategory } from "@/types";
@@ -90,8 +94,12 @@ export default async function GuideBlockPage({
 
     // Same pre-fetch-then-fallback pattern as every other block below —
     // see RecommendationCategoryPanel/useTranslatedRecommendations for the
-    // client-side locale switch and cache-miss fallback.
-    const translations = await fetchPropertyTranslations(property.id, TARGET_LOCALES[0]);
+    // client-side locale switch and cache-miss fallback. Recommendation
+    // descriptions are always Claude-written in Spanish regardless of
+    // properties.language (see curateRecommendations in lib/claude.ts), so
+    // this stays pinned to the fixed recommendations target, not the
+    // dynamic per-property one used for regular blocks below.
+    const translations = await fetchPropertyTranslations(property.id, RECOMMENDATIONS_TARGET_LOCALE);
     const translated = lookupTranslation<TranslatablePayload>(translations, category, null);
 
     return (
@@ -135,7 +143,9 @@ export default async function GuideBlockPage({
   // server can't know in advance which language will be shown — fetching
   // the (only) target locale's translations here means switching languages
   // client-side is instant, with zero AI call on the guest's critical path.
-  const translations = await fetchPropertyTranslations(property.id, TARGET_LOCALES[0]);
+  // Target is whichever locale isn't this property's own source language.
+  const sourceLocale = resolvePropertySourceLocale(property.language);
+  const translations = await fetchPropertyTranslations(property.id, guideTargetLocaleFor(sourceLocale));
 
   return (
     <div className="mx-auto max-w-2xl pb-24">

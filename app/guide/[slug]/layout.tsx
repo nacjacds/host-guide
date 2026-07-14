@@ -1,5 +1,6 @@
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { GuideLocaleProvider } from "@/components/guide/GuideLocaleProvider";
+import { resolvePropertySourceLocale } from "@/lib/translations/constants";
 import { GuideTransition } from "@/components/guide/GuideTransition";
 import { WhatsAppFab } from "@/components/guide/WhatsAppFab";
 import { BackToEditorFab } from "@/components/guide/BackToEditorFab";
@@ -23,7 +24,7 @@ export default async function GuideLayout({
   // every page route nested under this layout).
   const { data: property } = await supabase
     .from("properties")
-    .select("id, host_id, whatsapp_number, is_published, deleted_at")
+    .select("id, host_id, whatsapp_number, is_published, deleted_at, language")
     .eq("slug", slug)
     .single();
 
@@ -55,7 +56,10 @@ export default async function GuideLayout({
   }
 
   return (
-    <GuideLocaleProvider propertyId={property?.id ?? ""}>
+    <GuideLocaleProvider
+      propertyId={property?.id ?? ""}
+      sourceLocale={resolvePropertySourceLocale(property?.language)}
+    >
       <GuideTransition>{children}</GuideTransition>
       <GuideFooter />
       {isAvailable && <WhatsAppFab whatsappNumber={whatsappNumber} />}

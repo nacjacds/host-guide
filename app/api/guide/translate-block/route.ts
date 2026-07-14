@@ -3,7 +3,12 @@ import { z } from "zod";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { extractTranslatable, type TranslatablePayload } from "@/lib/translations/extract";
 import { translateContent } from "@/lib/translations/translateContent";
-import { isTargetLocale, SOURCE_LOCALE } from "@/lib/translations/constants";
+import {
+  isGuideLocale,
+  resolvePropertySourceLocale,
+  RECOMMENDATIONS_SOURCE_LOCALE,
+  RECOMMENDATIONS_TARGET_LOCALE,
+} from "@/lib/translations/constants";
 import {
   BASE_RECOMMENDATION_CATEGORIES,
   OPTIONAL_RECOMMENDATION_CATEGORIES,
@@ -59,16 +64,20 @@ export async function POST(request: NextRequest) {
   }
   const { propertyId, targetLocale, blockType, blockId, title, content } = parsed.data;
 
-  if (!isTargetLocale(targetLocale) || !withinLimit(getClientIp(request))) {
+  if (!isGuideLocale(targetLocale) || !withinLimit(getClientIp(request))) {
     return NextResponse.json({ translated: null });
   }
 
   // Public route — confirm this is a real, published property rather than
-  // letting it be used as an open "translate anything" proxy.
+  // letting it be used as an open "translate anything" proxy. Also carries
+  // properties.language, the authoritative source locale for this
+  // property's guide_blocks/welcome_message (see
+  // lib/translations/constants.ts's resolvePropertySourceLocale) — derived
+  // server-side rather than trusted from the client.
   const supabase = createServiceRoleClient();
   const { data: property } = await supabase
     .from("properties")
-    .select("id")
+    .select("id, language")
     .eq("id", propertyId)
     .eq("is_published", true)
     .maybeSingle();
@@ -76,16 +85,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ translated: null });
   }
 
+  const propertySourceLocale = resolvePropertySourceLocale(property.language);
+
   try {
     if (blockType === "welcome_message") {
-      if (typeof content !== "string" || !content.trim()) {
+      if (typeof content !== "string" || !content.trim() || targetLocale === propertySourceLocale) {
         return NextResponse.json({ translated: null });
       }
       const translated = await translateContent({
         propertyId,
         blockType: "welcome_message",
         blockId: null,
-        sourceLocale: SOURCE_LOCALE,
+        sourceLocale: propertySourceLocale,
         targetLocale,
         content,
       });
@@ -93,26 +104,35 @@ export async function POST(request: NextRequest) {
     }
 
     if (RECOMMENDATION_CATEGORIES.includes(blockType)) {
-      // The client already sends this pre-shaped as a TranslatablePayload
-      // ({ fields: { descriptions: { [recId]: description } } }) — a
-      // recommendation category has no single guide_blocks row to run
-      // through extractTranslatable, so this skips straight to
-      // translateContent, same as the welcome_message case above.
-      if (typeof content !== "object" || content === null) {
+      // Recommendation descriptions are always Claude-written in Spanish
+      // regardless of properties.language (see curateRecommendations in
+      // lib/claude.ts) — this branch intentionally stays pinned to the
+      // fixed recommendations source/target, not the dynamic per-property
+      // one used just above and below.
+      if (
+        typeof content !== "object" ||
+        content === null ||
+        targetLocale !== RECOMMENDATIONS_TARGET_LOCALE
+      ) {
         return NextResponse.json({ translated: null });
       }
       const translated = await translateContent({
         propertyId,
         blockType,
         blockId: null,
-        sourceLocale: SOURCE_LOCALE,
+        sourceLocale: RECOMMENDATIONS_SOURCE_LOCALE,
         targetLocale,
         content: content as unknown as TranslatablePayload,
       });
       return NextResponse.json({ translated });
     }
 
-    if (typeof content !== "object" || content === null || !blockId) {
+    if (
+      typeof content !== "object" ||
+      content === null ||
+      !blockId ||
+      targetLocale === propertySourceLocale
+    ) {
       return NextResponse.json({ translated: null });
     }
 
@@ -125,7 +145,7 @@ export async function POST(request: NextRequest) {
       propertyId,
       blockType,
       blockId,
-      sourceLocale: SOURCE_LOCALE,
+      sourceLocale: propertySourceLocale,
       targetLocale,
       content: extracted,
     });

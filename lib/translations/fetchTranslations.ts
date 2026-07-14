@@ -1,5 +1,5 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
-import type { TargetLocale } from "./constants";
+import type { GuideLocale } from "./constants";
 import { translationKey, type PropertyTranslations } from "./lookup";
 
 export type { PropertyTranslations } from "./lookup";
@@ -11,7 +11,7 @@ export { lookupTranslation } from "./lookup";
 // anonymous/guest requests.
 export async function fetchPropertyTranslations(
   propertyId: string,
-  targetLocale: TargetLocale
+  targetLocale: GuideLocale
 ): Promise<PropertyTranslations> {
   const supabase = createServiceRoleClient();
   const { data } = await supabase

@@ -23,7 +23,14 @@ export async function generateGuideContent(property: {
   name: string;
   address: string;
   hostTone: HostTone;
+  // Dashboard locale at generation time — content is written directly in
+  // this language rather than always generated in Spanish and translated
+  // afterward (see app/api/ai/generate-content/route.ts, which also
+  // persists this as properties.language so the translation pipeline
+  // knows the real source language of the resulting blocks).
+  locale: "es" | "en";
 }): Promise<GuideContent> {
+  const outputLanguage = property.locale === "en" ? "inglés" : "español";
   const prompt = `
 Eres un asistente que ayuda a propietarios de alojamientos turísticos a crear guías para sus huéspedes.
 
@@ -31,6 +38,9 @@ Genera el contenido para la guía del siguiente alojamiento:
 - Nombre: ${property.name}
 - Dirección: ${property.address}
 - Tono del anfitrión: ${property.hostTone === "friendly" ? "cercano, tuteo" : "formal, usted"}
+
+IMPORTANTE: Escribe TODO el contenido (mensaje de bienvenida, tips, normas, descripción del
+barrio) en ${outputLanguage}.
 
 Devuelve SOLO un JSON con esta estructura exacta:
 {
@@ -123,10 +133,12 @@ export interface CuratedRecommendation {
 // any factual data (name/address/rating/etc.), only choose, rank, and
 // describe from the list it's given.
 //
-// Deliberately always writes in Spanish (SOURCE_LOCALE, see
+// Deliberately always writes in Spanish (RECOMMENDATIONS_SOURCE_LOCALE, see
 // lib/translations/constants.ts) regardless of what language a guest is
-// viewing the guide in — same as every other piece of host-authored/
-// AI-generated guide content. A guest viewing in English gets these
+// viewing the guide in, or what properties.language/dashboard_locale the
+// host uses — unlike guide_blocks/welcome_message content, this doesn't
+// follow the host's dashboard locale (see generateGuideContent above). A
+// guest viewing in English gets these
 // descriptions translated on the fly via the same content_translations
 // cache the rest of the guide uses (see
 // lib/translations/translateRecommendations.ts), not by asking Claude to

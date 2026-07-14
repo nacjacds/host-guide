@@ -16,12 +16,12 @@ export function WelcomeMessage({
   hostAvatarUrl?: string | null;
   translated: string | null;
 }) {
-  const { locale, propertyId, t } = useGuideLocale();
+  const { locale, propertyId, sourceLocale, t } = useGuideLocale();
   const [fallback, setFallback] = useState<string | null>(null);
   const requested = useRef(false);
 
   useEffect(() => {
-    if (locale === "es" || translated || requested.current) return;
+    if (locale === sourceLocale || translated || requested.current) return;
     requested.current = true;
 
     let cancelled = false;
@@ -45,9 +45,9 @@ export function WelcomeMessage({
     return () => {
       cancelled = true;
     };
-  }, [locale, translated, propertyId, message]);
+  }, [locale, sourceLocale, translated, propertyId, message]);
 
-  const displayMessage = locale === "es" ? message : (translated ?? fallback ?? message);
+  const displayMessage = locale === sourceLocale ? message : (translated ?? fallback ?? message);
 
   return (
     <div className="mx-4 flex items-start gap-4 py-8 sm:mx-6 sm:py-10 lg:mx-8">

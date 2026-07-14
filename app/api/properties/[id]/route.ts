@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { triggerWelcomeMessageTranslation } from "@/lib/translations/trigger";
+import { resolvePropertySourceLocale } from "@/lib/translations/constants";
 import { geocodeAddress } from "@/lib/google-places";
 import { isValidPhoneNumber } from "@/lib/phone";
 import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
@@ -98,7 +99,11 @@ export async function PATCH(
   }
 
   if (parsed.data.welcome_message !== undefined) {
-    triggerWelcomeMessageTranslation(property.id, property.welcome_message);
+    triggerWelcomeMessageTranslation(
+      property.id,
+      property.welcome_message,
+      resolvePropertySourceLocale(property.language)
+    );
   }
 
   return NextResponse.json({ property });
