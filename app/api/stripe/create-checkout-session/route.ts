@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     let customerId = profile?.stripe_customer_id ?? null;
+    const appUrl = getAppUrl();
 
     if (!customerId) {
       const customer = await stripe.customers.create({
@@ -51,9 +52,35 @@ export async function POST(request: NextRequest) {
         .from("profiles")
         .update({ stripe_customer_id: customerId })
         .eq("id", user.id);
+    } else {
+      // Safeguard against creating a second, independent subscription.
+      // ChangePlanDialog only ever renders this checkout flow when the host
+      // has no active plan yet, but that check is client-side state that
+      // can go stale (double-submit, a second tab, a delayed webhook before
+      // the page refetches) — without this, Stripe would happily create a
+      // brand-new subscription alongside the existing one instead of
+      // replacing it (confirmed in the sandbox: two simultaneous active
+      // subscriptions on the same customer). Redirecting to the Customer
+      // Portal here mirrors exactly what the UI would have shown had its
+      // state not been stale — no error round-trip, no dead end.
+      const existingSubscriptions = await stripe.subscriptions.list({
+        customer: customerId,
+        status: "all",
+        limit: 10,
+      });
+      const hasBillableSubscription = existingSubscriptions.data.some(
+        (sub) => sub.status === "active" || sub.status === "trialing"
+      );
+
+      if (hasBillableSubscription) {
+        const portalSession = await stripe.billingPortal.sessions.create({
+          customer: customerId,
+          return_url: `${appUrl}/account`,
+        });
+        return NextResponse.json({ url: portalSession.url });
+      }
     }
 
-    const appUrl = getAppUrl();
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
