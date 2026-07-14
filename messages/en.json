@@ -214,6 +214,18 @@
         "portalError": "Couldn't open the billing portal",
         "downgradeError": "Couldn't switch to the Free plan",
         "downgradeSuccess": "You've switched to the Free plan"
+      },
+      "security": {
+        "title": "Change password",
+        "currentPasswordLabel": "Current password",
+        "newPasswordLabel": "New password",
+        "confirmPasswordLabel": "Confirm new password",
+        "submit": "Change password",
+        "saving": "Saving...",
+        "success": "Password updated",
+        "tooShort": "The new password must be at least 8 characters",
+        "mismatch": "Passwords don't match",
+        "wrongCurrentPassword": "The current password is incorrect"
       }
     },
     "editor": {
@@ -639,7 +651,9 @@
       "propertiesPage": {
         "title": "Properties",
         "backToPanel": "← Back to panel",
-        "allProperties": "All properties ({count})"
+        "allProperties": "All properties ({count})",
+        "viewFlat": "Table",
+        "viewGrouped": "By host"
       },
       "propertiesTable": {
         "empty": "No properties.",
@@ -665,7 +679,8 @@
         "purgeError": "Couldn't purge the property",
         "purged": "\"{name}\" permanently purged",
         "purging": "Purging...",
-        "purgePermanently": "Purge permanently"
+        "purgePermanently": "Purge permanently",
+        "hostGroupCount": "{count, plural, one {# property} other {# properties}}"
       },
       "tickets": {
         "typeLabels": {

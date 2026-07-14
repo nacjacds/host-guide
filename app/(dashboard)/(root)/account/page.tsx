@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AccountHeader } from "@/components/account/AccountHeader";
 import { CurrentPlanCard } from "@/components/account/CurrentPlanCard";
 import { ProfileForm } from "@/components/account/ProfileForm";
+import { ChangePasswordForm } from "@/components/account/ChangePasswordForm";
 import { DeleteAccountButton } from "@/components/account/DeleteAccountButton";
 import { getPlan } from "@/lib/plans";
 
@@ -33,6 +34,8 @@ export default async function AccountPage() {
       <CurrentPlanCard planId={plan.id} priceEurMonth={plan.priceEurMonth} />
 
       <ProfileForm profile={profile} email={user.email ?? ""} />
+
+      <ChangePasswordForm email={user.email ?? ""} />
 
       <DeleteAccountButton />
     </div>

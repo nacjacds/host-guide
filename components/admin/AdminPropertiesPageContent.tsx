@@ -1,15 +1,24 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AdminPropertiesTable,
   type AdminPropertyRow,
 } from "@/components/admin/AdminPropertiesTable";
+import { AdminPropertiesGroupedByHost } from "@/components/admin/AdminPropertiesGroupedByHost";
+
+type ViewMode = "flat" | "grouped";
 
 export function AdminPropertiesPageContent({ rows }: { rows: AdminPropertyRow[] }) {
   const t = useTranslations("dashboard.admin.propertiesPage");
+  // Lifted here (not inside either table) so switching views is instant and
+  // never remounts/resets whatever search or filter state a future version
+  // of this page adds above the tables.
+  const [view, setView] = useState<ViewMode>("flat");
 
   return (
     <>
@@ -21,11 +30,21 @@ export function AdminPropertiesPageContent({ rows }: { rows: AdminPropertyRow[] 
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
           <CardTitle>{t("allProperties", { count: rows.length })}</CardTitle>
+          <Tabs value={view} onValueChange={(value) => setView(value as ViewMode)}>
+            <TabsList variant="line">
+              <TabsTrigger value="flat">{t("viewFlat")}</TabsTrigger>
+              <TabsTrigger value="grouped">{t("viewGrouped")}</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </CardHeader>
         <CardContent>
-          <AdminPropertiesTable properties={rows} />
+          {view === "flat" ? (
+            <AdminPropertiesTable properties={rows} />
+          ) : (
+            <AdminPropertiesGroupedByHost properties={rows} />
+          )}
         </CardContent>
       </Card>
     </>

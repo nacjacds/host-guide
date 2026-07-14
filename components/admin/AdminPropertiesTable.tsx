@@ -24,6 +24,7 @@ export interface AdminPropertyRow {
   id: string;
   name: string;
   slug: string;
+  hostId: string;
   hostEmail: string;
   hostCurrentPlan: PlanId | null;
   isPublished: boolean;
@@ -109,7 +110,13 @@ function PurgeDialog({
   );
 }
 
-function PropertyRow({ property }: { property: AdminPropertyRow }) {
+function PropertyRow({
+  property,
+  hideHostColumn,
+}: {
+  property: AdminPropertyRow;
+  hideHostColumn: boolean;
+}) {
   const t = useTranslations("dashboard.admin.propertiesTable");
   const tPlans = useTranslations("dashboard.plans");
   const tCommon = useTranslations("dashboard.common");
@@ -147,7 +154,7 @@ function PropertyRow({ property }: { property: AdminPropertyRow }) {
         <p className="text-sm font-medium">{property.name}</p>
         <p className="text-xs text-muted-foreground">{property.slug}</p>
       </td>
-      <td className="py-2 pr-4 text-sm">{property.hostEmail}</td>
+      {!hideHostColumn && <td className="py-2 pr-4 text-sm">{property.hostEmail}</td>}
       <td className="py-2 pr-4 text-sm text-muted-foreground">
         {property.isPublished ? t("published") : t("draft")}
       </td>
@@ -215,7 +222,16 @@ function PropertyRow({ property }: { property: AdminPropertyRow }) {
   );
 }
 
-export function AdminPropertiesTable({ properties }: { properties: AdminPropertyRow[] }) {
+export function AdminPropertiesTable({
+  properties,
+  hideHostColumn = false,
+}: {
+  properties: AdminPropertyRow[];
+  // Set by the grouped-by-host view (AdminPropertiesGroupedByHost), which
+  // already shows the host as the group header — repeating it in every row
+  // would be redundant there.
+  hideHostColumn?: boolean;
+}) {
   const t = useTranslations("dashboard.admin.propertiesTable");
 
   if (properties.length === 0) {
@@ -228,7 +244,7 @@ export function AdminPropertiesTable({ properties }: { properties: AdminProperty
         <thead>
           <tr className="border-b border-border text-left text-xs text-muted-foreground">
             <th className="py-2 pr-4 font-medium">{t("property")}</th>
-            <th className="py-2 pr-4 font-medium">{t("host")}</th>
+            {!hideHostColumn && <th className="py-2 pr-4 font-medium">{t("host")}</th>}
             <th className="py-2 pr-4 font-medium">{t("status")}</th>
             <th className="py-2 pr-4 font-medium">{t("deletedColumn")}</th>
             <th className="py-2 font-medium">{t("actions")}</th>
@@ -236,7 +252,7 @@ export function AdminPropertiesTable({ properties }: { properties: AdminProperty
         </thead>
         <tbody>
           {properties.map((property) => (
-            <PropertyRow key={property.id} property={property} />
+            <PropertyRow key={property.id} property={property} hideHostColumn={hideHostColumn} />
           ))}
         </tbody>
       </table>

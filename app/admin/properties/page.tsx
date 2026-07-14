@@ -33,6 +33,7 @@ export default async function AdminPropertiesPage() {
     id: property.id,
     name: property.name,
     slug: property.slug,
+    hostId: property.host_id,
     hostEmail: emailById.get(property.host_id) ?? "—",
     hostCurrentPlan: planById.get(property.host_id) ?? null,
     isPublished: property.is_published,

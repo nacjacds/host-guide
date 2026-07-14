@@ -214,6 +214,18 @@
         "portalError": "No se pudo abrir el portal de facturación",
         "downgradeError": "No se pudo cambiar al plan Free",
         "downgradeSuccess": "Has cambiado al plan Free"
+      },
+      "security": {
+        "title": "Cambiar contraseña",
+        "currentPasswordLabel": "Contraseña actual",
+        "newPasswordLabel": "Nueva contraseña",
+        "confirmPasswordLabel": "Confirmar nueva contraseña",
+        "submit": "Cambiar contraseña",
+        "saving": "Guardando...",
+        "success": "Contraseña actualizada",
+        "tooShort": "La nueva contraseña debe tener al menos 8 caracteres",
+        "mismatch": "Las contraseñas no coinciden",
+        "wrongCurrentPassword": "La contraseña actual no es correcta"
       }
     },
     "editor": {
@@ -639,7 +651,9 @@
       "propertiesPage": {
         "title": "Propiedades",
         "backToPanel": "← Volver al panel",
-        "allProperties": "Todas las propiedades ({count})"
+        "allProperties": "Todas las propiedades ({count})",
+        "viewFlat": "Tabla",
+        "viewGrouped": "Por anfitrión"
       },
       "propertiesTable": {
         "empty": "No hay propiedades.",
@@ -665,7 +679,8 @@
         "purgeError": "No se pudo purgar la propiedad",
         "purged": "\"{name}\" purgada permanentemente",
         "purging": "Purgando...",
-        "purgePermanently": "Purgar definitivamente"
+        "purgePermanently": "Purgar definitivamente",
+        "hostGroupCount": "{count, plural, one {# propiedad} other {# propiedades}}"
       },
       "tickets": {
         "typeLabels": {
