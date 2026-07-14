@@ -1,8 +1,19 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PropertyEditor } from "@/components/editor/PropertyEditor";
-import { getRegenerationQuotaStatus } from "@/lib/recommendations/quota";
-import { nextPlanWithMoreRegenerations } from "@/lib/plans";
+import { getRecommendationRegenerationStatus } from "@/lib/recommendations/quota";
+import {
+  BASE_RECOMMENDATION_CATEGORIES,
+  OPTIONAL_RECOMMENDATION_CATEGORIES,
+} from "@/lib/recommendations/constants";
+import { cheapestPlanWithRecommendationRegenerations } from "@/lib/plans";
+import { isSuperAdmin } from "@/lib/admin";
+import type { PropertyRecommendationCategory } from "@/types";
+
+const ALL_CATEGORIES: PropertyRecommendationCategory[] = [
+  ...BASE_RECOMMENDATION_CATEGORIES,
+  ...OPTIONAL_RECOMMENDATION_CATEGORIES,
+];
 
 export default async function EditPropertyPage({
   params,
@@ -44,8 +55,15 @@ export default async function EditPropertyPage({
     .eq("id", property.host_id)
     .single();
 
-  const quotaStatus = await getRegenerationQuotaStatus(property.host_id, profile?.plan);
-  const upgradePlan = nextPlanWithMoreRegenerations(profile?.plan);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const quotaByCategory = await getRecommendationRegenerationStatus(id, ALL_CATEGORIES, {
+    planId: profile?.plan,
+    isSuperAdmin: isSuperAdmin(user?.email),
+  });
+  const upgradePlan = cheapestPlanWithRecommendationRegenerations(profile?.plan);
 
   return (
     <PropertyEditor
@@ -53,12 +71,7 @@ export default async function EditPropertyPage({
       initialBlocks={blocks ?? []}
       initialRecommendations={recommendations ?? []}
       categoriesDetected={recommendationMeta?.categories_detected ?? []}
-      recommendationQuota={{
-        limit: quotaStatus.limit,
-        used: quotaStatus.used,
-        remaining: quotaStatus.remaining,
-        resetDate: quotaStatus.resetDate.toISOString(),
-      }}
+      recommendationQuotaByCategory={quotaByCategory}
       upgradePlanLabel={upgradePlan?.label ?? null}
     />
   );

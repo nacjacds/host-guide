@@ -346,6 +346,7 @@ export interface Database {
           id: string;
           host_id: string;
           property_id: string;
+          category: PropertyRecommendationCategory | null;
           trigger_type: RegenerationTriggerType;
           triggered_at: string;
         };
@@ -353,6 +354,7 @@ export interface Database {
           id?: string;
           host_id: string;
           property_id: string;
+          category?: PropertyRecommendationCategory | null;
           trigger_type?: RegenerationTriggerType;
           triggered_at?: string;
         };
@@ -360,6 +362,7 @@ export interface Database {
           id?: string;
           host_id?: string;
           property_id?: string;
+          category?: PropertyRecommendationCategory | null;
           trigger_type?: RegenerationTriggerType;
           triggered_at?: string;
         };

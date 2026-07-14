@@ -22,17 +22,24 @@ export const OPTIONAL_RECOMMENDATION_CATEGORIES: PropertyRecommendationCategory[
 
 export const MAX_PLACES_PER_CATEGORY = 10;
 
-// Shared shape for the host's monthly manual-regeneration quota status —
-// used by the Settings page's global button and the Editor's per-section
-// "Generar con IA" buttons alike (see lib/recommendations/quota.ts).
-// resetDate is an ISO string, formatted client-side (lib/recommendations/format.ts)
-// so it reacts instantly to a dashboard locale switch instead of being baked
-// into Spanish/English at server-render time.
-export interface RecommendationQuota {
-  limit: number;
-  used: number;
-  remaining: number;
-  resetDate: string;
+// Per-category, per-property manual-regeneration status (see
+// lib/recommendations/quota.ts) — one of these per category, not a single
+// global count. nextAvailableAt is an ISO string, formatted client-side
+// (lib/recommendations/format.ts) so it reacts instantly to a dashboard
+// locale switch instead of being baked into Spanish/English at
+// server-render time.
+export interface CategoryRegenerationStatus {
+  available: boolean;
+  // True when this category has never had any recommendations generated
+  // for this property before — that first generation is always free and
+  // uncounted, regardless of plan (see quota.ts).
+  isFirstGeneration: boolean;
+  // Only set when available is false: "plan" means the host's plan has no
+  // regeneration access at all (Free); "used_this_month" means this exact
+  // category already consumed its one regeneration this calendar month.
+  blockedReason: "plan" | "used_this_month" | null;
+  // ISO string, only set when blockedReason === "used_this_month".
+  nextAvailableAt: string | null;
 }
 
 export const RECOMMENDATION_CATEGORY_ICONS: Record<PropertyRecommendationCategory, LucideIcon> = {

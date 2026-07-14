@@ -377,8 +377,6 @@
       "recommendations": {
         "title": "Recomendaciones locales",
         "walkingMinutes": "{count} min andando",
-        "remaining": "Te quedan {remaining} de {limit} regeneraciones este mes · Se reinician el {resetDate}",
-        "none": "Sin generaciones disponibles este mes · Se reinician el {resetDate}",
         "upgradePlan": "Mejorar plan",
         "generateWithAi": "Generar con IA",
         "generating": "Generando...",
@@ -414,7 +412,10 @@
           "nightlife": "Ocio nocturno",
           "beaches": "Playas",
           "nature": "Naturaleza"
-        }
+        },
+        "regenerationAvailable": "Disponible",
+        "regenerationRequiresPlan": "Regenerar requiere un plan de pago",
+        "regenerationUsedThisMonth": "Ya regenerada este mes · disponible el {date}"
       },
       "blocks": {
         "wifi": {

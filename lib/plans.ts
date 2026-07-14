@@ -8,11 +8,14 @@ export interface PlanDefinition {
   aiEnabled: boolean;
   analyticsEnabled: boolean;
   whiteLabel: boolean;
-  // Monthly cap on manual "Regenerar recomendaciones" clicks, shared across
-  // every property the host owns (not per-property) — protects against
-  // uncontrolled Google Places + Claude spend. Scheduled/cron regenerations
-  // and any future initial-generation-on-creation are exempt.
-  monthlyRecommendationRegenerations: number;
+  // Whether this plan can manually regenerate AI recommendations at all.
+  // When true, each category (Qué visitar, Dónde comer, ...) can be
+  // regenerated at most once per calendar month, per property — see
+  // lib/recommendations/quota.ts. A category's very first generation
+  // (no existing content yet) is exempt from this and always allowed,
+  // regardless of plan. Every paid tier gets the same cadence — there is
+  // no higher-tier multiplier, unlike the old shared monthly pool.
+  recommendationRegenerationsEnabled: boolean;
 }
 
 export const PLANS: Record<PlanId, PlanDefinition> = {
@@ -24,7 +27,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     aiEnabled: false,
     analyticsEnabled: false,
     whiteLabel: false,
-    monthlyRecommendationRegenerations: 1,
+    recommendationRegenerationsEnabled: false,
   },
   starter: {
     id: "starter",
@@ -34,7 +37,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     aiEnabled: true,
     analyticsEnabled: false,
     whiteLabel: false,
-    monthlyRecommendationRegenerations: 3,
+    recommendationRegenerationsEnabled: true,
   },
   pro: {
     id: "pro",
@@ -44,7 +47,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     aiEnabled: true,
     analyticsEnabled: true,
     whiteLabel: false,
-    monthlyRecommendationRegenerations: 10,
+    recommendationRegenerationsEnabled: true,
   },
   agency: {
     id: "agency",
@@ -54,7 +57,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     aiEnabled: true,
     analyticsEnabled: true,
     whiteLabel: true,
-    monthlyRecommendationRegenerations: 25,
+    recommendationRegenerationsEnabled: true,
   },
 };
 
@@ -68,20 +71,18 @@ export function planPropertyLimit(planId: string | null | undefined): number {
   return getPlan(planId).maxProperties;
 }
 
-export function planRecommendationRegenerationLimit(planId: string | null | undefined): number {
-  return getPlan(planId).monthlyRecommendationRegenerations;
+export function planAllowsRecommendationRegeneration(planId: string | null | undefined): boolean {
+  return getPlan(planId).recommendationRegenerationsEnabled;
 }
 
-// The next plan tier with a higher manual-regeneration quota than the
-// current one, if any — powers the "Mejorar plan" link shown when a host
-// hits their monthly limit.
-export function nextPlanWithMoreRegenerations(planId: string | null | undefined): PlanDefinition | null {
-  const current = getPlan(planId);
-  const currentIndex = PLAN_ORDER.indexOf(current.id);
-  for (const id of PLAN_ORDER.slice(currentIndex + 1)) {
-    if (PLANS[id].monthlyRecommendationRegenerations > current.monthlyRecommendationRegenerations) {
-      return PLANS[id];
-    }
-  }
-  return null;
+// The cheapest plan that unlocks manual recommendation regeneration —
+// powers the "Mejorar plan" link shown when a Free host hits the gate.
+// Every paid tier grants the same per-category cadence, so this is only
+// ever meaningful coming from Free; returns null for any plan that
+// already has access.
+export function cheapestPlanWithRecommendationRegenerations(
+  planId: string | null | undefined
+): PlanDefinition | null {
+  if (getPlan(planId).recommendationRegenerationsEnabled) return null;
+  return PLANS.starter;
 }

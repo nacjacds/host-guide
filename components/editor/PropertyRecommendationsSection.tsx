@@ -18,7 +18,7 @@ import {
   BASE_RECOMMENDATION_CATEGORIES,
   OPTIONAL_RECOMMENDATION_CATEGORIES,
   RECOMMENDATION_CATEGORY_ICONS,
-  type RecommendationQuota,
+  type CategoryRegenerationStatus,
 } from "@/lib/recommendations/constants";
 import { formatResetDate } from "@/lib/recommendations/format";
 import type { PropertyRecommendation, PropertyRecommendationCategory } from "@/types";
@@ -143,13 +143,13 @@ export function PropertyRecommendationsSection({
   propertyId,
   initialRecommendations,
   categoriesDetected,
-  initialQuota,
+  initialQuotaByCategory,
   upgradePlanLabel,
 }: {
   propertyId: string;
   initialRecommendations: PropertyRecommendation[];
   categoriesDetected: PropertyRecommendationCategory[];
-  initialQuota: RecommendationQuota;
+  initialQuotaByCategory: Record<string, CategoryRegenerationStatus>;
   upgradePlanLabel: string | null;
 }) {
   const t = useTranslations("dashboard.editor.recommendations");
@@ -163,9 +163,9 @@ export function PropertyRecommendationsSection({
   const [editEnOverrideEnabled, setEditEnOverrideEnabled] = useState(false);
   const [editDescriptionEn, setEditDescriptionEn] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
-  const [quota, setQuota] = useState(initialQuota);
+  const [quotaByCategory, setQuotaByCategory] =
+    useState<Record<string, CategoryRegenerationStatus>>(initialQuotaByCategory);
   const { locale } = useLocale();
-  const resetDateLabel = formatResetDate(new Date(quota.resetDate), locale);
   const [generatingCategory, setGeneratingCategory] = useState<PropertyRecommendationCategory | null>(
     null
   );
@@ -290,8 +290,9 @@ export function PropertyRecommendationsSection({
         return;
       }
 
-      const { recommendations: newForCategory } = (await response.json()) as {
+      const { recommendations: newForCategory, quotaStatus } = (await response.json()) as {
         recommendations: PropertyRecommendation[];
+        quotaStatus: Record<string, CategoryRegenerationStatus>;
       };
 
       // Replace only this category's ai_curated rows — everything else
@@ -300,11 +301,12 @@ export function PropertyRecommendationsSection({
         ...prev.filter((r) => !(r.category === category && r.source === "ai_curated")),
         ...newForCategory,
       ]);
-      setQuota((prev) => ({
-        ...prev,
-        used: prev.used + 1,
-        remaining: Math.max(0, prev.remaining - 1),
-      }));
+      // Server-authoritative: reflects super-admin bypass and the
+      // first-generation exemption correctly without the client having to
+      // replicate that logic.
+      if (quotaStatus?.[category]) {
+        setQuotaByCategory((prev) => ({ ...prev, [category]: quotaStatus[category] }));
+      }
 
       if (newForCategory.length === 0) {
         toast.error(t("noRealPlacesFound"));
@@ -336,38 +338,23 @@ export function PropertyRecommendationsSection({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-medium text-muted-foreground">{t("title")}</h2>
-        <span className="text-xs text-muted-foreground">
-          {quota.remaining > 0 ? (
-            t("remaining", {
-              remaining: quota.remaining,
-              limit: quota.limit,
-              resetDate: resetDateLabel,
-            })
-          ) : (
-            <>
-              {t("none", { resetDate: resetDateLabel })}
-              {upgradePlanLabel && (
-                <>
-                  {" · "}
-                  <Link
-                    href="/account"
-                    className="text-primary underline underline-offset-2 hover:no-underline"
-                  >
-                    {t("upgradePlan")}
-                  </Link>
-                </>
-              )}
-            </>
-          )}
-        </span>
-      </div>
+      <h2 className="text-sm font-medium text-muted-foreground">{t("title")}</h2>
       {visibleCategories.map((category) => {
         const items = recommendations.filter((r) => r.category === category);
         const Icon = RECOMMENDATION_CATEGORY_ICONS[category];
         const generating = generatingCategory === category;
         const collapsed = collapsedCategories.has(category);
+        const status = quotaByCategory[category];
+        const resetLabel = status?.nextAvailableAt
+          ? formatResetDate(new Date(status.nextAvailableAt), locale)
+          : null;
+        const statusText = !status
+          ? null
+          : status.available
+            ? t("regenerationAvailable")
+            : status.blockedReason === "plan"
+              ? t("regenerationRequiresPlan")
+              : t("regenerationUsedThisMonth", { date: resetLabel ?? "" });
         return (
           <Card key={category} className="overflow-visible">
             <CardHeader>
@@ -396,17 +383,35 @@ export function PropertyRecommendationsSection({
                   variant="outline"
                   size="sm"
                   onClick={() => handleGenerate(category)}
-                  disabled={generatingCategory !== null || quota.remaining <= 0}
-                  title={
-                    quota.remaining <= 0
-                      ? t("none", { resetDate: resetDateLabel })
-                      : undefined
-                  }
+                  disabled={generatingCategory !== null || !status?.available}
+                  title={statusText ?? undefined}
                 >
                   <Sparkles size={14} strokeWidth={1.5} />
                   {generating ? t("generating") : t("generateWithAi")}
                 </Button>
               </CardTitle>
+              {statusText && (
+                <p className="text-xs text-muted-foreground">
+                  {status?.available || status?.blockedReason !== "plan" ? (
+                    statusText
+                  ) : (
+                    <>
+                      {statusText}
+                      {upgradePlanLabel && (
+                        <>
+                          {" · "}
+                          <Link
+                            href="/account"
+                            className="text-primary underline underline-offset-2 hover:no-underline"
+                          >
+                            {t("upgradePlan")}
+                          </Link>
+                        </>
+                      )}
+                    </>
+                  )}
+                </p>
+              )}
             </CardHeader>
             {collapsed ? null : (
             <CardContent className="space-y-3">

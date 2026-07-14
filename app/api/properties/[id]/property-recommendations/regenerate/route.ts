@@ -3,11 +3,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { generatePropertyRecommendations } from "@/lib/recommendations/generateRecommendations";
-import { getRegenerationQuotaStatus } from "@/lib/recommendations/quota";
+import { getRecommendationRegenerationStatus } from "@/lib/recommendations/quota";
+import {
+  BASE_RECOMMENDATION_CATEGORIES,
+  OPTIONAL_RECOMMENDATION_CATEGORIES,
+} from "@/lib/recommendations/constants";
 import { formatResetDate } from "@/lib/recommendations/format";
 import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
 import { getApiLocale } from "@/lib/apiLocale";
 import { pick } from "@/lib/apiMessages";
+import { isSuperAdmin } from "@/lib/admin";
+import type { PropertyRecommendationCategory } from "@/types";
+
+const ALL_CATEGORIES: PropertyRecommendationCategory[] = [
+  ...BASE_RECOMMENDATION_CATEGORIES,
+  ...OPTIONAL_RECOMMENDATION_CATEGORIES,
+];
 
 const regenerateSchema = z.object({
   // Omitted = regenerate every category (Settings' global button); present
@@ -65,19 +76,31 @@ export async function POST(
     return notFoundResponse(request, supabase, user.id, "property");
   }
 
-  const quota = await getRegenerationQuotaStatus(user.id, profile?.plan);
-  if (quota.remaining <= 0) {
+  const categoriesToProcess = parsed.data.category ? [parsed.data.category] : ALL_CATEGORIES;
+  const admin = isSuperAdmin(user.email);
+
+  const statusBefore = await getRecommendationRegenerationStatus(propertyId, categoriesToProcess, {
+    planId: profile?.plan,
+    isSuperAdmin: admin,
+  });
+
+  const blocked = categoriesToProcess.find((category) => !statusBefore[category].available);
+  if (blocked) {
+    const reason = statusBefore[blocked].blockedReason;
     const locale = await getApiLocale(request, supabase, user.id);
-    return NextResponse.json(
-      {
-        error: pick(
-          locale,
-          `Has usado tus ${quota.limit} regeneraciones manuales de este mes. Se restablecen el ${formatResetDate(quota.resetDate, locale)}.`,
-          `You've used your ${quota.limit} manual regenerations for this month. They reset on ${formatResetDate(quota.resetDate, locale)}.`
-        ),
-      },
-      { status: 429 }
-    );
+    const message =
+      reason === "plan"
+        ? pick(
+            locale,
+            "Regenerar recomendaciones requiere un plan de pago",
+            "Regenerating recommendations requires a paid plan"
+          )
+        : pick(
+            locale,
+            `Ya has regenerado esta categoría este mes. Vuelve a estar disponible el ${formatResetDate(new Date(statusBefore[blocked].nextAvailableAt!), locale)}.`,
+            `You've already regenerated this category this month. It'll be available again on ${formatResetDate(new Date(statusBefore[blocked].nextAvailableAt!), locale)}.`
+          );
+    return NextResponse.json({ error: message }, { status: 429 });
   }
 
   try {
@@ -85,14 +108,33 @@ export async function POST(
       category: parsed.data.category,
     });
 
-    const serviceClient = createServiceRoleClient();
-    await serviceClient.from("recommendation_regeneration_usage").insert({
-      host_id: user.id,
-      property_id: propertyId,
-      trigger_type: "manual",
+    // Only a genuine regeneration (the category already had content before
+    // this run) counts as usage — a category's first-ever generation is
+    // always free, and super admins never consume or gate on this at all
+    // (see getRecommendationRegenerationStatus).
+    if (!admin) {
+      const categoriesToRecord = categoriesToProcess.filter(
+        (category) => !statusBefore[category].isFirstGeneration
+      );
+      if (categoriesToRecord.length > 0) {
+        const serviceClient = createServiceRoleClient();
+        await serviceClient.from("recommendation_regeneration_usage").insert(
+          categoriesToRecord.map((category) => ({
+            host_id: user.id,
+            property_id: propertyId,
+            category,
+            trigger_type: "manual" as const,
+          }))
+        );
+      }
+    }
+
+    const quotaStatus = await getRecommendationRegenerationStatus(propertyId, categoriesToProcess, {
+      planId: profile?.plan,
+      isSuperAdmin: admin,
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({ ...result, quotaStatus });
   } catch (err) {
     // TEMPORARY diagnostic logging — the catch block previously logged
     // nothing server-side, only returning err.message to the client.
