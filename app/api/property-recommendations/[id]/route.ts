@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { triggerRecommendationsTranslation } from "@/lib/translations/translateRecommendations";
 import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
 import { getApiLocale } from "@/lib/apiLocale";
-import { commonApiMessages } from "@/lib/apiMessages";
+import { commonApiMessages, pick } from "@/lib/apiMessages";
+import { isValidMapsUrl } from "@/lib/mapsUrl";
 
 const editSchema = z.object({
   name: z.string().trim().min(1).max(200),
@@ -14,6 +15,16 @@ const editSchema = z.object({
   // (or left the text empty), revert to automatic translation. A non-empty
   // string = manual override, protected from future auto-translation.
   description_en_override: z.string().trim().max(600).nullable().optional(),
+  // Empty string or omitted = leave the existing maps_url (auto-generated
+  // from Google Places for ai_curated rows, or a previous manual override)
+  // untouched. Only a non-empty value overwrites it — this field can never
+  // clear maps_url back to null.
+  maps_url: z
+    .string()
+    .trim()
+    .max(2048)
+    .optional()
+    .refine((value) => !value || isValidMapsUrl(value), { message: "invalid_maps_url" }),
 });
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -31,7 +42,17 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const parsed = editSchema.safeParse(body);
   if (!parsed.success) {
     const locale = await getApiLocale(request, supabase, user.id);
-    return NextResponse.json({ error: commonApiMessages.invalidData[locale] }, { status: 400 });
+    const isInvalidMapsUrl = parsed.error.issues.some(
+      (issue) => issue.message === "invalid_maps_url"
+    );
+    return NextResponse.json(
+      {
+        error: isInvalidMapsUrl
+          ? pick(locale, "El link de Google Maps no es una URL válida", "The Google Maps link isn't a valid URL")
+          : commonApiMessages.invalidData[locale],
+      },
+      { status: 400 }
+    );
   }
 
   // RLS (property_recommendations_select_own) already restricts this to
@@ -62,6 +83,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       ...(parsed.data.description_en_override !== undefined
         ? { description_en_override: parsed.data.description_en_override || null }
         : {}),
+      // Empty/omitted -> leave the existing maps_url untouched (see schema
+      // comment above) — only ever overwritten by an explicit non-empty value.
+      ...(parsed.data.maps_url ? { maps_url: parsed.data.maps_url } : {}),
       source: nextSource,
     })
     .eq("id", id)

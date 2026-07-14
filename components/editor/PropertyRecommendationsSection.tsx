@@ -21,6 +21,7 @@ import {
   type CategoryRegenerationStatus,
 } from "@/lib/recommendations/constants";
 import { formatResetDate } from "@/lib/recommendations/format";
+import { isValidMapsUrl } from "@/lib/mapsUrl";
 import type { PropertyRecommendation, PropertyRecommendationCategory } from "@/types";
 
 const ALL_CATEGORIES = [...BASE_RECOMMENDATION_CATEGORIES, ...OPTIONAL_RECOMMENDATION_CATEGORIES];
@@ -160,6 +161,7 @@ export function PropertyRecommendationsSection({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [editMapsUrl, setEditMapsUrl] = useState("");
   const [editEnOverrideEnabled, setEditEnOverrideEnabled] = useState(false);
   const [editDescriptionEn, setEditDescriptionEn] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
@@ -225,6 +227,11 @@ export function PropertyRecommendationsSection({
     setEditingId(rec.id);
     setEditName(rec.name);
     setEditDescription(rec.description ?? "");
+    // Starts empty rather than pre-filled with rec.maps_url — leaving it
+    // empty means "keep the existing link" (shown as a placeholder below),
+    // so there's no ambiguity between "never touched" and "host cleared a
+    // pre-filled value on purpose".
+    setEditMapsUrl("");
     setEditEnOverrideEnabled(!!rec.description_en_override);
     setEditDescriptionEn(rec.description_en_override ?? "");
   }
@@ -233,6 +240,7 @@ export function PropertyRecommendationsSection({
     setEditingId(null);
     setEditName("");
     setEditDescription("");
+    setEditMapsUrl("");
     setEditEnOverrideEnabled(false);
     setEditDescriptionEn("");
   }
@@ -240,6 +248,11 @@ export function PropertyRecommendationsSection({
   async function handleSaveEdit(id: string) {
     if (!editName.trim()) {
       toast.error(t("nameEmpty"));
+      return;
+    }
+    const trimmedMapsUrl = editMapsUrl.trim();
+    if (trimmedMapsUrl && !isValidMapsUrl(trimmedMapsUrl)) {
+      toast.error(t("mapsUrlInvalid"));
       return;
     }
     setSavingEdit(true);
@@ -254,6 +267,9 @@ export function PropertyRecommendationsSection({
           // revert to automatic translation.
           description_en_override:
             editEnOverrideEnabled && editDescriptionEn.trim() ? editDescriptionEn.trim() : null,
+          // Omitted (undefined, dropped by JSON.stringify) when empty —
+          // leaves the existing maps_url untouched server-side.
+          maps_url: trimmedMapsUrl || undefined,
         }),
       });
       if (!response.ok) {
@@ -443,6 +459,19 @@ export function PropertyRecommendationsSection({
                             onChange={(e) => setEditDescription(e.target.value)}
                             disabled={savingEdit}
                             rows={2}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor={`edit-maps-url-${rec.id}`} className="text-xs">
+                            {t("mapsUrlLabel")}
+                          </Label>
+                          <Input
+                            id={`edit-maps-url-${rec.id}`}
+                            type="url"
+                            value={editMapsUrl}
+                            onChange={(e) => setEditMapsUrl(e.target.value)}
+                            disabled={savingEdit}
+                            placeholder={rec.maps_url ?? t("mapsUrlPlaceholder")}
                           />
                         </div>
                         <div className="flex items-center justify-between gap-2 rounded-md border border-border bg-muted/30 px-2.5 py-2">

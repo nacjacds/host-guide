@@ -415,7 +415,10 @@
         },
         "regenerationAvailable": "Disponible",
         "regenerationRequiresPlan": "Regenerar requiere un plan de pago",
-        "regenerationUsedThisMonth": "Ya regenerada este mes · disponible el {date}"
+        "regenerationUsedThisMonth": "Ya regenerada este mes · disponible el {date}",
+        "mapsUrlLabel": "Link de Google Maps",
+        "mapsUrlPlaceholder": "Se genera automáticamente — escribe aquí para sobrescribir",
+        "mapsUrlInvalid": "Introduce una URL válida"
       },
       "blocks": {
         "wifi": {
