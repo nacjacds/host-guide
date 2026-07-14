@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -196,27 +197,35 @@ function PropertyRow({
         )}
       </td>
       <td className="py-2 text-sm">
-        {property.deletedAt && (
-          <div className="flex flex-wrap gap-1.5">
-            <Button variant="outline" size="sm" onClick={handleRestore} disabled={restoring}>
-              {restoring ? t("restoring") : t("restore")}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-              onClick={() => setPurgeOpen(true)}
-            >
-              {t("purge")}
-            </Button>
-            <PurgeDialog
-              property={property}
-              open={purgeOpen}
-              onOpenChange={setPurgeOpen}
-              onPurged={() => router.refresh()}
-            />
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <Link
+            href={`/guide/${property.slug}`}
+            className="font-medium text-primary underline-offset-2 hover:underline"
+          >
+            {t("viewProperty")}
+          </Link>
+          {property.deletedAt && (
+            <>
+              <Button variant="outline" size="sm" onClick={handleRestore} disabled={restoring}>
+                {restoring ? t("restoring") : t("restore")}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                onClick={() => setPurgeOpen(true)}
+              >
+                {t("purge")}
+              </Button>
+              <PurgeDialog
+                property={property}
+                open={purgeOpen}
+                onOpenChange={setPurgeOpen}
+                onPurged={() => router.refresh()}
+              />
+            </>
+          )}
+        </div>
       </td>
     </tr>
   );

@@ -1,10 +1,14 @@
+import { cookies } from "next/headers";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { GuideLocaleProvider } from "@/components/guide/GuideLocaleProvider";
 import { resolvePropertySourceLocale } from "@/lib/translations/constants";
 import { GuideTransition } from "@/components/guide/GuideTransition";
 import { WhatsAppFab } from "@/components/guide/WhatsAppFab";
 import { BackToEditorFab } from "@/components/guide/BackToEditorFab";
+import { AdminReturnFab } from "@/components/guide/AdminReturnFab";
 import { GuideFooter } from "@/components/guide/GuideFooter";
+import { isSuperAdmin } from "@/lib/admin";
+import { decodeImpersonationToken, IMPERSONATION_COOKIE_NAME } from "@/lib/impersonation";
 
 export default async function GuideLayout({
   children,
@@ -41,6 +45,23 @@ export default async function GuideLayout({
   } = await supabase.auth.getUser();
   const isOwner = Boolean(user && property && user.id === property.host_id);
 
+  // A super admin browsing a guide directly from /admin/properties' "Ver
+  // propiedad" link (not the host, and not currently impersonating anyone)
+  // gets "Volver a admin" instead of "Back to editor". Impersonation
+  // itself swaps the session to the host's own (see lib/impersonation.ts),
+  // so isOwner above already covers "admin impersonating this exact
+  // property's host" correctly; the impersonation-cookie check here is
+  // defense-in-depth — in practice a session can never be both the real
+  // super admin's and mid-impersonation at once, since
+  // /api/admin/impersonate blocks impersonating your own account. Mutually
+  // exclusive with isOwner by construction, so the two FABs never render
+  // together.
+  const cookieStore = await cookies();
+  const isImpersonating = Boolean(
+    decodeImpersonationToken(cookieStore.get(IMPERSONATION_COOKIE_NAME)?.value ?? "")
+  );
+  const isDirectAdminView = !isOwner && !isImpersonating && isSuperAdmin(user?.email);
+
   // Fall back to the host's personal phone (profiles.phone) when the
   // property itself has no WhatsApp number configured, so a host only has
   // to fill it in once in /account to cover every property. profiles has no
@@ -64,6 +85,7 @@ export default async function GuideLayout({
       <GuideFooter />
       {isAvailable && <WhatsAppFab whatsappNumber={whatsappNumber} />}
       {isOwner && <BackToEditorFab />}
+      {isDirectAdminView && <AdminReturnFab returnTo="/admin/properties" />}
     </GuideLocaleProvider>
   );
 }

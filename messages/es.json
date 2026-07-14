@@ -680,7 +680,8 @@
         "purged": "\"{name}\" purgada permanentemente",
         "purging": "Purgando...",
         "purgePermanently": "Purgar definitivamente",
-        "hostGroupCount": "{count, plural, one {# propiedad} other {# propiedades}}"
+        "hostGroupCount": "{count, plural, one {# propiedad} other {# propiedades}}",
+        "viewProperty": "Ver propiedad"
       },
       "tickets": {
         "typeLabels": {
