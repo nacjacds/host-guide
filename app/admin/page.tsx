@@ -82,6 +82,7 @@ export default async function AdminPage() {
         totalDraft={totalDraft}
         hosts={hosts}
         ticketRows={ticketRows}
+        currentUserId={user?.id ?? ""}
       />
     </div>
   );

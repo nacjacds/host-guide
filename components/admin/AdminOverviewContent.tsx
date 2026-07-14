@@ -13,6 +13,7 @@ export function AdminOverviewContent({
   totalDraft,
   hosts,
   ticketRows,
+  currentUserId,
 }: {
   totalHosts: number;
   totalProperties: number;
@@ -20,6 +21,7 @@ export function AdminOverviewContent({
   totalDraft: number;
   hosts: AdminHostRow[];
   ticketRows: AdminTicketRow[];
+  currentUserId: string;
 }) {
   const t = useTranslations("dashboard.admin");
 
@@ -83,7 +85,7 @@ export function AdminOverviewContent({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <AdminHostsTable hosts={hosts} />
+          <AdminHostsTable hosts={hosts} currentUserId={currentUserId} />
         </CardContent>
       </Card>
 

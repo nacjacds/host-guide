@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
@@ -25,7 +26,7 @@ export interface AdminHostRow {
   createdAt: string;
 }
 
-function HostRow({ host }: { host: AdminHostRow }) {
+function HostRow({ host, isCurrentUser }: { host: AdminHostRow; isCurrentUser: boolean }) {
   const t = useTranslations("dashboard.admin.hostsTable");
   const tPlans = useTranslations("dashboard.plans");
   const tCommon = useTranslations("dashboard.common");
@@ -113,22 +114,39 @@ function HostRow({ host }: { host: AdminHostRow }) {
         {formatLocalizedDate(host.createdAt, locale)}
       </td>
       <td className="py-2 text-sm">
-        {!isSuperAdmin(host.email) && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleImpersonate}
-            disabled={impersonating}
-          >
-            {impersonating ? t("entering") : t("enterAsUser")}
+        {isCurrentUser ? (
+          // Own row: go straight to the real dashboard with the current
+          // session as-is — impersonation is for viewing as a DIFFERENT
+          // host, and /api/admin/impersonate itself already refuses to
+          // impersonate your own account, so this is a plain navigation,
+          // no cookies or banner involved.
+          <Button variant="outline" size="sm" render={<Link href="/dashboard" />}>
+            {t("goToMyDashboard")}
           </Button>
+        ) : (
+          !isSuperAdmin(host.email) && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleImpersonate}
+              disabled={impersonating}
+            >
+              {impersonating ? t("entering") : t("enterAsUser")}
+            </Button>
+          )
         )}
       </td>
     </tr>
   );
 }
 
-export function AdminHostsTable({ hosts }: { hosts: AdminHostRow[] }) {
+export function AdminHostsTable({
+  hosts,
+  currentUserId,
+}: {
+  hosts: AdminHostRow[];
+  currentUserId: string;
+}) {
   const t = useTranslations("dashboard.admin.hostsTable");
 
   if (hosts.length === 0) {
@@ -149,7 +167,7 @@ export function AdminHostsTable({ hosts }: { hosts: AdminHostRow[] }) {
         </thead>
         <tbody>
           {hosts.map((host) => (
-            <HostRow key={host.id} host={host} />
+            <HostRow key={host.id} host={host} isCurrentUser={host.id === currentUserId} />
           ))}
         </tbody>
       </table>

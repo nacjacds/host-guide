@@ -650,7 +650,8 @@
         "impersonateConfirm": "Log in as {email}? You'll see their dashboard exactly as they do, until you click \"Back to admin\".",
         "impersonateError": "Couldn't impersonate this user",
         "entering": "Entering...",
-        "enterAsUser": "Log in as this user"
+        "enterAsUser": "Log in as this user",
+        "goToMyDashboard": "Go to my dashboard"
       },
       "propertiesPage": {
         "title": "Properties",

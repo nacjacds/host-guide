@@ -650,7 +650,8 @@
         "impersonateConfirm": "¿Entrar como {email}? Verás su panel exactamente como lo ve él, hasta que pulses \"Volver a admin\".",
         "impersonateError": "No se pudo impersonar a este usuario",
         "entering": "Entrando...",
-        "enterAsUser": "Entrar como este usuario"
+        "enterAsUser": "Entrar como este usuario",
+        "goToMyDashboard": "Ir a mi panel"
       },
       "propertiesPage": {
         "title": "Propiedades",
