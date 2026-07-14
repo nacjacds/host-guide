@@ -13,7 +13,7 @@ import { SidebarNav } from "@/components/dashboard/SidebarNav";
 import { DashboardLocaleSwitcher } from "@/components/dashboard/DashboardLocaleSwitcher";
 import { EmailNotConfirmedBanner } from "@/components/dashboard/EmailNotConfirmedBanner";
 import { LocaleProvider } from "@/components/shared/LocaleProvider";
-import { parseLocale } from "@/lib/locale";
+import { parseLocale, type AppLocale } from "@/lib/locale";
 
 export default async function DashboardLayout({
   children,
@@ -49,9 +49,27 @@ export default async function DashboardLayout({
 
   const cookieStore = await cookies();
   const impersonationToken = cookieStore.get(IMPERSONATION_COOKIE_NAME)?.value;
-  const isImpersonating = impersonationToken
-    ? decodeImpersonationToken(impersonationToken) !== null
-    : false;
+  const impersonationPayload = impersonationToken
+    ? decodeImpersonationToken(impersonationToken)
+    : null;
+  const isImpersonating = impersonationPayload !== null;
+
+  // While impersonating, `user` above is the impersonated HOST's session
+  // (that's how impersonation works — see lib/impersonation.ts), so the
+  // LocaleProvider below is correctly seeded with the host's own
+  // dashboard_locale for the rest of the dashboard. The banner itself is
+  // the one exception: it's the admin's own UI chrome, so it gets its own
+  // nested LocaleProvider seeded from the admin's locale instead.
+  let adminLocale: AppLocale | undefined;
+  if (impersonationPayload) {
+    const serviceClient = createServiceRoleClient();
+    const { data: adminProfile } = await serviceClient
+      .from("profiles")
+      .select("dashboard_locale")
+      .eq("id", impersonationPayload.adminId)
+      .single();
+    adminLocale = parseLocale(adminProfile?.dashboard_locale);
+  }
 
   let openTicketCount = 0;
   if (isAdmin) {
@@ -82,7 +100,9 @@ export default async function DashboardLayout({
     <LocaleProvider initialLocale={locale}>
       <div className="flex min-h-screen flex-col">
         {isImpersonating && (
-          <ImpersonationBanner hostLabel={profile?.full_name ?? user.email ?? ""} />
+          <LocaleProvider initialLocale={adminLocale}>
+            <ImpersonationBanner hostLabel={profile?.full_name ?? user.email ?? ""} />
+          </LocaleProvider>
         )}
         <MobileTopbar
           fullName={profile?.full_name ?? null}

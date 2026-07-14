@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Bug, Lightbulb, HelpCircle, ChevronLeft, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,15 +15,17 @@ const SUBJECT_MAX = 100;
 const DESCRIPTION_MAX = 1000;
 const MAX_SCREENSHOT_BYTES = 2 * 1024 * 1024;
 
-const OPTIONS: { type: SupportTicketType; label: string; icon: typeof Bug }[] = [
-  { type: "bug", label: "Reportar un problema", icon: Bug },
-  { type: "feature_request", label: "Sugerir una mejora", icon: Lightbulb },
-  { type: "question", label: "Tengo una pregunta", icon: HelpCircle },
+const OPTIONS: { type: SupportTicketType; icon: typeof Bug }[] = [
+  { type: "bug", icon: Bug },
+  { type: "feature_request", icon: Lightbulb },
+  { type: "question", icon: HelpCircle },
 ];
 
 type Step = "menu" | "form" | "sent";
 
 export function SupportWidget() {
+  const t = useTranslations("dashboard.support");
+  const tCommon = useTranslations("dashboard.common");
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("menu");
   const [ticketType, setTicketType] = useState<SupportTicketType | null>(null);
@@ -71,11 +74,11 @@ export function SupportWidget() {
     if (!file) return;
 
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      toast.error("La captura debe ser JPG, PNG o WebP");
+      toast.error(t("onlyJpgPngWebp"));
       return;
     }
     if (file.size > MAX_SCREENSHOT_BYTES) {
-      toast.error("La captura no puede superar 2MB");
+      toast.error(t("tooLarge2mb"));
       return;
     }
     setScreenshot(file);
@@ -100,13 +103,13 @@ export function SupportWidget() {
 
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo enviar el mensaje");
+        toast.error(error ?? t("submitError"));
         return;
       }
 
       setStep("sent");
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setSubmitting(false);
     }
@@ -118,8 +121,8 @@ export function SupportWidget() {
         <div className="mb-3 w-80 rounded-2xl border border-border bg-card p-4 shadow-lg">
           {step === "menu" && (
             <div className="space-y-2">
-              <p className="mb-2 text-sm font-medium">¿Cómo podemos ayudarte?</p>
-              {OPTIONS.map(({ type, label, icon: Icon }) => (
+              <p className="mb-2 text-sm font-medium">{t("howCanWeHelp")}</p>
+              {OPTIONS.map(({ type, icon: Icon }) => (
                 <button
                   key={type}
                   type="button"
@@ -127,7 +130,7 @@ export function SupportWidget() {
                   className="flex w-full items-center gap-2.5 rounded-lg border border-border px-3 py-2.5 text-left text-sm transition-colors hover:bg-accent/40"
                 >
                   <Icon size={18} strokeWidth={1.5} />
-                  {label}
+                  {t(`options.${type}`)}
                 </button>
               ))}
             </div>
@@ -141,10 +144,10 @@ export function SupportWidget() {
                 className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
               >
                 <ChevronLeft size={14} />
-                {OPTIONS.find((o) => o.type === ticketType)?.label}
+                {t(`options.${ticketType}`)}
               </button>
               <div>
-                <Label htmlFor="ticket-subject">Asunto</Label>
+                <Label htmlFor="ticket-subject">{t("subjectLabel")}</Label>
                 <Input
                   id="ticket-subject"
                   value={subject}
@@ -154,7 +157,7 @@ export function SupportWidget() {
                 />
               </div>
               <div>
-                <Label htmlFor="ticket-description">Descripción</Label>
+                <Label htmlFor="ticket-description">{t("descriptionLabel")}</Label>
                 <Textarea
                   id="ticket-description"
                   value={description}
@@ -168,7 +171,7 @@ export function SupportWidget() {
                 </p>
               </div>
               <div>
-                <Label>Captura de pantalla (opcional)</Label>
+                <Label>{t("screenshotLabel")}</Label>
                 <Button
                   type="button"
                   variant="outline"
@@ -176,7 +179,7 @@ export function SupportWidget() {
                   className="w-full"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  {screenshot ? screenshot.name : "Adjuntar imagen"}
+                  {screenshot ? screenshot.name : t("attachImage")}
                 </Button>
                 <input
                   ref={fileInputRef}
@@ -187,18 +190,16 @@ export function SupportWidget() {
                 />
               </div>
               <Button type="submit" className="w-full" disabled={submitting}>
-                {submitting ? "Enviando..." : "Enviar"}
+                {submitting ? t("sending") : t("send")}
               </Button>
             </form>
           )}
 
           {step === "sent" && (
             <div className="space-y-3 py-2 text-center">
-              <p className="text-sm">
-                Hemos recibido tu mensaje, te responderemos en 24h.
-              </p>
+              <p className="text-sm">{t("sentMessage")}</p>
               <Button variant="outline" size="sm" onClick={handleToggle}>
-                Cerrar
+                {t("close")}
               </Button>
             </div>
           )}
@@ -208,7 +209,7 @@ export function SupportWidget() {
       <button
         type="button"
         onClick={handleToggle}
-        aria-label={open ? "Cerrar ayuda" : "Abrir ayuda"}
+        aria-label={open ? t("closeHelp") : t("openHelp")}
         className={cn(
           "flex size-12 items-center justify-center rounded-full bg-[#1A1A18] text-white shadow-lg transition-transform hover:scale-105"
         )}

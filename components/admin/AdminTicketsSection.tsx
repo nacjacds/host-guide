@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Select,
   SelectContent,
@@ -10,6 +11,8 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useLocale } from "@/components/shared/LocaleProvider";
+import { formatLocalizedDate } from "@/lib/formatDate";
 import type { SupportTicketStatus, SupportTicketType } from "@/types";
 
 export interface AdminTicketRow {
@@ -23,12 +26,6 @@ export interface AdminTicketRow {
   createdAt: string;
 }
 
-const TYPE_LABELS: Record<SupportTicketType, string> = {
-  bug: "Problema",
-  feature_request: "Mejora",
-  question: "Pregunta",
-};
-
 function TicketRow({
   ticket,
   onResolved,
@@ -36,6 +33,9 @@ function TicketRow({
   ticket: AdminTicketRow;
   onResolved: (id: string) => void;
 }) {
+  const t = useTranslations("dashboard.admin.tickets");
+  const tCommon = useTranslations("dashboard.common");
+  const { locale } = useLocale();
   const [status, setStatus] = useState(ticket.status);
   const [updating, setUpdating] = useState(false);
 
@@ -48,14 +48,14 @@ function TicketRow({
         body: JSON.stringify({ status: "closed" }),
       });
       if (!response.ok) {
-        toast.error("No se pudo actualizar el ticket");
+        toast.error(t("updateError"));
         return;
       }
       setStatus("closed");
       onResolved(ticket.id);
-      toast.success("Ticket marcado como resuelto");
+      toast.success(t("resolved"));
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setUpdating(false);
     }
@@ -66,7 +66,7 @@ function TicketRow({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
-            {TYPE_LABELS[ticket.type]}
+            {t(`typeLabels.${ticket.type}`)}
           </span>
           <span
             className={
@@ -75,11 +75,11 @@ function TicketRow({
                 : "rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800"
             }
           >
-            {status === "open" ? "Abierto" : "Resuelto"}
+            {status === "open" ? t("statusOpen") : t("statusResolved")}
           </span>
         </div>
         <span className="text-xs text-muted-foreground">
-          {new Date(ticket.createdAt).toLocaleDateString("es-ES")}
+          {formatLocalizedDate(ticket.createdAt, locale)}
         </span>
       </div>
       <p className="mt-2 text-sm font-medium">{ticket.subject}</p>
@@ -92,13 +92,13 @@ function TicketRow({
           rel="noopener noreferrer"
           className="mt-1 inline-block text-xs text-primary underline underline-offset-2"
         >
-          Ver captura
+          {t("viewScreenshot")}
         </a>
       )}
       {status === "open" && (
         <div className="mt-2">
           <Button variant="outline" size="sm" onClick={handleResolve} disabled={updating}>
-            {updating ? "..." : "Marcar como resuelto"}
+            {updating ? "..." : t("markResolved")}
           </Button>
         </div>
       )}
@@ -107,6 +107,7 @@ function TicketRow({
 }
 
 export function AdminTicketsSection({ tickets }: { tickets: AdminTicketRow[] }) {
+  const t = useTranslations("dashboard.admin.tickets");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [resolvedIds, setResolvedIds] = useState<Set<string>>(new Set());
@@ -126,10 +127,10 @@ export function AdminTicketsSection({ tickets }: { tickets: AdminTicketRow[] }) 
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos los tipos</SelectItem>
-            <SelectItem value="bug">Problema</SelectItem>
-            <SelectItem value="feature_request">Mejora</SelectItem>
-            <SelectItem value="question">Pregunta</SelectItem>
+            <SelectItem value="all">{t("allTypes")}</SelectItem>
+            <SelectItem value="bug">{t("typeLabels.bug")}</SelectItem>
+            <SelectItem value="feature_request">{t("typeLabels.feature_request")}</SelectItem>
+            <SelectItem value="question">{t("typeLabels.question")}</SelectItem>
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v ?? "all")}>
@@ -137,15 +138,15 @@ export function AdminTicketsSection({ tickets }: { tickets: AdminTicketRow[] }) 
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos los estados</SelectItem>
-            <SelectItem value="open">Abiertos</SelectItem>
-            <SelectItem value="closed">Resueltos</SelectItem>
+            <SelectItem value="all">{t("allStatuses")}</SelectItem>
+            <SelectItem value="open">{t("openFilter")}</SelectItem>
+            <SelectItem value="closed">{t("resolvedFilter")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No hay tickets con estos filtros.</p>
+        <p className="text-sm text-muted-foreground">{t("empty")}</p>
       ) : (
         <div className="space-y-2">
           {filtered.map((ticket) => (

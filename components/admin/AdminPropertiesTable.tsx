@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,8 +15,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { PLANS, type PlanId } from "@/lib/plans";
+import { PLAN_ORDER, type PlanId } from "@/lib/plans";
 import { isPurgeEligible, DELETED_PROPERTY_RETENTION_DAYS } from "@/lib/properties";
+import { useLocale } from "@/components/shared/LocaleProvider";
+import { formatLocalizedDate } from "@/lib/formatDate";
 
 export interface AdminPropertyRow {
   id: string;
@@ -42,6 +45,8 @@ function PurgeDialog({
   onOpenChange: (open: boolean) => void;
   onPurged: () => void;
 }) {
+  const t = useTranslations("dashboard.admin.propertiesTable");
+  const tCommon = useTranslations("dashboard.common");
   const [confirmText, setConfirmText] = useState("");
   const [purging, setPurging] = useState(false);
   const matches = confirmText.trim() === PURGE_CONFIRM_PHRASE;
@@ -57,14 +62,14 @@ function PurgeDialog({
       });
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo purgar la propiedad");
+        toast.error(error ?? t("purgeError"));
         return;
       }
-      toast.success(`"${property.name}" purgada permanentemente`);
+      toast.success(t("purged", { name: property.name }));
       onOpenChange(false);
       onPurged();
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setPurging(false);
     }
@@ -74,11 +79,9 @@ function PurgeDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>¿Purgar &quot;{property.name}&quot; definitivamente?</AlertDialogTitle>
+          <AlertDialogTitle>{t("purgeDialogTitle", { name: property.name })}</AlertDialogTitle>
           <AlertDialogDescription>
-            Esto borra físicamente la propiedad y todos sus datos relacionados (recomendaciones,
-            traducciones, guía, imagen de portada). No se puede deshacer. Para confirmar, escribe:{" "}
-            <strong>{PURGE_CONFIRM_PHRASE}</strong>
+            {t("purgeDialogDescription")} <strong>{PURGE_CONFIRM_PHRASE}</strong>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <Input
@@ -90,7 +93,7 @@ function PurgeDialog({
         />
         <AlertDialogFooter>
           <AlertDialogClose render={<Button type="button" variant="ghost" disabled={purging} />}>
-            Cancelar
+            {tCommon("cancel")}
           </AlertDialogClose>
           <Button
             type="button"
@@ -98,7 +101,7 @@ function PurgeDialog({
             disabled={!matches || purging}
             className="bg-destructive text-white hover:bg-destructive/90"
           >
-            {purging ? "Purgando..." : "Purgar definitivamente"}
+            {purging ? t("purging") : t("purgePermanently")}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -107,12 +110,16 @@ function PurgeDialog({
 }
 
 function PropertyRow({ property }: { property: AdminPropertyRow }) {
+  const t = useTranslations("dashboard.admin.propertiesTable");
+  const tPlans = useTranslations("dashboard.plans");
+  const tCommon = useTranslations("dashboard.common");
+  const { locale } = useLocale();
   const router = useRouter();
   const [restoring, setRestoring] = useState(false);
   const [purgeOpen, setPurgeOpen] = useState(false);
 
   async function handleRestore() {
-    if (!window.confirm(`¿Restaurar "${property.name}"? Volverá a estar visible para el host.`)) {
+    if (!window.confirm(t("restoreConfirm", { name: property.name }))) {
       return;
     }
     setRestoring(true);
@@ -122,13 +129,13 @@ function PropertyRow({ property }: { property: AdminPropertyRow }) {
       });
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo restaurar la propiedad");
+        toast.error(error ?? t("restoreError"));
         return;
       }
-      toast.success(`"${property.name}" restaurada`);
+      toast.success(t("restored", { name: property.name }));
       router.refresh();
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setRestoring(false);
     }
@@ -142,30 +149,38 @@ function PropertyRow({ property }: { property: AdminPropertyRow }) {
       </td>
       <td className="py-2 pr-4 text-sm">{property.hostEmail}</td>
       <td className="py-2 pr-4 text-sm text-muted-foreground">
-        {property.isPublished ? "Publicada" : "Borrador"}
+        {property.isPublished ? t("published") : t("draft")}
       </td>
       <td className="py-2 pr-4 text-sm">
         {property.deletedAt ? (
           <div className="space-y-0.5">
             <span className="inline-flex items-center rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
-              Borrada por el host el {new Date(property.deletedAt).toLocaleDateString("es-ES")}
+              {t("deletedByHostOn", { date: formatLocalizedDate(property.deletedAt, locale) })}
             </span>
             {property.deletedByHostPlan && (
               <p className="text-xs text-muted-foreground">
-                Plan del anfitrión al borrar: {PLANS[property.deletedByHostPlan as PlanId]?.label ?? property.deletedByHostPlan}
+                {t("hostPlanAtDeletion", {
+                  plan: PLAN_ORDER.includes(property.deletedByHostPlan as PlanId)
+                    ? tPlans(`${property.deletedByHostPlan}.label`)
+                    : property.deletedByHostPlan,
+                })}
               </p>
             )}
             {isPurgeEligible(property.deletedAt) ? (
               <p className="text-xs text-muted-foreground">
-                Elegible para purga (&gt;{DELETED_PROPERTY_RETENTION_DAYS} días)
+                {t("eligibleForPurge", { days: DELETED_PROPERTY_RETENTION_DAYS })}
               </p>
             ) : (
               <p className="text-xs text-muted-foreground">
-                Purgable a partir del{" "}
-                {new Date(
-                  new Date(property.deletedAt).getTime() +
-                    DELETED_PROPERTY_RETENTION_DAYS * 24 * 60 * 60 * 1000
-                ).toLocaleDateString("es-ES")}
+                {t("purgeableFrom", {
+                  date: formatLocalizedDate(
+                    new Date(
+                      new Date(property.deletedAt).getTime() +
+                        DELETED_PROPERTY_RETENTION_DAYS * 24 * 60 * 60 * 1000
+                    ),
+                    locale
+                  ),
+                })}
               </p>
             )}
           </div>
@@ -177,7 +192,7 @@ function PropertyRow({ property }: { property: AdminPropertyRow }) {
         {property.deletedAt && (
           <div className="flex flex-wrap gap-1.5">
             <Button variant="outline" size="sm" onClick={handleRestore} disabled={restoring}>
-              {restoring ? "Restaurando..." : "Restaurar"}
+              {restoring ? t("restoring") : t("restore")}
             </Button>
             <Button
               variant="outline"
@@ -185,7 +200,7 @@ function PropertyRow({ property }: { property: AdminPropertyRow }) {
               className="text-destructive hover:bg-destructive/10 hover:text-destructive"
               onClick={() => setPurgeOpen(true)}
             >
-              Purgar
+              {t("purge")}
             </Button>
             <PurgeDialog
               property={property}
@@ -201,8 +216,10 @@ function PropertyRow({ property }: { property: AdminPropertyRow }) {
 }
 
 export function AdminPropertiesTable({ properties }: { properties: AdminPropertyRow[] }) {
+  const t = useTranslations("dashboard.admin.propertiesTable");
+
   if (properties.length === 0) {
-    return <p className="text-sm text-muted-foreground">No hay propiedades.</p>;
+    return <p className="text-sm text-muted-foreground">{t("empty")}</p>;
   }
 
   return (
@@ -210,11 +227,11 @@ export function AdminPropertiesTable({ properties }: { properties: AdminProperty
       <table className="w-full border-collapse">
         <thead>
           <tr className="border-b border-border text-left text-xs text-muted-foreground">
-            <th className="py-2 pr-4 font-medium">Propiedad</th>
-            <th className="py-2 pr-4 font-medium">Anfitrión</th>
-            <th className="py-2 pr-4 font-medium">Estado</th>
-            <th className="py-2 pr-4 font-medium">Borrado</th>
-            <th className="py-2 font-medium">Acciones</th>
+            <th className="py-2 pr-4 font-medium">{t("property")}</th>
+            <th className="py-2 pr-4 font-medium">{t("host")}</th>
+            <th className="py-2 pr-4 font-medium">{t("status")}</th>
+            <th className="py-2 pr-4 font-medium">{t("deletedColumn")}</th>
+            <th className="py-2 font-medium">{t("actions")}</th>
           </tr>
         </thead>
         <tbody>

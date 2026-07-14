@@ -606,6 +606,119 @@
       "qrAlt": "Código QR de la guía",
       "downloadQr": "Descargar QR",
       "qrError": "No se pudo generar el QR"
+    },
+    "admin": {
+      "title": "Panel de administración",
+      "stats": {
+        "hosts": "Anfitriones",
+        "properties": "Propiedades",
+        "published": "Guías publicadas",
+        "draft": "Borrador"
+      },
+      "hostsCard": {
+        "title": "Anfitriones",
+        "viewAllProperties": "Ver todas las propiedades →"
+      },
+      "supportCard": {
+        "title": "Soporte"
+      },
+      "hostsTable": {
+        "empty": "Todavía no hay anfitriones.",
+        "email": "Email",
+        "plan": "Plan",
+        "properties": "Propiedades",
+        "registered": "Registro",
+        "actions": "Acciones",
+        "planChangeError": "No se pudo cambiar el plan",
+        "planUpdated": "Plan actualizado a {plan}",
+        "impersonateConfirm": "¿Entrar como {email}? Verás su panel exactamente como lo ve él, hasta que pulses \"Volver a admin\".",
+        "impersonateError": "No se pudo impersonar a este usuario",
+        "entering": "Entrando...",
+        "enterAsUser": "Entrar como este usuario"
+      },
+      "propertiesPage": {
+        "title": "Propiedades",
+        "backToPanel": "← Volver al panel",
+        "allProperties": "Todas las propiedades ({count})"
+      },
+      "propertiesTable": {
+        "empty": "No hay propiedades.",
+        "property": "Propiedad",
+        "host": "Anfitrión",
+        "status": "Estado",
+        "deletedColumn": "Borrado",
+        "actions": "Acciones",
+        "published": "Publicada",
+        "draft": "Borrador",
+        "deletedByHostOn": "Borrada por el host el {date}",
+        "hostPlanAtDeletion": "Plan del anfitrión al borrar: {plan}",
+        "eligibleForPurge": "Elegible para purga (>{days} días)",
+        "purgeableFrom": "Purgable a partir del {date}",
+        "restoreConfirm": "¿Restaurar \"{name}\"? Volverá a estar visible para el host.",
+        "restoreError": "No se pudo restaurar la propiedad",
+        "restored": "\"{name}\" restaurada",
+        "restoring": "Restaurando...",
+        "restore": "Restaurar",
+        "purge": "Purgar",
+        "purgeDialogTitle": "¿Purgar \"{name}\" definitivamente?",
+        "purgeDialogDescription": "Esto borra físicamente la propiedad y todos sus datos relacionados (recomendaciones, traducciones, guía, imagen de portada). No se puede deshacer. Para confirmar, escribe:",
+        "purgeError": "No se pudo purgar la propiedad",
+        "purged": "\"{name}\" purgada permanentemente",
+        "purging": "Purgando...",
+        "purgePermanently": "Purgar definitivamente"
+      },
+      "tickets": {
+        "typeLabels": {
+          "bug": "Problema",
+          "feature_request": "Mejora",
+          "question": "Pregunta"
+        },
+        "statusOpen": "Abierto",
+        "statusResolved": "Resuelto",
+        "viewScreenshot": "Ver captura",
+        "markResolved": "Marcar como resuelto",
+        "updateError": "No se pudo actualizar el ticket",
+        "resolved": "Ticket marcado como resuelto",
+        "allTypes": "Todos los tipos",
+        "allStatuses": "Todos los estados",
+        "openFilter": "Abiertos",
+        "resolvedFilter": "Resueltos",
+        "empty": "No hay tickets con estos filtros."
+      },
+      "impersonation": {
+        "banner": "Estás viendo el panel como {host} — modo impersonación",
+        "stopError": "No se pudo volver a la cuenta de administrador",
+        "returning": "Volviendo...",
+        "backToAdmin": "Volver a admin"
+      }
+    },
+    "support": {
+      "options": {
+        "bug": "Reportar un problema",
+        "feature_request": "Sugerir una mejora",
+        "question": "Tengo una pregunta"
+      },
+      "howCanWeHelp": "¿Cómo podemos ayudarte?",
+      "subjectLabel": "Asunto",
+      "descriptionLabel": "Descripción",
+      "screenshotLabel": "Captura de pantalla (opcional)",
+      "attachImage": "Adjuntar imagen",
+      "onlyJpgPngWebp": "La captura debe ser JPG, PNG o WebP",
+      "tooLarge2mb": "La captura no puede superar 2MB",
+      "submitError": "No se pudo enviar el mensaje",
+      "send": "Enviar",
+      "sending": "Enviando...",
+      "sentMessage": "Hemos recibido tu mensaje, te responderemos en 24h.",
+      "close": "Cerrar",
+      "openHelp": "Abrir ayuda",
+      "closeHelp": "Cerrar ayuda"
+    },
+    "stats": {
+      "visits30days": "Visitas (últimos 30 días)",
+      "topSections": "Secciones más consultadas",
+      "topCountries": "Países de visitantes",
+      "noDataYet": "Sin datos todavía.",
+      "noCountryDataYet": "Sin datos todavía (el país solo se detecta en producción)."
     }
   }
 }

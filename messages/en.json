@@ -606,6 +606,119 @@
       "qrAlt": "Guide QR code",
       "downloadQr": "Download QR",
       "qrError": "Couldn't generate the QR"
+    },
+    "admin": {
+      "title": "Admin panel",
+      "stats": {
+        "hosts": "Hosts",
+        "properties": "Properties",
+        "published": "Published guides",
+        "draft": "Draft"
+      },
+      "hostsCard": {
+        "title": "Hosts",
+        "viewAllProperties": "View all properties →"
+      },
+      "supportCard": {
+        "title": "Support"
+      },
+      "hostsTable": {
+        "empty": "No hosts yet.",
+        "email": "Email",
+        "plan": "Plan",
+        "properties": "Properties",
+        "registered": "Registered",
+        "actions": "Actions",
+        "planChangeError": "Couldn't change the plan",
+        "planUpdated": "Plan updated to {plan}",
+        "impersonateConfirm": "Log in as {email}? You'll see their dashboard exactly as they do, until you click \"Back to admin\".",
+        "impersonateError": "Couldn't impersonate this user",
+        "entering": "Entering...",
+        "enterAsUser": "Log in as this user"
+      },
+      "propertiesPage": {
+        "title": "Properties",
+        "backToPanel": "← Back to panel",
+        "allProperties": "All properties ({count})"
+      },
+      "propertiesTable": {
+        "empty": "No properties.",
+        "property": "Property",
+        "host": "Host",
+        "status": "Status",
+        "deletedColumn": "Deleted",
+        "actions": "Actions",
+        "published": "Published",
+        "draft": "Draft",
+        "deletedByHostOn": "Deleted by host on {date}",
+        "hostPlanAtDeletion": "Host's plan when deleted: {plan}",
+        "eligibleForPurge": "Eligible for purge (>{days} days)",
+        "purgeableFrom": "Purgeable starting {date}",
+        "restoreConfirm": "Restore \"{name}\"? It will become visible to the host again.",
+        "restoreError": "Couldn't restore the property",
+        "restored": "\"{name}\" restored",
+        "restoring": "Restoring...",
+        "restore": "Restore",
+        "purge": "Purge",
+        "purgeDialogTitle": "Permanently purge \"{name}\"?",
+        "purgeDialogDescription": "This physically deletes the property and all its related data (recommendations, translations, guide, cover image). This can't be undone. To confirm, type:",
+        "purgeError": "Couldn't purge the property",
+        "purged": "\"{name}\" permanently purged",
+        "purging": "Purging...",
+        "purgePermanently": "Purge permanently"
+      },
+      "tickets": {
+        "typeLabels": {
+          "bug": "Bug",
+          "feature_request": "Feature request",
+          "question": "Question"
+        },
+        "statusOpen": "Open",
+        "statusResolved": "Resolved",
+        "viewScreenshot": "View screenshot",
+        "markResolved": "Mark as resolved",
+        "updateError": "Couldn't update the ticket",
+        "resolved": "Ticket marked as resolved",
+        "allTypes": "All types",
+        "allStatuses": "All statuses",
+        "openFilter": "Open",
+        "resolvedFilter": "Resolved",
+        "empty": "No tickets match these filters."
+      },
+      "impersonation": {
+        "banner": "You're viewing the dashboard as {host} — impersonation mode",
+        "stopError": "Couldn't return to the admin account",
+        "returning": "Returning...",
+        "backToAdmin": "Back to admin"
+      }
+    },
+    "support": {
+      "options": {
+        "bug": "Report a problem",
+        "feature_request": "Suggest an improvement",
+        "question": "I have a question"
+      },
+      "howCanWeHelp": "How can we help?",
+      "subjectLabel": "Subject",
+      "descriptionLabel": "Description",
+      "screenshotLabel": "Screenshot (optional)",
+      "attachImage": "Attach image",
+      "onlyJpgPngWebp": "The screenshot must be JPG, PNG, or WebP",
+      "tooLarge2mb": "The screenshot can't be larger than 2MB",
+      "submitError": "Couldn't send the message",
+      "send": "Send",
+      "sending": "Sending...",
+      "sentMessage": "We've received your message, we'll reply within 24h.",
+      "close": "Close",
+      "openHelp": "Open help",
+      "closeHelp": "Close help"
+    },
+    "stats": {
+      "visits30days": "Visits (last 30 days)",
+      "topSections": "Most viewed sections",
+      "topCountries": "Visitor countries",
+      "noDataYet": "No data yet.",
+      "noCountryDataYet": "No data yet (country is only detected in production)."
     }
   }
 }

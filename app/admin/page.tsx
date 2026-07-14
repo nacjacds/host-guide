@@ -1,10 +1,9 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { isSuperAdmin } from "@/lib/admin";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AdminHostsTable, type AdminHostRow } from "@/components/admin/AdminHostsTable";
-import { AdminTicketsSection, type AdminTicketRow } from "@/components/admin/AdminTicketsSection";
+import { AdminOverviewContent } from "@/components/admin/AdminOverviewContent";
+import type { AdminHostRow } from "@/components/admin/AdminHostsTable";
+import type { AdminTicketRow } from "@/components/admin/AdminTicketsSection";
 import type { PlanId } from "@/lib/plans";
 
 export default async function AdminPage() {
@@ -76,76 +75,14 @@ export default async function AdminPage() {
         style={{ width: "200px", height: "auto" }}
         className="mx-auto mb-4"
       />
-      <h1 className="mb-8 text-center text-2xl font-semibold text-[#1A1A18]">
-        Panel de administración
-      </h1>
-
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Anfitriones
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{totalHosts}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Propiedades
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{totalProperties}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Guías publicadas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{totalPublished}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Borrador</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{totalDraft}</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            Anfitriones
-            <Link
-              href="/admin/properties"
-              className="text-sm font-normal text-primary underline-offset-2 hover:underline"
-            >
-              Ver todas las propiedades &rarr;
-            </Link>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <AdminHostsTable hosts={hosts} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Soporte</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <AdminTicketsSection tickets={ticketRows} />
-        </CardContent>
-      </Card>
+      <AdminOverviewContent
+        totalHosts={totalHosts}
+        totalProperties={totalProperties}
+        totalPublished={totalPublished}
+        totalDraft={totalDraft}
+        hosts={hosts}
+        ticketRows={ticketRows}
+      />
     </div>
   );
 }

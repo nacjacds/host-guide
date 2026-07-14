@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Select,
   SelectContent,
@@ -11,8 +12,10 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { PLANS, PLAN_ORDER, type PlanId } from "@/lib/plans";
+import { PLAN_ORDER, type PlanId } from "@/lib/plans";
 import { isSuperAdmin } from "@/lib/admin";
+import { useLocale } from "@/components/shared/LocaleProvider";
+import { formatLocalizedDate } from "@/lib/formatDate";
 
 export interface AdminHostRow {
   id: string;
@@ -23,6 +26,10 @@ export interface AdminHostRow {
 }
 
 function HostRow({ host }: { host: AdminHostRow }) {
+  const t = useTranslations("dashboard.admin.hostsTable");
+  const tPlans = useTranslations("dashboard.plans");
+  const tCommon = useTranslations("dashboard.common");
+  const { locale } = useLocale();
   const router = useRouter();
   const [plan, setPlan] = useState<PlanId>(host.plan);
   const [saving, setSaving] = useState(false);
@@ -43,24 +50,20 @@ function HostRow({ host }: { host: AdminHostRow }) {
       if (!response.ok) {
         setPlan(previous);
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo cambiar el plan");
+        toast.error(error ?? t("planChangeError"));
         return;
       }
-      toast.success(`Plan actualizado a ${PLANS[value as PlanId].label}`);
+      toast.success(t("planUpdated", { plan: tPlans(`${value}.label`) }));
     } catch {
       setPlan(previous);
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setSaving(false);
     }
   }
 
   async function handleImpersonate() {
-    if (
-      !window.confirm(
-        `¿Entrar como ${host.email}? Verás su panel exactamente como lo ve él, hasta que pulses "Volver a admin".`
-      )
-    ) {
+    if (!window.confirm(t("impersonateConfirm", { email: host.email }))) {
       return;
     }
     if (impersonatingRef.current) return;
@@ -75,13 +78,13 @@ function HostRow({ host }: { host: AdminHostRow }) {
       });
       if (!response.ok) {
         const { error } = await response.json().catch(() => ({ error: null }));
-        toast.error(error ?? "No se pudo impersonar a este usuario");
+        toast.error(error ?? t("impersonateError"));
         return;
       }
       router.push("/dashboard");
       router.refresh();
     } catch {
-      toast.error("Error de red");
+      toast.error(tCommon("networkError"));
     } finally {
       setImpersonating(false);
       impersonatingRef.current = false;
@@ -99,7 +102,7 @@ function HostRow({ host }: { host: AdminHostRow }) {
           <SelectContent>
             {PLAN_ORDER.map((planId) => (
               <SelectItem key={planId} value={planId}>
-                {PLANS[planId].label}
+                {tPlans(`${planId}.label`)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -107,7 +110,7 @@ function HostRow({ host }: { host: AdminHostRow }) {
       </td>
       <td className="py-2 pr-4 text-sm">{host.propertyCount}</td>
       <td className="py-2 pr-4 text-sm text-muted-foreground">
-        {new Date(host.createdAt).toLocaleDateString("es-ES")}
+        {formatLocalizedDate(host.createdAt, locale)}
       </td>
       <td className="py-2 text-sm">
         {!isSuperAdmin(host.email) && (
@@ -117,7 +120,7 @@ function HostRow({ host }: { host: AdminHostRow }) {
             onClick={handleImpersonate}
             disabled={impersonating}
           >
-            {impersonating ? "Entrando..." : "Entrar como este usuario"}
+            {impersonating ? t("entering") : t("enterAsUser")}
           </Button>
         )}
       </td>
@@ -126,8 +129,10 @@ function HostRow({ host }: { host: AdminHostRow }) {
 }
 
 export function AdminHostsTable({ hosts }: { hosts: AdminHostRow[] }) {
+  const t = useTranslations("dashboard.admin.hostsTable");
+
   if (hosts.length === 0) {
-    return <p className="text-sm text-muted-foreground">Todavía no hay anfitriones.</p>;
+    return <p className="text-sm text-muted-foreground">{t("empty")}</p>;
   }
 
   return (
@@ -135,11 +140,11 @@ export function AdminHostsTable({ hosts }: { hosts: AdminHostRow[] }) {
       <table className="w-full border-collapse">
         <thead>
           <tr className="border-b border-border text-left text-xs text-muted-foreground">
-            <th className="py-2 pr-4 font-medium">Email</th>
-            <th className="py-2 pr-4 font-medium">Plan</th>
-            <th className="py-2 pr-4 font-medium">Propiedades</th>
-            <th className="py-2 pr-4 font-medium">Registro</th>
-            <th className="py-2 font-medium">Acciones</th>
+            <th className="py-2 pr-4 font-medium">{t("email")}</th>
+            <th className="py-2 pr-4 font-medium">{t("plan")}</th>
+            <th className="py-2 pr-4 font-medium">{t("properties")}</th>
+            <th className="py-2 pr-4 font-medium">{t("registered")}</th>
+            <th className="py-2 font-medium">{t("actions")}</th>
           </tr>
         </thead>
         <tbody>
