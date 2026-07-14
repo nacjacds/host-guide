@@ -13,7 +13,6 @@ export interface PlanDefinition {
   // uncontrolled Google Places + Claude spend. Scheduled/cron regenerations
   // and any future initial-generation-on-creation are exempt.
   monthlyRecommendationRegenerations: number;
-  features: string[];
 }
 
 export const PLANS: Record<PlanId, PlanDefinition> = {
@@ -26,7 +25,6 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     analyticsEnabled: false,
     whiteLabel: false,
     monthlyRecommendationRegenerations: 1,
-    features: ["1 propiedad", "Bloques de contenido manuales", "QR descargable"],
   },
   starter: {
     id: "starter",
@@ -37,7 +35,6 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     analyticsEnabled: false,
     whiteLabel: false,
     monthlyRecommendationRegenerations: 3,
-    features: ["3 propiedades", "Generación de contenido con IA", "Recomendaciones IA", "QR descargable"],
   },
   pro: {
     id: "pro",
@@ -48,7 +45,6 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     analyticsEnabled: true,
     whiteLabel: false,
     monthlyRecommendationRegenerations: 10,
-    features: ["10 propiedades", "Todo lo de Starter", "Estadísticas de visitas", "Bot de WhatsApp"],
   },
   agency: {
     id: "agency",
@@ -59,7 +55,6 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     analyticsEnabled: true,
     whiteLabel: true,
     monthlyRecommendationRegenerations: 25,
-    features: ["30 propiedades", "Todo lo de Pro", "Marca blanca", "Soporte prioritario"],
   },
 };
 

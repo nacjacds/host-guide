@@ -35,14 +35,6 @@ export interface RecommendationQuota {
   resetDate: string;
 }
 
-export const RECOMMENDATION_CATEGORY_LABELS: Record<PropertyRecommendationCategory, string> = {
-  attractions: "Qué visitar",
-  restaurants: "Dónde comer",
-  nightlife: "Ocio nocturno",
-  beaches: "Playas",
-  nature: "Naturaleza",
-};
-
 export const RECOMMENDATION_CATEGORY_ICONS: Record<PropertyRecommendationCategory, LucideIcon> = {
   attractions: Landmark,
   restaurants: UtensilsCrossed,

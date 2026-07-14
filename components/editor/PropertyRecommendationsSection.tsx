@@ -17,16 +17,12 @@ import { toast } from "sonner";
 import {
   BASE_RECOMMENDATION_CATEGORIES,
   OPTIONAL_RECOMMENDATION_CATEGORIES,
-  RECOMMENDATION_CATEGORY_LABELS,
   RECOMMENDATION_CATEGORY_ICONS,
   type RecommendationQuota,
 } from "@/lib/recommendations/constants";
 import { formatResetDate } from "@/lib/recommendations/format";
 import type { PropertyRecommendation, PropertyRecommendationCategory } from "@/types";
 
-// RECOMMENDATION_CATEGORY_LABELS (lib/recommendations/constants.ts) stays
-// hardcoded in Spanish for now — it's outside components/editor/, a
-// deliberate Fase 2 gap (same treatment as lib/plans.ts in Fase 1).
 const ALL_CATEGORIES = [...BASE_RECOMMENDATION_CATEGORIES, ...OPTIONAL_RECOMMENDATION_CATEGORIES];
 
 // Takes the translator as a param — plain helper called during render,
@@ -388,7 +384,7 @@ export function PropertyRecommendationsSection({
                     )}
                   />
                   <Icon className="size-4 shrink-0" strokeWidth={1.5} />
-                  <span className="truncate">{RECOMMENDATION_CATEGORY_LABELS[category]}</span>
+                  <span className="truncate">{t(`categories.${category}`)}</span>
                   {items.length > 0 && (
                     <span className="text-xs font-normal text-muted-foreground">
                       ({items.length})
@@ -587,7 +583,7 @@ export function PropertyRecommendationsSection({
                 setManuallyRevealed((prev) => new Set(prev).add(category))
               }
             >
-              {t("addSection", { category: RECOMMENDATION_CATEGORY_LABELS[category] })}
+              {t("addSection", { category: t(`categories.${category}`) })}
             </button>
           ))}
         </div>

@@ -82,10 +82,26 @@
       "cta": "Start for free",
       "ctaPaid": "Start with {plan}",
       "planFeatures": {
-        "free": ["1 property", "Manual content blocks", "Downloadable QR"],
-        "starter": ["3 properties", "AI content & recommendations", "Downloadable QR"],
-        "pro": ["10 properties", "Everything in Starter + analytics", "WhatsApp bot"],
-        "agency": ["30 properties", "Everything in Pro + white label", "Priority support"]
+        "free": [
+          "1 property",
+          "Manual content blocks",
+          "Downloadable QR"
+        ],
+        "starter": [
+          "3 properties",
+          "AI content & recommendations",
+          "Downloadable QR"
+        ],
+        "pro": [
+          "10 properties",
+          "Everything in Starter + analytics",
+          "WhatsApp bot"
+        ],
+        "agency": [
+          "30 properties",
+          "Everything in Pro + white label",
+          "Priority support"
+        ]
       }
     },
     "finalCta": {
@@ -379,7 +395,14 @@
         "edit": "Edit",
         "remove": "Remove",
         "confirmDeleteTitle": "Delete this place?",
-        "confirmDeleteDescription": "This action can't be undone."
+        "confirmDeleteDescription": "This action can't be undone.",
+        "categories": {
+          "attractions": "What to see",
+          "restaurants": "Where to eat",
+          "nightlife": "Nightlife",
+          "beaches": "Beaches",
+          "nature": "Nature"
+        }
       },
       "blocks": {
         "wifi": {
@@ -442,7 +465,48 @@
           "deleteError": "Couldn't delete the image",
           "confirmDeleteTitle": "Delete image?",
           "confirmDeleteDescription": "This action can't be undone."
+        },
+        "checkout": {
+          "time": "Check-out time",
+          "instructions": "Instructions"
         }
+      }
+    },
+    "plans": {
+      "free": {
+        "label": "Free",
+        "features": [
+          "1 property",
+          "Manual content blocks",
+          "Downloadable QR"
+        ]
+      },
+      "starter": {
+        "label": "Starter",
+        "features": [
+          "3 properties",
+          "AI content generation",
+          "AI recommendations",
+          "Downloadable QR"
+        ]
+      },
+      "pro": {
+        "label": "Pro",
+        "features": [
+          "10 properties",
+          "Everything in Starter",
+          "Visit statistics",
+          "WhatsApp bot"
+        ]
+      },
+      "agency": {
+        "label": "Agency",
+        "features": [
+          "30 properties",
+          "Everything in Pro",
+          "White label",
+          "Priority support"
+        ]
       }
     }
   }

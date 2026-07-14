@@ -190,6 +190,7 @@ export function BlockEditor({
             )}
             {(block.type === "checkin" || block.type === "checkout") && (
               <CheckinBlock
+                blockType={block.type}
                 content={block.content as unknown as CheckinContent}
                 onChange={updateContent}
               />

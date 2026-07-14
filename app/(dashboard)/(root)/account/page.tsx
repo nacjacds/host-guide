@@ -30,7 +30,7 @@ export default async function AccountPage() {
     <div className="mx-auto max-w-lg space-y-6">
       <AccountHeader currentPlan={plan.id} hasStripeCustomer={Boolean(profile?.stripe_customer_id)} />
 
-      <CurrentPlanCard planLabel={plan.label} priceEurMonth={plan.priceEurMonth} />
+      <CurrentPlanCard planId={plan.id} priceEurMonth={plan.priceEurMonth} />
 
       <ProfileForm profile={profile} email={user.email ?? ""} />
 

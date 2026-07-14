@@ -1,23 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import esMessages from "@/messages/es.json";
+import enMessages from "@/messages/en.json";
 import type { BlockType } from "@/types";
 
-const BLOCK_DEFAULTS: Record<
-  BlockType,
-  { title: string; icon: string; content: Record<string, unknown> }
-> = {
-  wifi: { title: "WiFi", icon: "📶", content: { network_name: "", password: "" } },
-  checkin: { title: "Check-in", icon: "🔑", content: { time: "", instructions: "" } },
-  checkout: { title: "Check-out", icon: "🚪", content: { time: "", instructions: "" } },
-  rules: { title: "Normas de la casa", icon: "📋", content: { rules: [] } },
-  parking: { title: "Parking", icon: "🅿️", content: { rules: [] } },
-  appliances: { title: "Electrodomésticos", icon: "🔌", content: { rules: [] } },
-  pool: { title: "Piscina", icon: "🏊", content: { rules: [] } },
-  drinks: { title: "Copas y bares", icon: "🍷", content: { places: [] } },
-  custom: { title: "Bloque personalizado", icon: "📄", content: { text: "" } },
+// Title comes from dashboard.editor.toolbar (messages/{es,en}.json) — same
+// labels shown in the block-creation toolbar — so a new block's initial
+// title matches the host's active dashboard locale instead of always
+// seeding Spanish. Icon and content shape never vary by locale.
+const BLOCK_DEFAULTS: Record<BlockType, { icon: string; content: Record<string, unknown> }> = {
+  wifi: { icon: "📶", content: { network_name: "", password: "" } },
+  checkin: { icon: "🔑", content: { time: "", instructions: "" } },
+  checkout: { icon: "🚪", content: { time: "", instructions: "" } },
+  rules: { icon: "📋", content: { rules: [] } },
+  parking: { icon: "🅿️", content: { rules: [] } },
+  appliances: { icon: "🔌", content: { rules: [] } },
+  pool: { icon: "🏊", content: { rules: [] } },
+  drinks: { icon: "🍷", content: { places: [] } },
+  custom: { icon: "📄", content: { text: "" } },
   emergencias: {
-    title: "Emergencias",
     icon: "🆘",
     content: {
       general: "112",
@@ -43,6 +45,7 @@ const createBlockSchema = z.object({
     "pool",
     "drinks",
   ]),
+  locale: z.enum(["es", "en"]).optional(),
 });
 
 export async function POST(
@@ -80,15 +83,17 @@ export async function POST(
     .select("id", { count: "exact", head: true })
     .eq("property_id", propertyId);
 
-  const { type } = parsed.data;
+  const { type, locale } = parsed.data;
   const defaults = BLOCK_DEFAULTS[type];
+  const messages = locale === "en" ? enMessages : esMessages;
+  const title = messages.dashboard.editor.toolbar[type];
 
   const { data: block, error } = await supabase
     .from("guide_blocks")
     .insert({
       property_id: propertyId,
       type,
-      title: defaults.title,
+      title,
       icon: defaults.icon,
       content: defaults.content,
       order_index: count ?? 0,

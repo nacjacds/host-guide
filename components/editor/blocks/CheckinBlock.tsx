@@ -11,13 +11,15 @@ export interface CheckinContent {
 }
 
 export function CheckinBlock({
+  blockType,
   content,
   onChange,
 }: {
+  blockType: "checkin" | "checkout";
   content: CheckinContent;
   onChange: (content: CheckinContent) => void;
 }) {
-  const t = useTranslations("dashboard.editor.blocks.checkin");
+  const t = useTranslations(`dashboard.editor.blocks.${blockType}`);
 
   return (
     <div className="space-y-3">

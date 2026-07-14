@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLocale } from "@/components/shared/LocaleProvider";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import type { BlockType, GuideBlock } from "@/types";
@@ -54,6 +55,7 @@ export function BlockToolbar({
 }) {
   const t = useTranslations("dashboard.editor.toolbar");
   const tCommon = useTranslations("dashboard.common");
+  const { locale } = useLocale();
   const [creatingType, setCreatingType] = useState<BlockType | null>(null);
   const existingTypes = new Set(blocks.map((b) => b.type));
 
@@ -63,7 +65,7 @@ export function BlockToolbar({
       const response = await fetch(`/api/properties/${propertyId}/blocks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type }),
+        body: JSON.stringify({ type, locale }),
       });
 
       if (!response.ok) {

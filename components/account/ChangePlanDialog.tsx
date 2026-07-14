@@ -9,9 +9,6 @@ import { toast } from "sonner";
 import { PLANS, PLAN_ORDER, type PlanId } from "@/lib/plans";
 import type { PaidPlanId } from "@/lib/stripe";
 
-// Plan tier names/feature bullet lists (lib/plans.ts) are not translated
-// yet — a deliberate Fase 1 gap, since restructuring lib/plans.ts into a
-// locale-aware shape is bigger than this component and out of scope here.
 export function ChangePlanDialog({
   currentPlan,
   hasStripeCustomer,
@@ -22,6 +19,7 @@ export function ChangePlanDialog({
   const t = useTranslations("dashboard.account.plan");
   const tAccount = useTranslations("dashboard.account");
   const tCommon = useTranslations("dashboard.common");
+  const tPlans = useTranslations("dashboard.plans");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loadingPlan, setLoadingPlan] = useState<PaidPlanId | null>(null);
@@ -105,7 +103,7 @@ export function ChangePlanDialog({
           </DialogHeader>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="rounded-lg border border-border p-4">
-              <p className="font-semibold">{PLANS.free.label}</p>
+              <p className="font-semibold">{tPlans("free.label")}</p>
               <p className="mt-1">
                 <span className="text-2xl font-bold">{PLANS.free.priceEurMonth}€</span>
                 <span className="text-sm font-normal text-muted-foreground">
@@ -113,7 +111,7 @@ export function ChangePlanDialog({
                 </span>
               </p>
               <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                {PLANS.free.features.map((feature) => (
+                {(tPlans.raw("free.features") as string[]).map((feature) => (
                   <li key={feature}>✓ {feature}</li>
                 ))}
               </ul>
@@ -139,7 +137,7 @@ export function ChangePlanDialog({
                 const plan = PLANS[planId];
                 return (
                   <div key={planId} className="rounded-lg border border-border p-4">
-                    <p className="font-semibold">{plan.label}</p>
+                    <p className="font-semibold">{tPlans(`${planId}.label`)}</p>
                     <p className="mt-1">
                       <span className="text-2xl font-bold">{plan.priceEurMonth}€</span>
                       <span className="text-sm font-normal text-muted-foreground">
@@ -147,7 +145,7 @@ export function ChangePlanDialog({
                       </span>
                     </p>
                     <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
-                      {plan.features.map((feature) => (
+                      {(tPlans.raw(`${planId}.features`) as string[]).map((feature) => (
                         <li key={feature}>✓ {feature}</li>
                       ))}
                     </ul>
