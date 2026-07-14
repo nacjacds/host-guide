@@ -64,6 +64,12 @@ export async function POST(request: NextRequest) {
     hostTone: property.host_tone,
   });
 
+  // Seeded in the host's active dashboard locale (same mechanism as
+  // getApiLocale everywhere else) rather than always Spanish — same bug
+  // class as the block-title-locale fix for new guide_blocks (see
+  // app/api/properties/[id]/blocks/route.ts). "Check-in"/"Check-out" stay
+  // as-is: those words are identical in both locales throughout the app.
+  const locale = await getApiLocale(request, supabase, user.id);
   const blocksToInsert: GuideBlockInsert[] = [
     {
       property_id: property.id,
@@ -84,7 +90,7 @@ export async function POST(request: NextRequest) {
     {
       property_id: property.id,
       type: "rules",
-      title: "Normas de la casa",
+      title: pick(locale, "Normas de la casa", "House rules"),
       icon: "📋",
       content: { rules: content.rules },
       order_index: 2,

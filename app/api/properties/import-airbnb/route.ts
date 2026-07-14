@@ -184,18 +184,39 @@ export async function POST(request: NextRequest) {
     /salida[^0-9]{0,25}(\d{1,2}(?::\d{2})?\s?(?:h|am|pm)?)/i,
   ]);
 
-  const KNOWN_RULES: { pattern: RegExp; label: string }[] = [
-    { pattern: /no smoking/i, label: "No fumar" },
-    { pattern: /no pets/i, label: "No se admiten mascotas" },
-    { pattern: /no parties or events/i, label: "No se permiten fiestas ni eventos" },
-    { pattern: /no unregistered guests/i, label: "No huéspedes no registrados" },
-    { pattern: /quiet hours/i, label: "Horas de silencio" },
-    { pattern: /no fumar/i, label: "No fumar" },
-    { pattern: /no se admiten mascotas/i, label: "No se admiten mascotas" },
-    { pattern: /no fiestas/i, label: "No se permiten fiestas ni eventos" },
+  // Labels seeded in the host's active dashboard locale at import time
+  // (same mechanism as getApiLocale everywhere else in this file) rather
+  // than always Spanish — same bug class as the block-title-locale fix
+  // for new guide_blocks (see app/api/properties/[id]/blocks/route.ts).
+  const rulesLocale = await getApiLocale(request, supabase, user.id);
+  const KNOWN_RULES: { pattern: RegExp; label: { es: string; en: string } }[] = [
+    { pattern: /no smoking/i, label: { es: "No fumar", en: "No smoking" } },
+    { pattern: /no pets/i, label: { es: "No se admiten mascotas", en: "No pets allowed" } },
+    {
+      pattern: /no parties or events/i,
+      label: { es: "No se permiten fiestas ni eventos", en: "No parties or events" },
+    },
+    {
+      pattern: /no unregistered guests/i,
+      label: { es: "No huéspedes no registrados", en: "No unregistered guests" },
+    },
+    { pattern: /quiet hours/i, label: { es: "Horas de silencio", en: "Quiet hours" } },
+    { pattern: /no fumar/i, label: { es: "No fumar", en: "No smoking" } },
+    {
+      pattern: /no se admiten mascotas/i,
+      label: { es: "No se admiten mascotas", en: "No pets allowed" },
+    },
+    {
+      pattern: /no fiestas/i,
+      label: { es: "No se permiten fiestas ni eventos", en: "No parties or events" },
+    },
   ];
   const houseRules = Array.from(
-    new Set(KNOWN_RULES.filter((rule) => rule.pattern.test(searchText)).map((rule) => rule.label))
+    new Set(
+      KNOWN_RULES.filter((rule) => rule.pattern.test(searchText)).map(
+        (rule) => rule.label[rulesLocale]
+      )
+    )
   );
 
   return NextResponse.json({
