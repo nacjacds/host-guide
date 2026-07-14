@@ -2,9 +2,9 @@
 
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { Home, Languages, Sparkles, QrCode, type LucideIcon } from "lucide-react";
+import { HouseGuideIcon, TranslationIcon, AiPinIcon, PrintableQrIcon } from "./FeatureIcons";
 
-const ICONS: LucideIcon[] = [Home, Languages, Sparkles, QrCode];
+const ICONS = [HouseGuideIcon, TranslationIcon, AiPinIcon, PrintableQrIcon];
 
 export function LandingFeatures() {
   const t = useTranslations("landing.features");
@@ -32,13 +32,13 @@ export function LandingFeatures() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.45, delay: (i % 2) * 0.08 }}
-                className="rounded-2xl border border-[#DDD8CC] bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+                className="flex flex-col items-center rounded-2xl border border-[#DDD8CC] bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md sm:p-8"
               >
-                <div className="mb-4 flex size-11 items-center justify-center rounded-xl bg-[#1B4F72]/8">
-                  <Icon size={22} strokeWidth={1.5} color="#1B4F72" />
-                </div>
+                <Icon className="mb-4 size-20 sm:size-24" />
                 <h3 className="mb-1.5 text-base font-semibold text-[#1A1A18]">{item.title}</h3>
-                <p className="text-sm leading-relaxed text-[#6B6B67]">{item.description}</p>
+                <p className="max-w-[26ch] text-sm leading-relaxed text-[#6B6B67]">
+                  {item.description}
+                </p>
               </motion.div>
             );
           })}
