@@ -1,6 +1,8 @@
 {
   "common": {
-    "back": "Volver"
+    "back": "Volver",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña"
   },
   "landing": {
     "nav": {
@@ -159,6 +161,28 @@
       "checkEmailTitle": "Revisa tu email",
       "checkEmailBody": "Te hemos enviado un enlace de confirmación a <strong>{email}</strong>. Ábrelo para confirmar tu cuenta antes de iniciar sesión.",
       "checkEmailLoginLink": "Ir a iniciar sesión"
+    },
+    "forgotPassword": {
+      "title": "Restablecer contraseña",
+      "description": "Introduce tu email y te enviaremos un enlace para restablecer tu contraseña.",
+      "emailLabel": "Email",
+      "submit": "Enviar enlace",
+      "submitLoading": "Enviando...",
+      "networkError": "Error de red",
+      "checkEmailTitle": "Revisa tu email",
+      "checkEmailBody": "Si existe una cuenta con <strong>{email}</strong>, te hemos enviado un enlace para restablecer tu contraseña.",
+      "backToLogin": "Volver a iniciar sesión"
+    },
+    "resetPassword": {
+      "invalidLinkTitle": "Enlace no válido",
+      "invalidLinkBody": "Este enlace de restablecimiento no es válido o ha caducado. Solicita uno nuevo.",
+      "requestNewLink": "Solicitar nuevo enlace",
+      "title": "Nueva contraseña",
+      "newPasswordLabel": "Nueva contraseña",
+      "submit": "Guardar nueva contraseña",
+      "submitLoading": "Guardando...",
+      "success": "Contraseña actualizada",
+      "networkError": "Error de red"
     }
   },
   "dashboard": {

@@ -1,6 +1,8 @@
 {
   "common": {
-    "back": "Back"
+    "back": "Back",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "landing": {
     "nav": {
@@ -159,6 +161,28 @@
       "checkEmailTitle": "Check your email",
       "checkEmailBody": "We've sent a confirmation link to <strong>{email}</strong>. Open it to confirm your account before logging in.",
       "checkEmailLoginLink": "Go to log in"
+    },
+    "forgotPassword": {
+      "title": "Reset password",
+      "description": "Enter your email and we'll send you a link to reset your password.",
+      "emailLabel": "Email",
+      "submit": "Send link",
+      "submitLoading": "Sending...",
+      "networkError": "Network error",
+      "checkEmailTitle": "Check your email",
+      "checkEmailBody": "If an account exists for <strong>{email}</strong>, we've sent a link to reset your password.",
+      "backToLogin": "Back to log in"
+    },
+    "resetPassword": {
+      "invalidLinkTitle": "Invalid link",
+      "invalidLinkBody": "This reset link is invalid or has expired. Request a new one.",
+      "requestNewLink": "Request new link",
+      "title": "New password",
+      "newPasswordLabel": "New password",
+      "submit": "Save new password",
+      "submitLoading": "Saving...",
+      "success": "Password updated",
+      "networkError": "Network error"
     }
   },
   "dashboard": {
