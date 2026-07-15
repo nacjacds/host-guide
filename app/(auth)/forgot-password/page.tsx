@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,9 +10,13 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { getAppUrl } from "@/lib/env";
+import { BackLink } from "@/components/shared/BackLink";
+import { safeReturnTo } from "@/lib/return-to";
 
 export default function ForgotPasswordPage() {
   const supabase = createClient();
+  const searchParams = useSearchParams();
+  const backHref = safeReturnTo(searchParams.get("returnTo") ?? undefined);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -52,6 +57,7 @@ export default function ForgotPasswordPage() {
     return (
       <div className="flex min-h-screen items-center justify-center p-6">
         <div className="w-full max-w-sm">
+          <BackLink href={backHref} label="Volver" />
           {logo}
           <Card className="w-full">
             <CardHeader>
@@ -77,6 +83,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-sm">
+        <BackLink href={backHref} label="Volver" />
         {logo}
         <Card className="w-full">
           <CardHeader>

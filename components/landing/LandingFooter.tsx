@@ -9,6 +9,7 @@ export function LandingFooter() {
   const year = new Date().getFullYear();
   const pathname = usePathname();
   const loginHref = `/login?returnTo=${encodeURIComponent(pathname)}`;
+  const registerHref = `/register?returnTo=${encodeURIComponent(pathname)}`;
 
   return (
     <footer className="bg-[#F5EFE6] py-10">
@@ -23,7 +24,7 @@ export function LandingFooter() {
           <Link href={loginHref} className="hover:underline">
             {t("login")}
           </Link>
-          <Link href="/register" className="hover:underline">
+          <Link href={registerHref} className="hover:underline">
             {t("register")}
           </Link>
         </div>

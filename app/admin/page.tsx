@@ -5,8 +5,13 @@ import { AdminOverviewContent } from "@/components/admin/AdminOverviewContent";
 import type { AdminHostRow } from "@/components/admin/AdminHostsTable";
 import type { AdminTicketRow } from "@/components/admin/AdminTicketsSection";
 import type { PlanId } from "@/lib/plans";
+import { safeReturnTo } from "@/lib/return-to";
 
-export default async function AdminPage() {
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ returnTo?: string }>;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -15,6 +20,9 @@ export default async function AdminPage() {
   if (!isSuperAdmin(user?.email)) {
     redirect("/login");
   }
+
+  const { returnTo } = await searchParams;
+  const backHref = safeReturnTo(returnTo);
 
   const serviceClient = createServiceRoleClient();
 
@@ -68,14 +76,8 @@ export default async function AdminPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-6">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/logo.svg"
-        alt="WelcoKit"
-        style={{ width: "200px", height: "auto" }}
-        className="mx-auto mb-4"
-      />
       <AdminOverviewContent
+        backHref={backHref}
         totalHosts={totalHosts}
         totalProperties={totalProperties}
         totalPublished={totalPublished}

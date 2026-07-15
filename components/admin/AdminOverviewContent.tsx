@@ -5,8 +5,10 @@ import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminHostsTable, type AdminHostRow } from "@/components/admin/AdminHostsTable";
 import { AdminTicketsSection, type AdminTicketRow } from "@/components/admin/AdminTicketsSection";
+import { BackLink } from "@/components/shared/BackLink";
 
 export function AdminOverviewContent({
+  backHref,
   totalHosts,
   totalProperties,
   totalPublished,
@@ -15,6 +17,7 @@ export function AdminOverviewContent({
   ticketRows,
   currentUserId,
 }: {
+  backHref: string;
   totalHosts: number;
   totalProperties: number;
   totalPublished: number;
@@ -24,9 +27,18 @@ export function AdminOverviewContent({
   currentUserId: string;
 }) {
   const t = useTranslations("dashboard.admin");
+  const tCommon = useTranslations("common");
 
   return (
     <>
+      <BackLink href={backHref} label={tCommon("back")} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/logo.svg"
+        alt="WelcoKit"
+        style={{ width: "200px", height: "auto" }}
+        className="mx-auto mb-4"
+      />
       <h1 className="mb-8 text-center text-2xl font-semibold text-[#1A1A18]">{t("title")}</h1>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">

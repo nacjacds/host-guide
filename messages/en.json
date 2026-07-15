@@ -1,4 +1,7 @@
 {
+  "common": {
+    "back": "Back"
+  },
   "landing": {
     "nav": {
       "login": "Log in"
@@ -141,8 +144,7 @@
       "submit": "Log in",
       "submitLoading": "Logging in...",
       "noAccount": "Don't have an account?",
-      "registerLink": "Sign up",
-      "back": "Back"
+      "registerLink": "Sign up"
     },
     "register": {
       "title": "Create account",
@@ -673,7 +675,7 @@
       },
       "propertiesPage": {
         "title": "Properties",
-        "backToPanel": "← Back to panel",
+        "backToPanel": "Back to panel",
         "allProperties": "All properties ({count})",
         "viewFlat": "Table",
         "viewGrouped": "By host"

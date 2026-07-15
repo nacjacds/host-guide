@@ -11,12 +11,16 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { LocaleProvider, useLocale } from "@/components/shared/LocaleProvider";
+import { BackLink } from "@/components/shared/BackLink";
 import { type AppLocale } from "@/lib/locale";
+import { safeReturnTo } from "@/lib/return-to";
 
-function RegisterFormContent() {
+function RegisterFormContent({ returnTo }: { returnTo?: string }) {
   const t = useTranslations("auth.register");
+  const tCommon = useTranslations("common");
   const { locale } = useLocale();
   const supabase = createClient();
+  const backHref = safeReturnTo(returnTo);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -65,6 +69,7 @@ function RegisterFormContent() {
     return (
       <div className="flex min-h-screen items-center justify-center p-6">
         <div className="w-full max-w-sm">
+          <BackLink href={backHref} label={tCommon("back")} />
           {logo}
           <Card className="w-full">
             <CardHeader>
@@ -92,6 +97,7 @@ function RegisterFormContent() {
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-sm">
+        <BackLink href={backHref} label={tCommon("back")} />
         {logo}
         <Card className="w-full">
           <CardHeader>
@@ -145,10 +151,16 @@ function RegisterFormContent() {
   );
 }
 
-export function RegisterForm({ initialLocale }: { initialLocale?: AppLocale }) {
+export function RegisterForm({
+  initialLocale,
+  returnTo,
+}: {
+  initialLocale?: AppLocale;
+  returnTo?: string;
+}) {
   return (
     <LocaleProvider initialLocale={initialLocale}>
-      <RegisterFormContent />
+      <RegisterFormContent returnTo={returnTo} />
     </LocaleProvider>
   );
 }

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,20 +12,13 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { LocaleProvider } from "@/components/shared/LocaleProvider";
+import { BackLink } from "@/components/shared/BackLink";
 import { type AppLocale, setLocaleCookie } from "@/lib/locale";
-
-// Only ever follows a same-site path — never an absolute/protocol-relative
-// URL — so a crafted `?returnTo=` query string can't be used as an open
-// redirect off the login page.
-function safeReturnTo(returnTo: string | undefined): string {
-  if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
-    return returnTo;
-  }
-  return "/";
-}
+import { safeReturnTo } from "@/lib/return-to";
 
 function LoginFormContent({ returnTo }: { returnTo?: string }) {
   const t = useTranslations("auth.login");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const supabase = createClient();
   const backHref = safeReturnTo(returnTo);
@@ -68,13 +60,7 @@ function LoginFormContent({ returnTo }: { returnTo?: string }) {
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-sm">
-        <Link
-          href={backHref}
-          className="mb-4 flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
-        >
-          <ChevronLeft className="size-5" />
-          {t("back")}
-        </Link>
+        <BackLink href={backHref} label={tCommon("back")} />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logo.svg"
@@ -107,7 +93,7 @@ function LoginFormContent({ returnTo }: { returnTo?: string }) {
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <p className="mt-1 text-right text-sm text-muted-foreground">
-                  <Link href="/forgot-password" className="underline">
+                  <Link href="/forgot-password?returnTo=%2Flogin" className="underline">
                     {t("forgotPassword")}
                   </Link>
                 </p>
@@ -118,7 +104,7 @@ function LoginFormContent({ returnTo }: { returnTo?: string }) {
             </form>
             <p className="mt-4 text-center text-sm text-muted-foreground">
               {t("noAccount")}{" "}
-              <Link href="/register" className="underline">
+              <Link href={`/register?returnTo=${encodeURIComponent(backHref)}`} className="underline">
                 {t("registerLink")}
               </Link>
             </p>

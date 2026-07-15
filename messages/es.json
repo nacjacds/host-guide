@@ -1,4 +1,7 @@
 {
+  "common": {
+    "back": "Volver"
+  },
   "landing": {
     "nav": {
       "login": "Iniciar sesión"
@@ -141,8 +144,7 @@
       "submit": "Entrar",
       "submitLoading": "Entrando...",
       "noAccount": "¿No tienes cuenta?",
-      "registerLink": "Regístrate",
-      "back": "Volver"
+      "registerLink": "Regístrate"
     },
     "register": {
       "title": "Crear cuenta",
@@ -673,7 +675,7 @@
       },
       "propertiesPage": {
         "title": "Propiedades",
-        "backToPanel": "← Volver al panel",
+        "backToPanel": "Volver al panel",
         "allProperties": "Todas las propiedades ({count})",
         "viewFlat": "Tabla",
         "viewGrouped": "Por anfitrión"

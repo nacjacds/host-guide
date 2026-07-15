@@ -91,10 +91,18 @@ export function MobileTopbar({
                 <div className="flex flex-col gap-2">
                   {group.map((link) => {
                     const active = isActiveNavLink(pathname, link.href);
+                    // The admin panel has no sidebar/hamburger of its own,
+                    // so its "< Back" needs a real origin to return to —
+                    // every other nav target here already has this menu to
+                    // get back, so only /admin needs this.
+                    const href =
+                      link.href === "/admin"
+                        ? `${link.href}?returnTo=${encodeURIComponent(pathname)}`
+                        : link.href;
                     return (
                       <div key={link.href}>
                         <Link
-                          href={link.href}
+                          href={href}
                           onClick={() => setOpen(false)}
                           className={cn(
                             "flex items-center justify-between rounded-lg border-l-[3px] border-transparent px-3 py-2 transition-colors",

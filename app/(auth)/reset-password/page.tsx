@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,18 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { BackLink } from "@/components/shared/BackLink";
+import { safeReturnTo } from "@/lib/return-to";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
   const supabase = createClient();
+  // Reached only via the recovery link in a password-reset email, never by
+  // navigating from another page in the app — `returnTo` will practically
+  // always be absent, so this falls back to home almost every time. Still
+  // included for consistency with every other standalone page's back link.
+  const searchParams = useSearchParams();
+  const backHref = safeReturnTo(searchParams.get("returnTo") ?? undefined);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
@@ -80,6 +88,7 @@ export default function ResetPasswordPage() {
     return (
       <div className="flex min-h-screen items-center justify-center p-6">
         <div className="w-full max-w-sm">
+          <BackLink href={backHref} label="Volver" />
           {logo}
           <Card className="w-full">
             <CardHeader>
@@ -105,6 +114,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-sm">
+        <BackLink href={backHref} label="Volver" />
         {logo}
         <Card className="w-full">
           <CardHeader>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,6 +9,7 @@ import {
   type AdminPropertyRow,
 } from "@/components/admin/AdminPropertiesTable";
 import { AdminPropertiesGroupedByHost } from "@/components/admin/AdminPropertiesGroupedByHost";
+import { BackLink } from "@/components/shared/BackLink";
 
 type ViewMode = "flat" | "grouped";
 
@@ -22,11 +22,9 @@ export function AdminPropertiesPageContent({ rows }: { rows: AdminPropertyRow[] 
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div>
+        <BackLink href="/admin" label={t("backToPanel")} />
         <h1 className="text-2xl font-semibold text-[#1A1A18]">{t("title")}</h1>
-        <Link href="/admin" className="text-sm text-muted-foreground hover:text-foreground">
-          {t("backToPanel")}
-        </Link>
       </div>
 
       <Card>
