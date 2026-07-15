@@ -24,7 +24,7 @@ function HorizontalConnector({ flip, className }: { flip: boolean; className?: s
       viewBox="0 0 64 40"
       fill="none"
       aria-hidden="true"
-      className={cn("-mt-[18px] h-10 w-16 shrink-0 self-center", className)}
+      className={cn("-mt-2 h-10 w-16 shrink-0 self-center", className)}
     >
       <path d={d} stroke="#FF4200" strokeWidth="1.75" strokeDasharray="3 4" strokeLinecap="round" />
       <circle cx="60" cy={dotY} r="3" fill="#FAFAF8" stroke="#FF4200" strokeWidth="1.75" />
@@ -46,7 +46,7 @@ export function LandingAnyPlatform() {
   const steps = t.raw("steps") as { label: string }[];
 
   return (
-    <section className="bg-[#FAFAF8] py-16 sm:py-24">
+    <section className="bg-[#FAFAF8] pt-16 sm:pt-24">
       <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
         <span className="text-xs font-medium tracking-wide text-[#FF4200] uppercase">
           {t("eyebrow")}
@@ -68,10 +68,10 @@ export function LandingAnyPlatform() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-60px" }}
                   transition={{ duration: 0.45, delay: i * 0.12 }}
-                  className="flex flex-col items-center sm:w-[170px]"
+                  className="flex flex-col items-center sm:w-[200px]"
                 >
-                  <Icon className="size-16 sm:size-[76px]" />
-                  <p className="mt-2.5 text-sm font-medium text-[#1A1A18]">
+                  <Icon className="size-20 sm:size-24" />
+                  <p className="mt-3 text-base font-medium text-[#1A1A18] sm:text-lg">
                     <strong className="font-bold">{i + 1}</strong> - {step.label}
                   </p>
                 </motion.div>
