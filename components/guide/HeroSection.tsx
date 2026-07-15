@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { Property } from "@/types";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { DirectionsButton } from "./DirectionsButton";
 
 export function HeroSection({ property }: { property: Property }) {
   const hasCoverImage = Boolean(property.cover_image_url);
@@ -41,13 +42,21 @@ export function HeroSection({ property }: { property: Property }) {
         <LanguageSwitcher />
       </div>
       <div
-        className="relative z-10 p-6 text-white"
+        className="relative z-10 flex items-end justify-between gap-3 p-6 text-white"
         style={{ textShadow: "0 1px 3px rgba(0, 0, 0, 0.5)" }}
       >
-        <h1 className="text-xl font-bold sm:text-2xl">{property.name}</h1>
-        {property.address && (
-          <p className="text-sm font-light text-white/80">{property.address}</p>
-        )}
+        {/*
+          min-w-0 lets this flex item shrink below its content's natural
+          width — without it, a long address would push past the
+          DirectionsButton instead of wrapping to a second line.
+        */}
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold sm:text-2xl">{property.name}</h1>
+          {property.address && (
+            <p className="text-sm font-light text-white/80">{property.address}</p>
+          )}
+        </div>
+        {property.address && <DirectionsButton address={property.address} />}
       </div>
     </div>
   );
