@@ -12,6 +12,16 @@
       "previewHost": "Carmen & Nacho",
       "previewGreeting": "¡Bienvenido a Carihuela Cristal!"
     },
+    "anyPlatform": {
+      "eyebrow": "Antes de la llegada",
+      "title": "Para reservas desde cualquier plataforma",
+      "body": "Envía el enlace a tu huésped antes de su llegada. También puedes imprimir el QR y ponerlo en tu propiedad. No tiene que descargar nada — solo abre el link y tiene toda la información de tu alojamiento a mano y en un solo sitio, sin importar dónde haya reservado. WhatsApp del anfitrión, check-in, check-out, normas de la casa, electrodomésticos, WiFi, lugares de interés, restaurantes, vida nocturna, etc. Potenciado con inteligencia artificial. Esa es la diferencia entre un alojamiento más y uno de cinco estrellas.",
+      "steps": [
+        { "label": "El huésped reserva" },
+        { "label": "Le envías el enlace" },
+        { "label": "Accede a toda la info en su móvil" }
+      ]
+    },
     "problem": {
       "eyebrow": "Ya conoces la rutina",
       "title": "Menos preguntas repetidas, más huéspedes contentos",

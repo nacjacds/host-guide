@@ -6,13 +6,12 @@ import { useTranslations } from "next-intl";
 import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GuidePreviewCard } from "./GuidePreviewCard";
-import { WaveDivider } from "./WaveDivider";
 
 export function LandingHero() {
   const t = useTranslations("landing.hero");
 
   return (
-    <section className="relative overflow-hidden bg-[#FAFAF8] pt-12 pb-0 sm:pt-16">
+    <section className="relative overflow-hidden bg-[#FAFAF8] pt-12 sm:pt-16">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -55,10 +54,6 @@ export function LandingHero() {
         >
           <GuidePreviewCard />
         </motion.div>
-      </div>
-
-      <div className="mt-14 sm:mt-20">
-        <WaveDivider color="#F5EFE6" />
       </div>
     </section>
   );

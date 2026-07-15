@@ -12,6 +12,16 @@
       "previewHost": "Carmen & Nacho",
       "previewGreeting": "Welcome to Carihuela Cristal!"
     },
+    "anyPlatform": {
+      "eyebrow": "Before arrival",
+      "title": "For bookings from any platform",
+      "body": "Send the link to your guest before arrival. You can also print the QR code and place it in your property. No app to download — they just open the link and have all your property's information in one place, no matter where they booked. Host's WhatsApp, check-in, check-out, house rules, appliances, WiFi, local attractions, restaurants, nightlife, and more. Powered by AI. That's the difference between just another stay and a five-star one.",
+      "steps": [
+        { "label": "The guest books" },
+        { "label": "You send the link" },
+        { "label": "They access all the info on their phone" }
+      ]
+    },
     "problem": {
       "eyebrow": "You know the routine",
       "title": "Fewer repeated questions, happier guests",

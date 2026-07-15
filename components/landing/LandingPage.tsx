@@ -5,6 +5,7 @@ import { LocaleProvider } from "@/components/shared/LocaleProvider";
 import { type AppLocale } from "@/lib/locale";
 import { LandingHeader } from "./LandingHeader";
 import { LandingHero } from "./LandingHero";
+import { LandingAnyPlatform } from "./LandingAnyPlatform";
 import { LandingProblemSolution } from "./LandingProblemSolution";
 import { LandingFeatures } from "./LandingFeatures";
 import { LandingHowItWorks } from "./LandingHowItWorks";
@@ -19,6 +20,7 @@ export function LandingPage({ initialLocale }: { initialLocale?: AppLocale }) {
         <div className="min-h-screen bg-[#FAFAF8]">
           <LandingHeader />
           <LandingHero />
+          <LandingAnyPlatform />
           <LandingProblemSolution />
           <LandingFeatures />
           <LandingHowItWorks />
