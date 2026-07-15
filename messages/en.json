@@ -17,9 +17,15 @@
       "title": "Share your property's information in one click",
       "body": "Send the link to your guest before arrival — it works for bookings from any platform. You can also print the QR code and place it in your property. Your guest doesn't have to download anything — they just open the link and have all your property's information in one place, no matter where they booked: host's WhatsApp, check-in, check-out, house rules, appliances, WiFi, local attractions, restaurants, nightlife, and more. Powered by AI. That's the difference between just another stay and a five-star one.",
       "steps": [
-        { "label": "The guest books" },
-        { "label": "You send the link" },
-        { "label": "They access all the info on their phone" }
+        {
+          "label": "The guest books"
+        },
+        {
+          "label": "You send the link"
+        },
+        {
+          "label": "They access all the info on their phone"
+        }
       ]
     },
     "problem": {
@@ -135,7 +141,8 @@
       "submit": "Log in",
       "submitLoading": "Logging in...",
       "noAccount": "Don't have an account?",
-      "registerLink": "Sign up"
+      "registerLink": "Sign up",
+      "back": "Back"
     },
     "register": {
       "title": "Create account",

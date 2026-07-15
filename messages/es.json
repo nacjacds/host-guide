@@ -17,9 +17,15 @@
       "title": "Comparte en un click la información de tu alojamiento",
       "body": "Envía el enlace a tu huésped antes de su llegada, sirve para reservas desde cualquier plataforma. También puedes imprimir el QR y ponerlo en tu propiedad. El huésped no tiene que descargar nada — solo abre el link y tiene toda la información de tu alojamiento a mano y en un solo sitio, sin importar dónde haya reservado: WhatsApp del anfitrión, check-in, check-out, normas de la casa, electrodomésticos, WiFi, lugares de interés, restaurantes, vida nocturna, etc. Potenciado con inteligencia artificial. Esa es la diferencia entre un alojamiento más y uno de cinco estrellas.",
       "steps": [
-        { "label": "El huésped reserva" },
-        { "label": "Le envías el enlace" },
-        { "label": "Accede a toda la info en su móvil" }
+        {
+          "label": "El huésped reserva"
+        },
+        {
+          "label": "Le envías el enlace"
+        },
+        {
+          "label": "Accede a toda la info en su móvil"
+        }
       ]
     },
     "problem": {
@@ -135,7 +141,8 @@
       "submit": "Entrar",
       "submitLoading": "Entrando...",
       "noAccount": "¿No tienes cuenta?",
-      "registerLink": "Regístrate"
+      "registerLink": "Regístrate",
+      "back": "Volver"
     },
     "register": {
       "title": "Crear cuenta",

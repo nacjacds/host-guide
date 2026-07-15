@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -14,10 +15,21 @@ import { toast } from "sonner";
 import { LocaleProvider } from "@/components/shared/LocaleProvider";
 import { type AppLocale, setLocaleCookie } from "@/lib/locale";
 
-function LoginFormContent() {
+// Only ever follows a same-site path — never an absolute/protocol-relative
+// URL — so a crafted `?returnTo=` query string can't be used as an open
+// redirect off the login page.
+function safeReturnTo(returnTo: string | undefined): string {
+  if (returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")) {
+    return returnTo;
+  }
+  return "/";
+}
+
+function LoginFormContent({ returnTo }: { returnTo?: string }) {
   const t = useTranslations("auth.login");
   const router = useRouter();
   const supabase = createClient();
+  const backHref = safeReturnTo(returnTo);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -56,6 +68,13 @@ function LoginFormContent() {
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-sm">
+        <Link
+          href={backHref}
+          className="mb-4 flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground"
+        >
+          <ChevronLeft className="size-5" />
+          {t("back")}
+        </Link>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logo.svg"
@@ -110,10 +129,16 @@ function LoginFormContent() {
   );
 }
 
-export function LoginForm({ initialLocale }: { initialLocale?: AppLocale }) {
+export function LoginForm({
+  initialLocale,
+  returnTo,
+}: {
+  initialLocale?: AppLocale;
+  returnTo?: string;
+}) {
   return (
     <LocaleProvider initialLocale={initialLocale}>
-      <LoginFormContent />
+      <LoginFormContent returnTo={returnTo} />
     </LocaleProvider>
   );
 }

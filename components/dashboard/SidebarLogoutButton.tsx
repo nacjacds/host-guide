@@ -17,8 +17,10 @@ export function SidebarLogoutButton({ onBeforeNavigate }: { onBeforeNavigate?: (
     onBeforeNavigate?.();
     await createClient().auth.signOut();
     // Full reload (not router.push) so every client-held auth/session
-    // state is dropped, not just the visible route.
-    window.location.href = "/login";
+    // state is dropped, not just the visible route. Lands on the public
+    // homepage, not /login — logging out isn't the same as being asked to
+    // log back in.
+    window.location.href = "/";
   }
 
   return (
