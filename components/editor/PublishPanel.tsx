@@ -16,10 +16,17 @@ import type { Property } from "@/types";
 
 const MAX_COVER_SIZE_BYTES = 3 * 1024 * 1024;
 
-export function PublishPanel({ property }: { property: Property }) {
+export function PublishPanel({
+  property,
+  isPublished,
+  onPublishedChange,
+}: {
+  property: Property;
+  isPublished: boolean;
+  onPublishedChange: (isPublished: boolean) => void;
+}) {
   const t = useTranslations("dashboard.editor.publish");
   const tCommon = useTranslations("dashboard.common");
-  const [isPublished, setIsPublished] = useState(property.is_published);
   const [updating, setUpdating] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [loadingQr, setLoadingQr] = useState(false);
@@ -116,7 +123,7 @@ export function PublishPanel({ property }: { property: Property }) {
 
   async function handleTogglePublished(checked: boolean) {
     setUpdating(true);
-    setIsPublished(checked);
+    onPublishedChange(checked);
     try {
       const response = await fetch(`/api/properties/${property.id}`, {
         method: "PATCH",
@@ -124,13 +131,13 @@ export function PublishPanel({ property }: { property: Property }) {
         body: JSON.stringify({ is_published: checked }),
       });
       if (!response.ok) {
-        setIsPublished(!checked);
+        onPublishedChange(!checked);
         toast.error(t("publishToggleError"));
         return;
       }
       toast.success(checked ? t("publishedToast") : t("unpublishedToast"));
     } catch {
-      setIsPublished(!checked);
+      onPublishedChange(!checked);
       toast.error(tCommon("networkError"));
     } finally {
       setUpdating(false);

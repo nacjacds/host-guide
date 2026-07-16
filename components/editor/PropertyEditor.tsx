@@ -63,6 +63,12 @@ export function PropertyEditor({
   const tSaveAll = useTranslations("dashboard.editor.saveAll");
   const tCommon = useTranslations("dashboard.common");
   const [blocks, setBlocks] = useState(initialBlocks);
+  // Lifted here (rather than kept local to PublishPanel) so the mobile
+  // "Ver guía"/"Compartir guía" pair portaled below — a sibling of
+  // PublishPanel, not a descendant — reacts to the publish toggle
+  // immediately instead of only after the next full page load re-reads
+  // property.is_published from the server.
+  const [isPublished, setIsPublished] = useState(property.is_published);
   const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set());
   const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
   const [savingAll, setSavingAll] = useState(false);
@@ -205,7 +211,7 @@ export function PropertyEditor({
           <GuideActionButtons
             propertyId={property.id}
             slug={property.slug}
-            isPublished={property.is_published}
+            isPublished={isPublished}
           />,
           mobileActionsSlot
         )}
@@ -272,7 +278,11 @@ export function PropertyEditor({
         </div>
 
         <div className="space-y-6">
-          <PublishPanel property={property} />
+          <PublishPanel
+            property={property}
+            isPublished={isPublished}
+            onPublishedChange={setIsPublished}
+          />
 
           <AirbnbImportPanel
             property={property}
