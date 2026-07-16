@@ -21,7 +21,14 @@ export interface PlaceResult {
   location: { lat: number; lng: number };
   maps_url: string;
   photo_url: string | null;
+  photo_urls: string[];
 }
+
+// Google's Text Search / Place Details responses already return every
+// photo reference in the same call as everything else — no extra API cost
+// to keep more than the first. Capped just to keep the array (and the
+// lightbox it feeds) reasonably sized.
+const MAX_PHOTOS_PER_PLACE = 5;
 
 const CATEGORY_QUERY: Record<string, string> = {
   supermarket: "supermercados",
@@ -47,6 +54,13 @@ export const RECOMMENDATION_CATEGORY_CONFIG: Record<
 function buildPhotoUrl(photoName: string | undefined): string | null {
   if (!photoName) return null;
   return `/api/places/photo?name=${encodeURIComponent(photoName)}`;
+}
+
+function buildPhotoUrls(photos: Array<{ name: string }> | undefined): string[] {
+  return (photos ?? [])
+    .slice(0, MAX_PHOTOS_PER_PLACE)
+    .map((p) => buildPhotoUrl(p.name))
+    .filter((url): url is string => url !== null);
 }
 
 const EARTH_RADIUS_METERS = 6371000;
@@ -239,6 +253,7 @@ function mapPlacesResponse(data: {
       location: { lat: p.location.latitude, lng: p.location.longitude },
       maps_url: p.googleMapsUri,
       photo_url: buildPhotoUrl(p.photos?.[0]?.name),
+      photo_urls: buildPhotoUrls(p.photos),
     }));
 }
 
@@ -396,6 +411,7 @@ export async function getPlaceDetails(placeId: string): Promise<PlaceResult | nu
     location: { lat: p.location.latitude, lng: p.location.longitude },
     maps_url: p.googleMapsUri ?? `https://www.google.com/maps/place/?q=place_id:${p.id}`,
     photo_url: buildPhotoUrl(p.photos?.[0]?.name),
+    photo_urls: buildPhotoUrls(p.photos),
   };
 }
 

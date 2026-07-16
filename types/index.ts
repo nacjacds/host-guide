@@ -277,6 +277,7 @@ export interface Database {
           maps_url: string | null;
           rating: number | null;
           photo_url: string | null;
+          photo_urls: string[];
           source: PropertyRecommendationSource;
           display_order: number;
           created_at: string;
@@ -297,6 +298,7 @@ export interface Database {
           maps_url?: string | null;
           rating?: number | null;
           photo_url?: string | null;
+          photo_urls?: string[];
           source?: PropertyRecommendationSource;
           display_order?: number;
           created_at?: string;
@@ -317,6 +319,7 @@ export interface Database {
           maps_url?: string | null;
           rating?: number | null;
           photo_url?: string | null;
+          photo_urls?: string[];
           source?: PropertyRecommendationSource;
           display_order?: number;
           created_at?: string;

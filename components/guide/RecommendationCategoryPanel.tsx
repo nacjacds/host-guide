@@ -1,10 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import { ExternalLink, Star } from "lucide-react";
 import { useGuideLocale } from "./GuideLocaleProvider";
 import { useTranslatedRecommendations } from "./useTranslatedRecommendations";
+import { PhotoLightbox } from "./PhotoLightbox";
 import type { TranslatablePayload } from "@/lib/translations/extract";
 import type { PropertyRecommendation } from "@/types";
+
+// Falls back to the single legacy photo_url for any row whose photo_urls
+// wasn't backfilled (shouldn't happen post-migration, but cheap to guard).
+function photosFor(rec: PropertyRecommendation): string[] {
+  if (rec.photo_urls.length > 0) return rec.photo_urls;
+  return rec.photo_url ? [rec.photo_url] : [];
+}
 
 function formatDistance(
   rec: PropertyRecommendation,
@@ -40,6 +49,8 @@ export function RecommendationCategoryPanel({
       recommendations,
       translated,
     });
+  const [lightbox, setLightbox] = useState<{ recId: string; index: number } | null>(null);
+  const lightboxRec = lightbox ? recommendations.find((r) => r.id === lightbox.recId) : null;
 
   if (recommendations.length === 0) {
     return (
@@ -59,12 +70,19 @@ export function RecommendationCategoryPanel({
             className="flex gap-3 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm"
           >
             {rec.photo_url && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={rec.photo_url}
-                alt=""
-                className="size-16 shrink-0 rounded-lg object-cover"
-              />
+              <button
+                type="button"
+                onClick={() => setLightbox({ recId: rec.id, index: 0 })}
+                aria-label={t("photoViewLarger")}
+                className="shrink-0 overflow-hidden rounded-lg"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={rec.photo_url}
+                  alt=""
+                  className="size-16 object-cover transition-transform hover:scale-105"
+                />
+              </button>
             )}
             <div className="min-w-0 flex-1">
               {rec.maps_url ? (
@@ -103,6 +121,14 @@ export function RecommendationCategoryPanel({
           </div>
         );
       })}
+
+      {lightbox && lightboxRec && (
+        <PhotoLightbox
+          images={photosFor(lightboxRec)}
+          initialIndex={lightbox.index}
+          onClose={() => setLightbox(null)}
+        />
+      )}
     </div>
   );
 }

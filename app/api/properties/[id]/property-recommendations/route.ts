@@ -99,6 +99,7 @@ export async function POST(
       maps_url: place.maps_url,
       rating: place.rating || null,
       photo_url: place.photo_url,
+      photo_urls: place.photo_urls,
       source: "manual",
       display_order: count ?? 0,
     })

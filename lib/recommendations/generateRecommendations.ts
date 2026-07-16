@@ -70,6 +70,7 @@ export async function generatePropertyRecommendations(
     maps_url: string;
     rating: number;
     photo_url: string | null;
+    photo_urls: string[];
     source: "ai_curated";
     display_order: number;
   }> = [];
@@ -140,6 +141,7 @@ export async function generatePropertyRecommendations(
         maps_url: `https://www.google.com/maps/place/?q=place_id:${place.place_id}`,
         rating: place.rating,
         photo_url: place.photo_url,
+        photo_urls: place.photo_urls,
         source: "ai_curated",
         display_order: i,
       });
