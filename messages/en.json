@@ -458,6 +458,8 @@
         },
         "regenerationAvailable": "Available",
         "regenerationRequiresPlan": "Regenerating requires a paid plan",
+        "regenerationFreeGenerationUsed": "You've already used your free AI generation for this category",
+        "regenerationPlanLockedOut": "The Free plan no longer includes AI generation",
         "regenerationUsedThisMonth": "Already regenerated this month · available on {date}",
         "mapsUrlLabel": "Google Maps link",
         "mapsUrlPlaceholder": "Generated automatically — type here to override",

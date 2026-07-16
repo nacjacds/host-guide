@@ -62,6 +62,7 @@ export default async function EditPropertyPage({
   const quotaByCategory = await getRecommendationRegenerationStatus(id, ALL_CATEGORIES, {
     planId: profile?.plan,
     isSuperAdmin: isSuperAdmin(user?.email),
+    email: user?.email,
   });
   const upgradePlan = cheapestPlanWithRecommendationRegenerations(profile?.plan);
 

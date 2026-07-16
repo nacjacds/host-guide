@@ -458,6 +458,8 @@
         },
         "regenerationAvailable": "Disponible",
         "regenerationRequiresPlan": "Regenerar requiere un plan de pago",
+        "regenerationFreeGenerationUsed": "Ya usaste tu generación gratuita con IA para esta categoría",
+        "regenerationPlanLockedOut": "El plan Free ya no incluye generación con IA",
         "regenerationUsedThisMonth": "Ya regenerada este mes · disponible el {date}",
         "mapsUrlLabel": "Link de Google Maps",
         "mapsUrlPlaceholder": "Se genera automáticamente — escribe aquí para sobrescribir",

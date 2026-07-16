@@ -368,6 +368,27 @@ export interface Database {
         };
         Relationships: [];
       };
+      free_ai_generation_usage: {
+        Row: {
+          id: string;
+          email: string;
+          category: PropertyRecommendationCategory;
+          used_at: string;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          category: PropertyRecommendationCategory;
+          used_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          category?: PropertyRecommendationCategory;
+          used_at?: string;
+        };
+        Relationships: [];
+      };
       bot_conversations: {
         Row: {
           id: string;

@@ -370,7 +370,17 @@ export function PropertyRecommendationsSection({
             ? t("regenerationAvailable")
             : status.blockedReason === "plan"
               ? t("regenerationRequiresPlan")
-              : t("regenerationUsedThisMonth", { date: resetLabel ?? "" });
+              : status.blockedReason === "free_generation_used"
+                ? t("regenerationFreeGenerationUsed")
+                : status.blockedReason === "plan_locked_out"
+                  ? t("regenerationPlanLockedOut")
+                  : t("regenerationUsedThisMonth", { date: resetLabel ?? "" });
+        // Upgrading actually helps for these three reasons — not for
+        // "used_this_month", where every paid tier shares the same cadence.
+        const showsUpgradeLink =
+          status?.blockedReason === "plan" ||
+          status?.blockedReason === "free_generation_used" ||
+          status?.blockedReason === "plan_locked_out";
         return (
           <Card key={category} className="overflow-visible">
             <CardHeader>
@@ -408,7 +418,7 @@ export function PropertyRecommendationsSection({
               </CardTitle>
               {statusText && (
                 <p className="text-xs text-muted-foreground">
-                  {status?.available || status?.blockedReason !== "plan" ? (
+                  {!showsUpgradeLink ? (
                     statusText
                   ) : (
                     <>

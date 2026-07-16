@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { generatePropertyRecommendations } from "@/lib/recommendations/generateRecommendations";
 import { getRecommendationRegenerationStatus } from "@/lib/recommendations/quota";
+import { recordFreeGenerationUsage } from "@/lib/recommendations/freeGenerationGate";
 import {
   BASE_RECOMMENDATION_CATEGORIES,
   OPTIONAL_RECOMMENDATION_CATEGORIES,
@@ -82,6 +83,7 @@ export async function POST(
   const statusBefore = await getRecommendationRegenerationStatus(propertyId, categoriesToProcess, {
     planId: profile?.plan,
     isSuperAdmin: admin,
+    email: user.email,
   });
 
   const blocked = categoriesToProcess.find((category) => !statusBefore[category].available);
@@ -95,11 +97,23 @@ export async function POST(
             "Regenerar recomendaciones requiere un plan de pago",
             "Regenerating recommendations requires a paid plan"
           )
-        : pick(
-            locale,
-            `Ya has regenerado esta categoría este mes. Vuelve a estar disponible el ${formatResetDate(new Date(statusBefore[blocked].nextAvailableAt!), locale)}.`,
-            `You've already regenerated this category this month. It'll be available again on ${formatResetDate(new Date(statusBefore[blocked].nextAvailableAt!), locale)}.`
-          );
+        : reason === "free_generation_used"
+          ? pick(
+              locale,
+              "Ya usaste tu generación gratuita con IA para esta categoría. Mejora tu plan para generar más.",
+              "You've already used your free AI generation for this category. Upgrade your plan to generate more."
+            )
+          : reason === "plan_locked_out"
+            ? pick(
+                locale,
+                "El plan Free ya no incluye generación con IA. Mejora tu plan para generar recomendaciones.",
+                "The Free plan no longer includes AI generation. Upgrade your plan to generate recommendations."
+              )
+            : pick(
+                locale,
+                `Ya has regenerado esta categoría este mes. Vuelve a estar disponible el ${formatResetDate(new Date(statusBefore[blocked].nextAvailableAt!), locale)}.`,
+                `You've already regenerated this category this month. It'll be available again on ${formatResetDate(new Date(statusBefore[blocked].nextAvailableAt!), locale)}.`
+              );
     return NextResponse.json({ error: message }, { status: 429 });
   }
 
@@ -127,11 +141,23 @@ export async function POST(
           }))
         );
       }
+
+      // The inverse set — categories this run just spent their free
+      // first-ever generation on — so this email can never get another
+      // free generation for them again, even from a different property
+      // (including one created after this one is deleted).
+      const categoriesJustUsedFree = categoriesToProcess.filter(
+        (category) => statusBefore[category].isFirstGeneration
+      );
+      if (categoriesJustUsedFree.length > 0 && user.email) {
+        await recordFreeGenerationUsage(user.email, categoriesJustUsedFree);
+      }
     }
 
     const quotaStatus = await getRecommendationRegenerationStatus(propertyId, categoriesToProcess, {
       planId: profile?.plan,
       isSuperAdmin: admin,
+      email: user.email,
     });
 
     return NextResponse.json({ ...result, quotaStatus });
