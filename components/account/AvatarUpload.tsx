@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "sonner";
 import { getInitials } from "@/lib/utils";
+import { compressImageFile } from "@/lib/compressImage";
 
 const MAX_SIZE_BYTES = 1 * 1024 * 1024;
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -22,6 +23,7 @@ export function AvatarUpload({
   const tCommon = useTranslations("dashboard.common");
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
   const [uploading, setUploading] = useState(false);
+  const [compressing, setCompressing] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -34,15 +36,22 @@ export function AvatarUpload({
       toast.error(t("invalidType"));
       return;
     }
-    if (file.size > MAX_SIZE_BYTES) {
-      toast.error(t("tooLarge"));
+
+    // Cropped to 200x200 server-side anyway, so 1024px is plenty of
+    // headroom for that crop — no need for the full 1920px used elsewhere.
+    setCompressing(true);
+    const compressed = await compressImageFile(file, { maxSizeMB: 1, maxWidthOrHeight: 1024 });
+    setCompressing(false);
+
+    if (compressed.size > MAX_SIZE_BYTES) {
+      toast.error(tCommon("imageStillTooLargeAfterCompression"));
       return;
     }
 
     setUploading(true);
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", compressed);
       const response = await fetch("/api/profile/avatar", {
         method: "POST",
         body: formData,
@@ -96,9 +105,9 @@ export function AvatarUpload({
           variant="outline"
           size="sm"
           onClick={() => inputRef.current?.click()}
-          disabled={uploading}
+          disabled={uploading || compressing}
         >
-          {uploading ? t("uploading") : t("change")}
+          {compressing ? tCommon("compressingImage") : uploading ? t("uploading") : t("change")}
         </Button>
         {avatarUrl && (
           <Button
@@ -106,7 +115,7 @@ export function AvatarUpload({
             variant="ghost"
             size="sm"
             onClick={() => setConfirmOpen(true)}
-            disabled={uploading}
+            disabled={uploading || compressing}
           >
             {t("remove")}
           </Button>

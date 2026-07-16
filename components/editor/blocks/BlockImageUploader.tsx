@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { toast } from "sonner";
+import { compressImageFile } from "@/lib/compressImage";
 import type { BlockImage } from "@/types";
 
 const MAX_IMAGES = 3;
@@ -25,6 +26,7 @@ export function BlockImageUploader({
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [compressing, setCompressing] = useState(false);
   const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
   const [pendingDeleteUrl, setPendingDeleteUrl] = useState<string | null>(null);
   const t = useTranslations("dashboard.editor.blocks.imageUploader");
@@ -39,15 +41,20 @@ export function BlockImageUploader({
       toast.error(t("onlyJpgPngWebp"));
       return;
     }
-    if (file.size > MAX_SIZE_BYTES) {
-      toast.error(t("tooLarge2mb"));
+
+    setCompressing(true);
+    const compressed = await compressImageFile(file, { maxSizeMB: 2, maxWidthOrHeight: 1920 });
+    setCompressing(false);
+
+    if (compressed.size > MAX_SIZE_BYTES) {
+      toast.error(tCommon("imageStillTooLargeAfterCompression"));
       return;
     }
 
     setUploading(true);
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", compressed);
       const response = await fetch(`/api/guide-blocks/${blockId}/images`, {
         method: "POST",
         body: formData,
@@ -137,10 +144,10 @@ export function BlockImageUploader({
             type="button"
             variant="outline"
             size="sm"
-            disabled={uploading}
+            disabled={uploading || compressing}
             onClick={() => fileInputRef.current?.click()}
           >
-            {uploading ? tCommon("saving") : t("addImage")}
+            {compressing ? tCommon("compressingImage") : uploading ? tCommon("saving") : t("addImage")}
           </Button>
         </>
       )}

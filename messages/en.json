@@ -205,7 +205,9 @@
       "save": "Save",
       "saving": "Saving...",
       "networkError": "Network error",
-      "notSpecified": "Not specified"
+      "notSpecified": "Not specified",
+      "compressingImage": "Compressing image...",
+      "imageStillTooLargeAfterCompression": "The image is still too large even after compression. Try a smaller or lower-resolution image."
     },
     "account": {
       "title": "My account",

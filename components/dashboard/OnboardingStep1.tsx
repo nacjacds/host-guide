@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { compressImageFile } from "@/lib/compressImage";
 import type { Property } from "@/types";
 
 const MAX_COVER_SIZE_BYTES = 3 * 1024 * 1024;
@@ -25,6 +26,7 @@ export function OnboardingStep1({
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [compressingCover, setCompressingCover] = useState(false);
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -55,23 +57,27 @@ export function OnboardingStep1({
     }
   }
 
-  function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
+    e.target.value = "";
     if (!file) return;
 
     if (file.type !== "image/jpeg") {
       toast.error(t("onlyJpg"));
-      e.target.value = "";
-      return;
-    }
-    if (file.size > MAX_COVER_SIZE_BYTES) {
-      toast.error(t("tooLarge3mb"));
-      e.target.value = "";
       return;
     }
 
-    setCoverFile(file);
-    setCoverPreview(URL.createObjectURL(file));
+    setCompressingCover(true);
+    const compressed = await compressImageFile(file, { maxSizeMB: 3, maxWidthOrHeight: 1920 });
+    setCompressingCover(false);
+
+    if (compressed.size > MAX_COVER_SIZE_BYTES) {
+      toast.error(tCommon("imageStillTooLargeAfterCompression"));
+      return;
+    }
+
+    setCoverFile(compressed);
+    setCoverPreview(URL.createObjectURL(compressed));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -194,8 +200,9 @@ export function OnboardingStep1({
                   size="sm"
                   className="w-full"
                   onClick={() => fileInputRef.current?.click()}
+                  disabled={compressingCover}
                 >
-                  {t("change")}
+                  {compressingCover ? tCommon("compressingImage") : t("change")}
                 </Button>
               </div>
             ) : (
@@ -205,8 +212,9 @@ export function OnboardingStep1({
                 size="sm"
                 className="w-full"
                 onClick={() => fileInputRef.current?.click()}
+                disabled={compressingCover}
               >
-                {t("uploadJpg")}
+                {compressingCover ? tCommon("compressingImage") : t("uploadJpg")}
               </Button>
             )}
             <input
@@ -217,7 +225,7 @@ export function OnboardingStep1({
               onChange={handleCoverChange}
             />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full" disabled={loading || compressingCover}>
             {loading ? t("creating") : t("continue")}
           </Button>
         </form>

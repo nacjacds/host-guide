@@ -12,6 +12,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { GuideActionButtons } from "./GuideActionButtons";
 import { toast } from "sonner";
 import { sanitizePhoneDigits, isValidPhoneNumber } from "@/lib/phone";
+import { compressImageFile } from "@/lib/compressImage";
 import type { Property } from "@/types";
 
 const MAX_COVER_SIZE_BYTES = 3 * 1024 * 1024;
@@ -32,6 +33,7 @@ export function PublishPanel({
   const [loadingQr, setLoadingQr] = useState(false);
   const [coverUrl, setCoverUrl] = useState(property.cover_image_url);
   const [uploadingCover, setUploadingCover] = useState(false);
+  const [compressingCover, setCompressingCover] = useState(false);
   const [confirmCoverDelete, setConfirmCoverDelete] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const [whatsappNumber, setWhatsappNumber] = useState(property.whatsapp_number ?? "");
@@ -46,15 +48,20 @@ export function PublishPanel({
       toast.error(t("onlyJpg"));
       return;
     }
-    if (file.size > MAX_COVER_SIZE_BYTES) {
-      toast.error(t("coverTooLarge"));
+
+    setCompressingCover(true);
+    const compressed = await compressImageFile(file, { maxSizeMB: 3, maxWidthOrHeight: 1920 });
+    setCompressingCover(false);
+
+    if (compressed.size > MAX_COVER_SIZE_BYTES) {
+      toast.error(tCommon("imageStillTooLargeAfterCompression"));
       return;
     }
 
     setUploadingCover(true);
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", compressed);
       const response = await fetch(`/api/properties/${property.id}/cover-image`, {
         method: "POST",
         body: formData,
@@ -213,16 +220,20 @@ export function PublishPanel({
                   size="sm"
                   className="flex-1"
                   onClick={() => coverInputRef.current?.click()}
-                  disabled={uploadingCover}
+                  disabled={uploadingCover || compressingCover}
                 >
-                  {uploadingCover ? tCommon("saving") : t("change")}
+                  {compressingCover
+                    ? tCommon("compressingImage")
+                    : uploadingCover
+                      ? tCommon("saving")
+                      : t("change")}
                 </Button>
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => setConfirmCoverDelete(true)}
-                  disabled={uploadingCover}
+                  disabled={uploadingCover || compressingCover}
                 >
                   {tCommon("delete")}
                 </Button>
@@ -235,9 +246,13 @@ export function PublishPanel({
               size="sm"
               className="w-full"
               onClick={() => coverInputRef.current?.click()}
-              disabled={uploadingCover}
+              disabled={uploadingCover || compressingCover}
             >
-              {uploadingCover ? tCommon("saving") : t("uploadJpg")}
+              {compressingCover
+                ? tCommon("compressingImage")
+                : uploadingCover
+                  ? tCommon("saving")
+                  : t("uploadJpg")}
             </Button>
           )}
           <input

@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { compressImageFile } from "@/lib/compressImage";
 import type { SupportTicketType } from "@/types";
 
 const SUBJECT_MAX = 100;
@@ -32,6 +33,7 @@ export function SupportWidget() {
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
   const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [compressingScreenshot, setCompressingScreenshot] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const widgetRef = useRef<HTMLDivElement>(null);
@@ -68,7 +70,7 @@ export function SupportWidget() {
     setStep("form");
   }
 
-  function handleScreenshotChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleScreenshotChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
@@ -77,11 +79,16 @@ export function SupportWidget() {
       toast.error(t("onlyJpgPngWebp"));
       return;
     }
-    if (file.size > MAX_SCREENSHOT_BYTES) {
-      toast.error(t("tooLarge2mb"));
+
+    setCompressingScreenshot(true);
+    const compressed = await compressImageFile(file, { maxSizeMB: 2, maxWidthOrHeight: 1920 });
+    setCompressingScreenshot(false);
+
+    if (compressed.size > MAX_SCREENSHOT_BYTES) {
+      toast.error(tCommon("imageStillTooLargeAfterCompression"));
       return;
     }
-    setScreenshot(file);
+    setScreenshot(compressed);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -178,8 +185,13 @@ export function SupportWidget() {
                   size="sm"
                   className="w-full"
                   onClick={() => fileInputRef.current?.click()}
+                  disabled={compressingScreenshot}
                 >
-                  {screenshot ? screenshot.name : t("attachImage")}
+                  {compressingScreenshot
+                    ? tCommon("compressingImage")
+                    : screenshot
+                      ? screenshot.name
+                      : t("attachImage")}
                 </Button>
                 <input
                   ref={fileInputRef}

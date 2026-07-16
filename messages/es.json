@@ -205,7 +205,9 @@
       "save": "Guardar",
       "saving": "Guardando...",
       "networkError": "Error de red",
-      "notSpecified": "Sin especificar"
+      "notSpecified": "Sin especificar",
+      "compressingImage": "Comprimiendo imagen...",
+      "imageStillTooLargeAfterCompression": "La imagen sigue siendo demasiado grande incluso después de comprimirla. Prueba con una imagen más pequeña o de menor resolución."
     },
     "account": {
       "title": "Mi cuenta",
