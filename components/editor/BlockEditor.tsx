@@ -72,7 +72,6 @@ export function BlockEditor({
   saving,
   defaultOpen = false,
   onChange,
-  onSynced,
   onSave,
   onDeleted,
 }: {
@@ -81,7 +80,6 @@ export function BlockEditor({
   saving: boolean;
   defaultOpen?: boolean;
   onChange: (patch: Partial<GuideBlock>) => void;
-  onSynced: (patch: Partial<GuideBlock>) => void;
   onSave: () => void;
   onDeleted: (id: string) => void;
 }) {
@@ -257,7 +255,7 @@ export function BlockEditor({
               <BlockImageUploader
                 blockId={block.id}
                 images={block.images}
-                onUploaded={(images: BlockImage[]) => onSynced({ images })}
+                onUploaded={(images: BlockImage[]) => onChange({ images })}
                 onCaptionChange={(images: BlockImage[]) => onChange({ images })}
               />
             </div>

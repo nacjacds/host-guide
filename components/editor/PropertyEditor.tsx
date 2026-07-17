@@ -273,7 +273,6 @@ export function PropertyEditor({
                       saving={savingIds.has(block.id)}
                       defaultOpen={newBlockIds.has(block.id)}
                       onChange={(patch) => handleBlockChange(block.id, patch)}
-                      onSynced={(patch) => handleBlockSynced(block.id, patch)}
                       onSave={() => handleSaveOne(block.id)}
                       onDeleted={handleBlockDeleted}
                     />
