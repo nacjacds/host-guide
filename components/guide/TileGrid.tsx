@@ -16,14 +16,14 @@ const TILE_CLASSES =
   "flex flex-col items-center justify-center gap-2 rounded-2xl border border-neutral-200 bg-white p-5 text-center shadow-sm transition-all hover:shadow-md sm:p-6";
 
 export function TileGrid({
-  slug,
+  basePath,
   blocks,
   recommendations,
   recommendationCategories,
   accentColor,
   translations,
 }: {
-  slug: string;
+  basePath: string;
   blocks: GuideBlock[];
   recommendations: Recommendation[];
   recommendationCategories: PropertyRecommendationCategory[];
@@ -43,7 +43,7 @@ export function TileGrid({
         const Icon = BLOCK_ICONS[block.type];
         const translated = lookupTranslation<TranslatablePayload>(translations, block.type, block.id);
         return (
-          <Link key={block.id} href={`/guide/${slug}/${block.type}`}>
+          <Link key={block.id} href={`${basePath}/${block.type}`}>
             <div
               className={cn(TILE_CLASSES, "hover:border-[var(--tile-accent)]")}
               style={{ "--tile-accent": accentColor } as React.CSSProperties}
@@ -59,7 +59,7 @@ export function TileGrid({
       {recommendationCategories.map((category) => {
         const Icon = RECOMMENDATION_CATEGORY_ICONS[category];
         return (
-          <Link key={category} href={`/guide/${slug}/${category}`}>
+          <Link key={category} href={`${basePath}/${category}`}>
             <div
               className={cn(TILE_CLASSES, "hover:border-[var(--tile-accent)]")}
               style={{ "--tile-accent": accentColor } as React.CSSProperties}
@@ -73,7 +73,7 @@ export function TileGrid({
         );
       })}
       {hasRecommendations && (
-        <Link href={`/guide/${slug}/recomendaciones`}>
+        <Link href={`${basePath}/recomendaciones`}>
           <div
             className={cn(TILE_CLASSES, "hover:border-[var(--tile-accent)]")}
             style={{ "--tile-accent": accentColor } as React.CSSProperties}

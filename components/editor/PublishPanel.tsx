@@ -13,7 +13,7 @@ import { GuideActionButtons } from "./GuideActionButtons";
 import { toast } from "sonner";
 import { sanitizePhoneDigits, isValidPhoneNumber } from "@/lib/phone";
 import { compressImageFile } from "@/lib/compressImage";
-import type { Property } from "@/types";
+import type { Property, GuestGuideLink } from "@/types";
 
 const MAX_COVER_SIZE_BYTES = 3 * 1024 * 1024;
 
@@ -21,10 +21,14 @@ export function PublishPanel({
   property,
   isPublished,
   onPublishedChange,
+  guestLinks,
+  onGuestLinksChange,
 }: {
   property: Property;
   isPublished: boolean;
   onPublishedChange: (isPublished: boolean) => void;
+  guestLinks: GuestGuideLink[];
+  onGuestLinksChange: (links: GuestGuideLink[]) => void;
 }) {
   const t = useTranslations("dashboard.editor.publish");
   const tCommon = useTranslations("dashboard.common");
@@ -197,6 +201,8 @@ export function PublishPanel({
           propertyId={property.id}
           slug={property.slug}
           isPublished={isPublished}
+          guestLinks={guestLinks}
+          onGuestLinksChange={onGuestLinksChange}
           className="hidden md:flex"
         />
         {!isPublished && (

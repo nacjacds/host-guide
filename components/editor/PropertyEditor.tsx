@@ -28,7 +28,13 @@ import { GuideActionButtons } from "./GuideActionButtons";
 import { AirbnbImportPanel } from "./AirbnbImportPanel";
 import { PropertyRecommendationsSection } from "./PropertyRecommendationsSection";
 import type { CategoryRegenerationStatus } from "@/lib/recommendations/constants";
-import type { GuideBlock, Property, PropertyRecommendation, PropertyRecommendationCategory } from "@/types";
+import type {
+  GuideBlock,
+  Property,
+  PropertyRecommendation,
+  PropertyRecommendationCategory,
+  GuestGuideLink,
+} from "@/types";
 
 async function saveBlock(block: GuideBlock) {
   const response = await fetch(`/api/guide-blocks/${block.id}`, {
@@ -51,6 +57,7 @@ export function PropertyEditor({
   categoriesDetected,
   recommendationQuotaByCategory,
   upgradePlanLabel,
+  initialGuestLinks,
 }: {
   property: Property;
   initialBlocks: GuideBlock[];
@@ -58,6 +65,7 @@ export function PropertyEditor({
   categoriesDetected: PropertyRecommendationCategory[];
   recommendationQuotaByCategory: Record<string, CategoryRegenerationStatus>;
   upgradePlanLabel: string | null;
+  initialGuestLinks: GuestGuideLink[];
 }) {
   const t = useTranslations("dashboard.editor");
   const tSaveAll = useTranslations("dashboard.editor.saveAll");
@@ -69,6 +77,11 @@ export function PropertyEditor({
   // immediately instead of only after the next full page load re-reads
   // property.is_published from the server.
   const [isPublished, setIsPublished] = useState(property.is_published);
+  // Same lifting reasoning as isPublished above — the mobile-portaled
+  // GuideActionButtons is a sibling of PublishPanel's own copy, not a
+  // descendant, so a link generated on one surface must be visible on the
+  // other immediately, not just after the next full page load.
+  const [guestLinks, setGuestLinks] = useState(initialGuestLinks);
   const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set());
   const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
   const [savingAll, setSavingAll] = useState(false);
@@ -212,6 +225,8 @@ export function PropertyEditor({
             propertyId={property.id}
             slug={property.slug}
             isPublished={isPublished}
+            guestLinks={guestLinks}
+            onGuestLinksChange={setGuestLinks}
           />,
           mobileActionsSlot
         )}
@@ -282,6 +297,8 @@ export function PropertyEditor({
             property={property}
             isPublished={isPublished}
             onPublishedChange={setIsPublished}
+            guestLinks={guestLinks}
+            onGuestLinksChange={setGuestLinks}
           />
 
           <AirbnbImportPanel

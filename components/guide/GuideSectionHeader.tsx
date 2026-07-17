@@ -7,12 +7,12 @@ import { useGuideLocale } from "./GuideLocaleProvider";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function GuideSectionHeader({
-  slug,
+  basePath,
   propertyName,
   accentColor,
   coverImageUrl,
 }: {
-  slug: string;
+  basePath: string;
   propertyName: string;
   accentColor: string;
   coverImageUrl?: string | null;
@@ -41,7 +41,7 @@ export function GuideSectionHeader({
         style={{ textShadow: coverImageUrl ? "0 1px 2px rgba(0, 0, 0, 0.5)" : undefined }}
       >
         <Link
-          href={`/guide/${slug}`}
+          href={basePath}
           className="flex shrink-0 items-center gap-1 text-sm text-white/80 hover:text-white"
         >
           <ChevronLeft className="size-5" />

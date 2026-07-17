@@ -5,27 +5,26 @@ import { RecommendationsPanel } from "@/components/guide/RecommendationsPanel";
 import { BackToGuideButton } from "@/components/guide/BackToGuideButton";
 import { GuideUnavailable } from "@/components/guide/GuideUnavailable";
 import { logAnalyticsEvent } from "@/lib/analytics";
-import { classifyGuideAvailability } from "@/lib/properties";
+import { resolveGuestLink } from "@/lib/guestLinks";
 
-export default async function GuideRecommendationsPage({
+// Mirrors app/guide/[slug]/recomendaciones/page.tsx — same legacy
+// supermarket/pharmacy/transport panel, resolved via a personalized
+// guest-link token instead of a slug.
+export default async function GuestLinkRecommendationsPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ token: string }>;
 }) {
-  const { slug } = await params;
+  const { token } = await params;
+  const resolution = await resolveGuestLink(token);
+
+  if (resolution.status === "not_found" || resolution.status === "unpublished") notFound();
+  if (resolution.status === "deleted") return <GuideUnavailable />;
+  if (resolution.status === "expired") return <GuideUnavailable variant="link_expired" />;
+
+  const property = resolution.property!;
+  const basePath = `/guide/link/${token}`;
   const supabase = await createClient();
-
-  // No is_published filter — see app/guide/[slug]/page.tsx for why.
-  const { data: property } = await supabase
-    .from("properties")
-    .select("*")
-    .eq("slug", slug)
-    .single();
-
-  const availability = classifyGuideAvailability(property);
-  if (availability === "not_found" || availability === "unpublished") notFound();
-  if (availability === "deleted") return <GuideUnavailable />;
-  if (!property) notFound();
 
   const { data: recommendations } = await supabase
     .from("recommendations")
@@ -39,7 +38,7 @@ export default async function GuideRecommendationsPage({
   return (
     <div className="mx-auto max-w-2xl pb-24">
       <GuideSectionHeader
-        basePath={`/guide/${slug}`}
+        basePath={basePath}
         propertyName={property.name}
         accentColor={property.accent_color}
         coverImageUrl={property.cover_image_url}
@@ -49,7 +48,7 @@ export default async function GuideRecommendationsPage({
           recommendations={recommendations ?? []}
           accentColor={property.accent_color}
         />
-        <BackToGuideButton basePath={`/guide/${slug}`} />
+        <BackToGuideButton basePath={basePath} />
       </div>
     </div>
   );

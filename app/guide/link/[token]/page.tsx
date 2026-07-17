@@ -8,35 +8,26 @@ import { GuideUnavailable } from "@/components/guide/GuideUnavailable";
 import { logAnalyticsEvent } from "@/lib/analytics";
 import { fetchPropertyTranslations, lookupTranslation } from "@/lib/translations/fetchTranslations";
 import { guideTargetLocaleFor, resolvePropertySourceLocale } from "@/lib/translations/constants";
-import { classifyGuideAvailability } from "@/lib/properties";
+import { resolveGuestLink } from "@/lib/guestLinks";
 
-export default async function GuidePage({
+// Mirrors app/guide/[slug]/page.tsx — same content, resolved via a
+// personalized guest-link token instead of the property's slug. See
+// lib/guestLinks.ts for the shared not_found/unpublished/deleted/expired
+// classification.
+export default async function GuestLinkGuidePage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ token: string }>;
 }) {
-  const { slug } = await params;
+  const { token } = await params;
+  const resolution = await resolveGuestLink(token);
+
+  if (resolution.status === "not_found" || resolution.status === "unpublished") notFound();
+  if (resolution.status === "deleted") return <GuideUnavailable />;
+  if (resolution.status === "expired") return <GuideUnavailable variant="link_expired" />;
+
+  const property = resolution.property!;
   const supabase = await createClient();
-
-  // No is_published filter here — fetched unconditionally so a
-  // soft-deleted property can be told apart from a genuinely-missing or
-  // still-draft one and shown different messaging (see
-  // lib/properties.ts's classifyGuideAvailability).
-  const { data: property } = await supabase
-    .from("properties")
-    .select("*")
-    .eq("slug", slug)
-    .single();
-
-  const availability = classifyGuideAvailability(property);
-  if (availability === "not_found" || availability === "unpublished") notFound();
-  if (availability === "deleted") return <GuideUnavailable />;
-  if (!property) notFound();
-
-  // profiles has no public/anon RLS select policy (only "own profile" for
-  // authenticated users), so a real anonymous guest can't read the host's
-  // name/avatar through the regular client — use service role here, it's
-  // only exposing display data the host already made public in their guide.
   const serviceClient = createServiceRoleClient();
 
   const [{ data: blocks }, { data: recommendations }, { data: propertyRecommendations }, { data: host }] =
@@ -64,10 +55,6 @@ export default async function GuidePage({
 
   await logAnalyticsEvent(property.id, "guide_opened");
 
-  // Only show a category tile for categories that actually have at least
-  // one place — covers both AI-curated and host-added manual entries, so a
-  // manually-added beach recommendation still surfaces even if the AI
-  // search itself found nothing nearby.
   const recommendationCategories = Array.from(
     new Set((propertyRecommendations ?? []).map((r) => r.category))
   );
@@ -77,12 +64,6 @@ export default async function GuidePage({
   const isEmpty =
     !hasVisibleBlocks && !hasVisibleRecommendations && recommendationCategories.length === 0;
 
-  // See app/guide/[slug]/[type]/page.tsx — locale is guest-selected
-  // client-side, so both the welcome message and (for custom blocks) tile
-  // titles are pre-fetched here regardless of which language ends up shown.
-  // Target is whichever locale ISN'T this property's own source language
-  // (properties.language) — only two guide locales exist today, so there's
-  // exactly one target to pre-fetch.
   const sourceLocale = resolvePropertySourceLocale(property.language);
   const translations = await fetchPropertyTranslations(property.id, guideTargetLocaleFor(sourceLocale));
   const translatedWelcomeMessage = lookupTranslation<string>(
@@ -106,7 +87,7 @@ export default async function GuidePage({
         <EmptyGuideState accentColor={property.accent_color} />
       ) : (
         <TileGrid
-          basePath={`/guide/${slug}`}
+          basePath={`/guide/link/${token}`}
           blocks={blocks ?? []}
           recommendations={recommendations ?? []}
           recommendationCategories={recommendationCategories}

@@ -419,6 +419,30 @@ export interface Database {
         };
         Relationships: [];
       };
+      guest_guide_links: {
+        Row: {
+          id: string;
+          property_id: string;
+          checkin_date: string;
+          checkout_date: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          property_id: string;
+          checkin_date: string;
+          checkout_date: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          property_id?: string;
+          checkin_date?: string;
+          checkout_date?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       translations_cache: {
         Row: {
           id: string;
@@ -569,6 +593,7 @@ export type Property = Database["public"]["Tables"]["properties"]["Row"];
 export type GuideBlock = Database["public"]["Tables"]["guide_blocks"]["Row"];
 export type Recommendation = Database["public"]["Tables"]["recommendations"]["Row"];
 export type PropertyRecommendation = Database["public"]["Tables"]["property_recommendations"]["Row"];
+export type GuestGuideLink = Database["public"]["Tables"]["guest_guide_links"]["Row"];
 export type PropertyRecommendationMeta = Database["public"]["Tables"]["property_recommendation_meta"]["Row"];
 export type RecommendationRegenerationUsage = Database["public"]["Tables"]["recommendation_regeneration_usage"]["Row"];
 export type BotConversation = Database["public"]["Tables"]["bot_conversations"]["Row"];

@@ -22,11 +22,13 @@ import {
   resolvePropertySourceLocale,
   RECOMMENDATIONS_TARGET_LOCALE,
 } from "@/lib/translations/constants";
-import { classifyGuideAvailability } from "@/lib/properties";
+import { resolveGuestLink } from "@/lib/guestLinks";
 import type { TranslatablePayload } from "@/lib/translations/extract";
 import type { BlockType, PropertyRecommendationCategory } from "@/types";
 import type { PlaceListContent } from "@/components/editor/blocks/PlaceListBlock";
 
+// Mirrors app/guide/[slug]/[type]/page.tsx — same content, resolved via a
+// personalized guest-link token instead of a slug.
 const VALID_TYPES: readonly BlockType[] = [
   "wifi",
   "checkin",
@@ -50,12 +52,12 @@ const RECOMMENDATION_TYPES: readonly PropertyRecommendationCategory[] = [
   "nature",
 ];
 
-export default async function GuideBlockPage({
+export default async function GuestLinkBlockPage({
   params,
 }: {
-  params: Promise<{ slug: string; type: string }>;
+  params: Promise<{ token: string; type: string }>;
 }) {
-  const { slug, type } = await params;
+  const { token, type } = await params;
 
   const isRecommendationCategory = RECOMMENDATION_TYPES.includes(
     type as PropertyRecommendationCategory
@@ -63,19 +65,14 @@ export default async function GuideBlockPage({
 
   if (!VALID_TYPES.includes(type as BlockType) && !isRecommendationCategory) notFound();
 
+  const resolution = await resolveGuestLink(token);
+  if (resolution.status === "not_found" || resolution.status === "unpublished") notFound();
+  if (resolution.status === "deleted") return <GuideUnavailable />;
+  if (resolution.status === "expired") return <GuideUnavailable variant="link_expired" />;
+
+  const property = resolution.property!;
+  const basePath = `/guide/link/${token}`;
   const supabase = await createClient();
-
-  // No is_published filter — see app/guide/[slug]/page.tsx for why.
-  const { data: property } = await supabase
-    .from("properties")
-    .select("*")
-    .eq("slug", slug)
-    .single();
-
-  const availability = classifyGuideAvailability(property);
-  if (availability === "not_found" || availability === "unpublished") notFound();
-  if (availability === "deleted") return <GuideUnavailable />;
-  if (!property) notFound();
 
   if (isRecommendationCategory) {
     const category = type as PropertyRecommendationCategory;
@@ -92,20 +89,13 @@ export default async function GuideBlockPage({
 
     const Icon = RECOMMENDATION_CATEGORY_ICONS[category];
 
-    // Same pre-fetch-then-fallback pattern as every other block below —
-    // see RecommendationCategoryPanel/useTranslatedRecommendations for the
-    // client-side locale switch and cache-miss fallback. Recommendation
-    // descriptions are always Claude-written in Spanish regardless of
-    // properties.language (see curateRecommendations in lib/claude.ts), so
-    // this stays pinned to the fixed recommendations target, not the
-    // dynamic per-property one used for regular blocks below.
     const translations = await fetchPropertyTranslations(property.id, RECOMMENDATIONS_TARGET_LOCALE);
     const translated = lookupTranslation<TranslatablePayload>(translations, category, null);
 
     return (
       <div className="mx-auto max-w-2xl pb-24">
         <GuideSectionHeader
-          basePath={`/guide/${slug}`}
+          basePath={basePath}
           propertyName={property.name}
           accentColor={property.accent_color}
           coverImageUrl={property.cover_image_url}
@@ -121,7 +111,7 @@ export default async function GuideBlockPage({
               translated={translated}
             />
           </div>
-          <BackToGuideButton basePath={`/guide/${slug}`} />
+          <BackToGuideButton basePath={basePath} />
         </div>
       </div>
     );
@@ -139,18 +129,13 @@ export default async function GuideBlockPage({
 
   await logAnalyticsEvent(property.id, "section_viewed", type);
 
-  // Locale is guest-selected client-side (see GuideLocaleProvider), so the
-  // server can't know in advance which language will be shown — fetching
-  // the (only) target locale's translations here means switching languages
-  // client-side is instant, with zero AI call on the guest's critical path.
-  // Target is whichever locale isn't this property's own source language.
   const sourceLocale = resolvePropertySourceLocale(property.language);
   const translations = await fetchPropertyTranslations(property.id, guideTargetLocaleFor(sourceLocale));
 
   return (
     <div className="mx-auto max-w-2xl pb-24">
       <GuideSectionHeader
-        basePath={`/guide/${slug}`}
+        basePath={basePath}
         propertyName={property.name}
         accentColor={property.accent_color}
         coverImageUrl={property.cover_image_url}
@@ -197,7 +182,7 @@ export default async function GuideBlockPage({
             </div>
           );
         })}
-        <BackToGuideButton basePath={`/guide/${slug}`} />
+        <BackToGuideButton basePath={basePath} />
       </div>
     </div>
   );

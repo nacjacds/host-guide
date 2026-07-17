@@ -16,6 +16,11 @@ interface GuideLocaleContextValue {
   // whether the currently-displayed `locale` needs translated content at
   // all, instead of assuming the source is always Spanish.
   sourceLocale: GuideLocale;
+  // Only set when visiting through a personalized guest link (see
+  // lib/guestLinks.ts) — null on the generic slug-based guide, which has
+  // no stay of its own to speak of. CheckinPanel uses this to show the
+  // guest's real check-in/check-out dates instead of just the time of day.
+  stayDates: { checkin: string; checkout: string } | null;
 }
 
 const GuideLocaleContext = createContext<GuideLocaleContextValue | null>(null);
@@ -23,10 +28,12 @@ const GuideLocaleContext = createContext<GuideLocaleContextValue | null>(null);
 export function GuideLocaleProvider({
   propertyId,
   sourceLocale,
+  stayDates = null,
   children,
 }: {
   propertyId: string;
   sourceLocale: GuideLocale;
+  stayDates?: { checkin: string; checkout: string } | null;
   children: React.ReactNode;
 }) {
   // Seeded from the property's own source language rather than hardcoded
@@ -50,7 +57,9 @@ export function GuideLocaleProvider({
   }
 
   return (
-    <GuideLocaleContext.Provider value={{ locale, setLocale, t, propertyId, sourceLocale }}>
+    <GuideLocaleContext.Provider
+      value={{ locale, setLocale, t, propertyId, sourceLocale, stayDates }}
+    >
       {children}
     </GuideLocaleContext.Provider>
   );

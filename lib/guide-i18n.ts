@@ -41,6 +41,7 @@ export const GUIDE_TRANSLATIONS = {
     block_beaches: "Playas",
     block_nature: "Naturaleza",
     checkinFromLabel: "Check-in a partir de las",
+    checkoutFromLabel: "Check-out antes de las",
     wifiConnectButton: "Ya estoy conectado",
     wifiConnectedPrefix: "Conectado a",
     wifiConnectedSuffix: "— ya puedes navegar la guía sin datos",
@@ -53,6 +54,9 @@ export const GUIDE_TRANSLATIONS = {
     guideUnavailableTitle: "Esta guía ya no está disponible",
     guideUnavailableMessage:
       "El anfitrión ha retirado esta guía. Si crees que es un error, contacta directamente con él.",
+    linkExpiredTitle: "Este enlace ya no está disponible",
+    linkExpiredMessage:
+      "El periodo de estancia asociado a este enlace ya ha terminado. Si necesitas acceder a la guía, contacta con tu anfitrión.",
   },
   en: {
     back: "Back",
@@ -92,6 +96,7 @@ export const GUIDE_TRANSLATIONS = {
     block_beaches: "Beaches",
     block_nature: "Nature",
     checkinFromLabel: "Check-in from",
+    checkoutFromLabel: "Check-out before",
     wifiConnectButton: "I'm connected",
     wifiConnectedPrefix: "Connected to",
     wifiConnectedSuffix: "— you can now browse the guide without using data",
@@ -104,6 +109,9 @@ export const GUIDE_TRANSLATIONS = {
     guideUnavailableTitle: "This guide is no longer available",
     guideUnavailableMessage:
       "The host has taken this guide down. If you think this is a mistake, please reach out to them directly.",
+    linkExpiredTitle: "This link is no longer available",
+    linkExpiredMessage:
+      "The stay period tied to this link has already ended. If you need to access the guide, please contact your host.",
   },
 } as const;
 

@@ -361,6 +361,28 @@
         "viewGuide": "Ver guía",
         "shareGuide": "Compartir guía"
       },
+      "guestLinks": {
+        "generateLink": "Generar enlace",
+        "dialogTitle": "Enlaces para huéspedes",
+        "dialogDescription": "Crea un enlace único para las fechas de estancia de un huésped. Deja de funcionar automáticamente después del check-out.",
+        "checkinLabel": "Check-in",
+        "checkoutLabel": "Check-out",
+        "generate": "Generar enlace",
+        "generating": "Generando...",
+        "generateError": "No se pudo generar el enlace",
+        "dateOrderError": "La fecha de check-out debe ser igual o posterior a la de check-in",
+        "linkCreated": "Enlace generado",
+        "activeLinks": "Enlaces generados",
+        "noLinksYet": "Todavía no has generado ningún enlace.",
+        "copyLink": "Copiar enlace",
+        "copied": "¡Copiado!",
+        "copyError": "No se pudo copiar el enlace",
+        "delete": "Eliminar",
+        "deleteError": "No se pudo eliminar el enlace",
+        "deleted": "Enlace eliminado",
+        "confirmDeleteTitle": "¿Eliminar este enlace?",
+        "confirmDeleteDescription": "El huésped que lo tenga ya no podrá acceder a la guía con él. Esta acción no se puede deshacer."
+      },
       "airbnbImport": {
         "title": "Importar desde Airbnb",
         "urlLabel": "URL de tu anuncio de Airbnb",

@@ -49,6 +49,12 @@ export default async function EditPropertyPage({
     .eq("property_id", id)
     .maybeSingle();
 
+  const { data: guestLinks } = await supabase
+    .from("guest_guide_links")
+    .select("*")
+    .eq("property_id", id)
+    .order("created_at", { ascending: false });
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("plan")
@@ -74,6 +80,7 @@ export default async function EditPropertyPage({
       categoriesDetected={recommendationMeta?.categories_detected ?? []}
       recommendationQuotaByCategory={quotaByCategory}
       upgradePlanLabel={upgradePlan?.label ?? null}
+      initialGuestLinks={guestLinks ?? []}
     />
   );
 }
