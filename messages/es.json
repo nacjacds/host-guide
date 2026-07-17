@@ -357,14 +357,12 @@
         "qrAlt": "Código QR de la guía",
         "downloadPng": "Descargar PNG"
       },
-      "guideActions": {
-        "viewGuide": "Ver guía",
-        "shareGuide": "Compartir guía"
-      },
       "guestLinks": {
-        "generateLink": "Generar enlace",
+        "generateLink": "Enlaces para huéspedes",
         "dialogTitle": "Enlaces para huéspedes",
         "dialogDescription": "Crea un enlace único para las fechas de estancia de un huésped. Deja de funcionar automáticamente después del check-out.",
+        "guestNameLabel": "Nombre del huésped (opcional)",
+        "guestNamePlaceholder": "María García",
         "checkinLabel": "Check-in",
         "checkoutLabel": "Check-out",
         "generate": "Generar enlace",
@@ -680,17 +678,6 @@
         "publishError": "No se pudo publicar la guía",
         "keepEditing": "Seguir editando"
       }
-    },
-    "shareGuide": {
-      "title": "Compartir guía",
-      "directLink": "Enlace directo",
-      "copied": "¡Copiado!",
-      "copyLink": "Copiar enlace",
-      "copyError": "No se pudo copiar el enlace",
-      "generatingQr": "Generando QR...",
-      "qrAlt": "Código QR de la guía",
-      "downloadQr": "Descargar QR",
-      "qrError": "No se pudo generar el QR"
     },
     "admin": {
       "title": "Panel de administración",

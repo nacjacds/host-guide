@@ -357,14 +357,12 @@
         "qrAlt": "Guide QR code",
         "downloadPng": "Download PNG"
       },
-      "guideActions": {
-        "viewGuide": "View guide",
-        "shareGuide": "Share guide"
-      },
       "guestLinks": {
-        "generateLink": "Generate link",
+        "generateLink": "Guest links",
         "dialogTitle": "Guest links",
         "dialogDescription": "Create a unique link for a guest's stay dates. It automatically stops working after check-out.",
+        "guestNameLabel": "Guest name (optional)",
+        "guestNamePlaceholder": "Jane Smith",
         "checkinLabel": "Check-in",
         "checkoutLabel": "Check-out",
         "generate": "Generate link",
@@ -680,17 +678,6 @@
         "publishError": "Couldn't publish the guide",
         "keepEditing": "Keep editing"
       }
-    },
-    "shareGuide": {
-      "title": "Share guide",
-      "directLink": "Direct link",
-      "copied": "Copied!",
-      "copyLink": "Copy link",
-      "copyError": "Couldn't copy the link",
-      "generatingQr": "Generating QR...",
-      "qrAlt": "Guide QR code",
-      "downloadQr": "Download QR",
-      "qrError": "Couldn't generate the QR"
     },
     "admin": {
       "title": "Admin panel",

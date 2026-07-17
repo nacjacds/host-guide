@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { useLocale } from "@/components/shared/LocaleProvider";
 import { formatLocalizedDate } from "@/lib/formatDate";
 import { getAppUrl } from "@/lib/env";
+import { cn } from "@/lib/utils";
 import type { GuestGuideLink } from "@/types";
 
 function todayIsoDate(): string {
@@ -27,15 +28,18 @@ export function GuestLinksDialog({
   propertyId,
   guestLinks,
   onGuestLinksChange,
+  className,
 }: {
   propertyId: string;
   guestLinks: GuestGuideLink[];
   onGuestLinksChange: (links: GuestGuideLink[]) => void;
+  className?: string;
 }) {
   const t = useTranslations("dashboard.editor.guestLinks");
   const tCommon = useTranslations("dashboard.common");
   const { locale } = useLocale();
   const [open, setOpen] = useState(false);
+  const [guestName, setGuestName] = useState("");
   const [checkinDate, setCheckinDate] = useState(todayIsoDate());
   const [checkoutDate, setCheckoutDate] = useState(todayIsoDate());
   const [generating, setGenerating] = useState(false);
@@ -59,7 +63,11 @@ export function GuestLinksDialog({
       const response = await fetch(`/api/properties/${propertyId}/guest-links`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ checkin_date: checkinDate, checkout_date: checkoutDate }),
+        body: JSON.stringify({
+          guest_name: guestName.trim() || null,
+          checkin_date: checkinDate,
+          checkout_date: checkoutDate,
+        }),
       });
 
       if (!response.ok) {
@@ -70,6 +78,7 @@ export function GuestLinksDialog({
 
       const { link } = (await response.json()) as { link: GuestGuideLink };
       onGuestLinksChange([link, ...guestLinks]);
+      setGuestName("");
       toast.success(t("linkCreated"));
     } catch {
       toast.error(tCommon("networkError"));
@@ -113,7 +122,7 @@ export function GuestLinksDialog({
       <Button
         type="button"
         variant="outline"
-        className="flex-1"
+        className={cn("w-full", className)}
         onClick={() => setOpen(true)}
       >
         <Link2 size={14} className="mr-1.5" />
@@ -127,6 +136,16 @@ export function GuestLinksDialog({
           <div className="space-y-4">
             <p className="text-xs text-muted-foreground">{t("dialogDescription")}</p>
             <form onSubmit={handleGenerate} className="space-y-3">
+              <div>
+                <Label htmlFor="guest-link-name">{t("guestNameLabel")}</Label>
+                <Input
+                  id="guest-link-name"
+                  value={guestName}
+                  onChange={(e) => setGuestName(e.target.value)}
+                  placeholder={t("guestNamePlaceholder")}
+                  maxLength={120}
+                />
+              </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <Label htmlFor="guest-link-checkin">{t("checkinLabel")}</Label>
@@ -165,7 +184,8 @@ export function GuestLinksDialog({
                       key={link.id}
                       className="flex items-center justify-between gap-2 rounded-lg border border-border p-2.5"
                     >
-                      <p className="text-xs font-medium">
+                      <p className="min-w-0 text-xs font-medium">
+                        {link.guest_name && `${link.guest_name} · `}
                         {formatLocalizedDate(link.checkin_date, locale)} →{" "}
                         {formatLocalizedDate(link.checkout_date, locale)}
                       </p>

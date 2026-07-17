@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { GuideActionButtons } from "./GuideActionButtons";
+import { GuestLinksDialog } from "./GuestLinksDialog";
 import { toast } from "sonner";
 import { sanitizePhoneDigits, isValidPhoneNumber } from "@/lib/phone";
 import { compressImageFile } from "@/lib/compressImage";
@@ -194,16 +194,14 @@ export function PublishPanel({
           />
         </div>
 
-        {/* Mobile renders this same pair portaled above the property tabs
+        {/* Mobile renders this same dialog portaled above the property tabs
             instead — see PropertyEditor.tsx. Hidden here below md to avoid
             showing it twice. */}
-        <GuideActionButtons
+        <GuestLinksDialog
           propertyId={property.id}
-          slug={property.slug}
-          isPublished={isPublished}
           guestLinks={guestLinks}
           onGuestLinksChange={onGuestLinksChange}
-          className="hidden md:flex"
+          className="hidden md:inline-flex"
         />
         {!isPublished && (
           <p className="text-xs text-muted-foreground">{t("publishHint")}</p>

@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 import { BlockEditor } from "./BlockEditor";
 import { BlockToolbar } from "./BlockToolbar";
 import { PublishPanel } from "./PublishPanel";
-import { GuideActionButtons } from "./GuideActionButtons";
+import { GuestLinksDialog } from "./GuestLinksDialog";
 import { AirbnbImportPanel } from "./AirbnbImportPanel";
 import { PropertyRecommendationsSection } from "./PropertyRecommendationsSection";
 import type { CategoryRegenerationStatus } from "@/lib/recommendations/constants";
@@ -71,25 +71,20 @@ export function PropertyEditor({
   const tSaveAll = useTranslations("dashboard.editor.saveAll");
   const tCommon = useTranslations("dashboard.common");
   const [blocks, setBlocks] = useState(initialBlocks);
-  // Lifted here (rather than kept local to PublishPanel) so the mobile
-  // "Ver guía"/"Compartir guía" pair portaled below — a sibling of
-  // PublishPanel, not a descendant — reacts to the publish toggle
-  // immediately instead of only after the next full page load re-reads
-  // property.is_published from the server.
   const [isPublished, setIsPublished] = useState(property.is_published);
-  // Same lifting reasoning as isPublished above — the mobile-portaled
-  // GuideActionButtons is a sibling of PublishPanel's own copy, not a
-  // descendant, so a link generated on one surface must be visible on the
-  // other immediately, not just after the next full page load.
+  // Lifted here (rather than kept local to PublishPanel) because the
+  // mobile-portaled GuestLinksDialog below is a sibling of PublishPanel's
+  // own copy, not a descendant — a link generated on one surface must be
+  // visible on the other immediately, not just after the next full page load.
   const [guestLinks, setGuestLinks] = useState(initialGuestLinks);
   const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set());
   const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
   const [savingAll, setSavingAll] = useState(false);
   const [newBlockIds, setNewBlockIds] = useState<Set<string>>(new Set());
 
-  // Portal target for the mobile "Ver guía"/"Compartir guía" pair — see
-  // the slot div in properties/[id]/layout.tsx. Only resolvable client-side
-  // after mount, hence the effect instead of reading it during render.
+  // Portal target for the mobile GuestLinksDialog trigger — see the slot
+  // div in properties/[id]/layout.tsx. Only resolvable client-side after
+  // mount, hence the effect instead of reading it during render.
   const [mobileActionsSlot, setMobileActionsSlot] = useState<HTMLElement | null>(null);
   useEffect(() => {
     setMobileActionsSlot(document.getElementById("guide-actions-mobile-slot"));
@@ -221,10 +216,8 @@ export function PropertyEditor({
     <>
       {mobileActionsSlot &&
         createPortal(
-          <GuideActionButtons
+          <GuestLinksDialog
             propertyId={property.id}
-            slug={property.slug}
-            isPublished={isPublished}
             guestLinks={guestLinks}
             onGuestLinksChange={setGuestLinks}
           />,

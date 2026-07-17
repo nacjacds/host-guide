@@ -44,13 +44,13 @@ export default async function PropertyLayout({
       </div>
 
       {/*
-        Mount point for the "Ver guía"/"Compartir guía" pair on mobile —
-        PropertyEditor.tsx (Editor tab only) portals GuideActionButtons in
+        Mount point for the "Enlaces para huéspedes" trigger on mobile —
+        PropertyEditor.tsx (Editor tab only) portals GuestLinksDialog in
         here so it renders between the name and the tabs, matching the
         desktop position's sibling markup without this shared,
-        cross-tab layout needing to know about publish state or fetch
-        extra property fields itself. Empty (and inert) on the other tabs,
-        since only the Editor tab portals into it.
+        cross-tab layout needing to fetch extra property fields itself.
+        Empty (and inert) on the other tabs, since only the Editor tab
+        portals into it.
       */}
       <div id="guide-actions-mobile-slot" className="md:hidden" />
 

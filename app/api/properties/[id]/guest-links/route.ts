@@ -9,6 +9,7 @@ const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
 const createGuestLinkSchema = z
   .object({
+    guest_name: z.string().trim().max(120).nullable().optional(),
     checkin_date: dateSchema,
     checkout_date: dateSchema,
   })
@@ -61,6 +62,7 @@ export async function POST(
     .from("guest_guide_links")
     .insert({
       property_id: propertyId,
+      guest_name: parsed.data.guest_name || null,
       checkin_date: parsed.data.checkin_date,
       checkout_date: parsed.data.checkout_date,
     })

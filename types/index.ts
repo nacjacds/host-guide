@@ -423,6 +423,7 @@ export interface Database {
         Row: {
           id: string;
           property_id: string;
+          guest_name: string | null;
           checkin_date: string;
           checkout_date: string;
           created_at: string;
@@ -430,6 +431,7 @@ export interface Database {
         Insert: {
           id?: string;
           property_id: string;
+          guest_name?: string | null;
           checkin_date: string;
           checkout_date: string;
           created_at?: string;
@@ -437,6 +439,7 @@ export interface Database {
         Update: {
           id?: string;
           property_id?: string;
+          guest_name?: string | null;
           checkin_date?: string;
           checkout_date?: string;
           created_at?: string;
