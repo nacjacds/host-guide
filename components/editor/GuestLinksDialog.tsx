@@ -126,28 +126,30 @@ export function GuestLinksDialog({
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-xs text-muted-foreground">{t("dialogDescription")}</p>
-            <form onSubmit={handleGenerate} className="flex items-end gap-2">
-              <div className="flex-1">
-                <Label htmlFor="guest-link-checkin">{t("checkinLabel")}</Label>
-                <Input
-                  id="guest-link-checkin"
-                  type="date"
-                  value={checkinDate}
-                  onChange={(e) => setCheckinDate(e.target.value)}
-                  required
-                />
+            <form onSubmit={handleGenerate} className="space-y-3">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <Label htmlFor="guest-link-checkin">{t("checkinLabel")}</Label>
+                  <Input
+                    id="guest-link-checkin"
+                    type="date"
+                    value={checkinDate}
+                    onChange={(e) => setCheckinDate(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="guest-link-checkout">{t("checkoutLabel")}</Label>
+                  <Input
+                    id="guest-link-checkout"
+                    type="date"
+                    value={checkoutDate}
+                    onChange={(e) => setCheckoutDate(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
-              <div className="flex-1">
-                <Label htmlFor="guest-link-checkout">{t("checkoutLabel")}</Label>
-                <Input
-                  id="guest-link-checkout"
-                  type="date"
-                  value={checkoutDate}
-                  onChange={(e) => setCheckoutDate(e.target.value)}
-                  required
-                />
-              </div>
-              <Button type="submit" size="sm" disabled={generating}>
+              <Button type="submit" size="sm" disabled={generating} className="w-full">
                 {generating ? t("generating") : t("generate")}
               </Button>
             </form>
