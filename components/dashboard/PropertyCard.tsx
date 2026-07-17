@@ -61,16 +61,6 @@ export function PropertyCard({ property }: { property: Property }) {
         >
           {t("edit")}
         </Link>
-        {property.is_published && (
-          <a
-            href={`/guide/${property.slug}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 rounded-lg border border-border px-3 py-1.5 text-center text-sm font-medium transition-colors hover:bg-accent/40"
-          >
-            {t("viewGuide")}
-          </a>
-        )}
       </div>
     </div>
   );

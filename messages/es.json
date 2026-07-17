@@ -598,8 +598,7 @@
       "card": {
         "published": "Publicada",
         "draft": "Borrador",
-        "edit": "Editar",
-        "viewGuide": "Ver guía"
+        "edit": "Editar"
       },
       "limitNotice": {
         "message": "Has alcanzado el límite de propiedades de tu plan {plan} ({count}/{max})",
