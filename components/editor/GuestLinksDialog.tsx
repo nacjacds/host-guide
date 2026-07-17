@@ -29,16 +29,18 @@ export function GuestLinksDialog({
   guestLinks,
   onGuestLinksChange,
   className,
+  defaultOpen = false,
 }: {
   propertyId: string;
   guestLinks: GuestGuideLink[];
   onGuestLinksChange: (links: GuestGuideLink[]) => void;
   className?: string;
+  defaultOpen?: boolean;
 }) {
   const t = useTranslations("dashboard.editor.guestLinks");
   const tCommon = useTranslations("dashboard.common");
   const { locale } = useLocale();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [guestName, setGuestName] = useState("");
   const [checkinDate, setCheckinDate] = useState(todayIsoDate());
   const [checkoutDate, setCheckoutDate] = useState(todayIsoDate());

@@ -23,12 +23,14 @@ export function PublishPanel({
   onPublishedChange,
   guestLinks,
   onGuestLinksChange,
+  guestLinksDefaultOpen,
 }: {
   property: Property;
   isPublished: boolean;
   onPublishedChange: (isPublished: boolean) => void;
   guestLinks: GuestGuideLink[];
   onGuestLinksChange: (links: GuestGuideLink[]) => void;
+  guestLinksDefaultOpen?: boolean;
 }) {
   const t = useTranslations("dashboard.editor.publish");
   const tCommon = useTranslations("dashboard.common");
@@ -202,6 +204,7 @@ export function PublishPanel({
           guestLinks={guestLinks}
           onGuestLinksChange={onGuestLinksChange}
           className="hidden md:inline-flex"
+          defaultOpen={guestLinksDefaultOpen}
         />
         {!isPublished && (
           <p className="text-xs text-muted-foreground">{t("publishHint")}</p>

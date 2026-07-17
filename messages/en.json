@@ -672,7 +672,7 @@
         "title": "Ready to publish!",
         "subtitle": "This is how your guide will look. You can publish it now or keep editing first.",
         "noBlocksYet": "No blocks yet",
-        "publish": "Publish and view my guide",
+        "publish": "Publish and generate a link",
         "publishing": "Publishing...",
         "publishError": "Couldn't publish the guide",
         "keepEditing": "Keep editing"

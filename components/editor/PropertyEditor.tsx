@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
@@ -89,6 +90,21 @@ export function PropertyEditor({
   useEffect(() => {
     setMobileActionsSlot(document.getElementById("guide-actions-mobile-slot"));
   }, []);
+
+  // Landing here with ?openGuestLinks=true (from onboarding's "publish and
+  // generate a link" step) auto-opens the desktop GuestLinksDialog instance
+  // only — its Dialog portals to the document body regardless of the
+  // trigger button's own responsive hidden/shown class, so this opens
+  // correctly on mobile too without needing to also flag the mobile-portaled
+  // instance (which would otherwise render a second, overlapping dialog).
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const autoOpenGuestLinks = searchParams.get("openGuestLinks") === "true";
+  useEffect(() => {
+    if (autoOpenGuestLinks) {
+      router.replace(`/properties/${property.id}/edit`);
+    }
+  }, [autoOpenGuestLinks, router, property.id]);
 
   // Re-sync when the server component re-fetches — useState's initial value
   // is only read on mount.
@@ -291,6 +307,7 @@ export function PropertyEditor({
             onPublishedChange={setIsPublished}
             guestLinks={guestLinks}
             onGuestLinksChange={setGuestLinks}
+            guestLinksDefaultOpen={autoOpenGuestLinks}
           />
 
           <AirbnbImportPanel

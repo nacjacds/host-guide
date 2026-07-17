@@ -36,9 +36,8 @@ export function OnboardingStep3({
         return;
       }
 
-      window.open(`/guide/${property.slug}`, "_blank", "noopener,noreferrer");
       onFinish();
-      router.push("/dashboard");
+      router.push(`/properties/${property.id}/edit?openGuestLinks=true`);
       router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : tCommon("networkError"));

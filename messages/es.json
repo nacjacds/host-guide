@@ -672,7 +672,7 @@
         "title": "¡Listo para publicar!",
         "subtitle": "Así se verá tu guía. Puedes publicarla ya o seguir editando primero.",
         "noBlocksYet": "Sin bloques todavía",
-        "publish": "Publicar y ver mi guía",
+        "publish": "Publicar y generar enlace",
         "publishing": "Publicando...",
         "publishError": "No se pudo publicar la guía",
         "keepEditing": "Seguir editando"
