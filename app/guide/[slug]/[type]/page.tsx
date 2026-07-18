@@ -16,14 +16,13 @@ import { GuideUnavailable } from "@/components/guide/GuideUnavailable";
 import { BLOCK_ICONS } from "@/lib/guide-icons";
 import { RECOMMENDATION_CATEGORY_ICONS } from "@/lib/recommendations/constants";
 import { logAnalyticsEvent } from "@/lib/analytics";
-import { fetchPropertyTranslations, lookupTranslation } from "@/lib/translations/fetchTranslations";
+import { fetchPropertyTranslationsForLocales } from "@/lib/translations/fetchTranslations";
 import {
-  guideTargetLocaleFor,
+  guideTargetLocalesFor,
   resolvePropertySourceLocale,
-  RECOMMENDATIONS_TARGET_LOCALE,
+  RECOMMENDATIONS_TARGET_LOCALES,
 } from "@/lib/translations/constants";
 import { classifyGuideAvailability } from "@/lib/properties";
-import type { TranslatablePayload } from "@/lib/translations/extract";
 import type { BlockType, PropertyRecommendationCategory } from "@/types";
 import type { PlaceListContent } from "@/components/editor/blocks/PlaceListBlock";
 
@@ -97,10 +96,12 @@ export default async function GuideBlockPage({
     // client-side locale switch and cache-miss fallback. Recommendation
     // descriptions are always Claude-written in Spanish regardless of
     // properties.language (see curateRecommendations in lib/claude.ts), so
-    // this stays pinned to the fixed recommendations target, not the
+    // this stays pinned to the fixed recommendations target list, not the
     // dynamic per-property one used for regular blocks below.
-    const translations = await fetchPropertyTranslations(property.id, RECOMMENDATIONS_TARGET_LOCALE);
-    const translated = lookupTranslation<TranslatablePayload>(translations, category, null);
+    const translationsByLocale = await fetchPropertyTranslationsForLocales(
+      property.id,
+      RECOMMENDATIONS_TARGET_LOCALES
+    );
 
     return (
       <div className="mx-auto max-w-2xl pb-24">
@@ -118,7 +119,7 @@ export default async function GuideBlockPage({
             <RecommendationCategoryPanel
               recommendations={recommendations}
               category={category}
-              translated={translated}
+              translationsByLocale={translationsByLocale}
             />
           </div>
           <BackToGuideButton basePath={`/guide/${slug}`} />
@@ -140,12 +141,14 @@ export default async function GuideBlockPage({
   await logAnalyticsEvent(property.id, "section_viewed", type);
 
   // Locale is guest-selected client-side (see GuideLocaleProvider), so the
-  // server can't know in advance which language will be shown — fetching
-  // the (only) target locale's translations here means switching languages
-  // client-side is instant, with zero AI call on the guest's critical path.
-  // Target is whichever locale isn't this property's own source language.
+  // server can't know in advance which language will be shown. Pre-fetches
+  // EVERY non-source locale so switching languages client-side is always
+  // instant, with zero AI call on the guest's critical path.
   const sourceLocale = resolvePropertySourceLocale(property.language);
-  const translations = await fetchPropertyTranslations(property.id, guideTargetLocaleFor(sourceLocale));
+  const translationsByLocale = await fetchPropertyTranslationsForLocales(
+    property.id,
+    guideTargetLocalesFor(sourceLocale)
+  );
 
   return (
     <div className="mx-auto max-w-2xl pb-24">
@@ -161,7 +164,6 @@ export default async function GuideBlockPage({
           const isWifi = block.type === "wifi";
           const isCheckin = block.type === "checkin" || block.type === "checkout";
           const isPlaceList = PLACE_LIST_TYPES.includes(block.type);
-          const translated = lookupTranslation<TranslatablePayload>(translations, block.type, block.id);
           return (
             <div key={block.id}>
               <SectionHeading
@@ -169,12 +171,12 @@ export default async function GuideBlockPage({
                 accentColor={property.accent_color}
                 isDestructive={isEmergency}
               >
-                <BlockTitle block={block} translated={translated} />
+                <BlockTitle block={block} translationsByLocale={translationsByLocale} />
               </SectionHeading>
               <div className="space-y-4">
                 <BlockImageCarousel images={block.images} />
                 {isEmergency ? (
-                  <EmergencyPanel block={block} translated={translated} />
+                  <EmergencyPanel block={block} translationsByLocale={translationsByLocale} />
                 ) : isWifi ? (
                   <WifiPanel
                     block={block}
@@ -182,16 +184,20 @@ export default async function GuideBlockPage({
                     propertyId={property.id}
                   />
                 ) : isCheckin ? (
-                  <CheckinPanel block={block} translated={translated} />
+                  <CheckinPanel block={block} translationsByLocale={translationsByLocale} />
                 ) : isPlaceList ? (
                   <PlaceListPanel
                     block={block}
                     content={block.content as unknown as PlaceListContent}
                     accentColor={property.accent_color}
-                    translated={translated}
+                    translationsByLocale={translationsByLocale}
                   />
                 ) : (
-                  <TilePanel block={block} accentColor={property.accent_color} translated={translated} />
+                  <TilePanel
+                    block={block}
+                    accentColor={property.accent_color}
+                    translationsByLocale={translationsByLocale}
+                  />
                 )}
               </div>
             </div>

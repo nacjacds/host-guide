@@ -4,19 +4,25 @@ import { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { getInitials, cn } from "@/lib/utils";
 import { useGuideLocale } from "./GuideLocaleProvider";
+import { lookupTranslation, type PropertyTranslationsByLocale } from "@/lib/translations/lookup";
 
 export function WelcomeMessage({
   message,
   hostName,
   hostAvatarUrl,
-  translated,
+  translationsByLocale,
 }: {
   message: string;
   hostName: string | null;
   hostAvatarUrl?: string | null;
-  translated: string | null;
+  translationsByLocale: PropertyTranslationsByLocale;
 }) {
   const { locale, propertyId, sourceLocale, t } = useGuideLocale();
+  const translated = lookupTranslation<string>(
+    translationsByLocale[locale] ?? {},
+    "welcome_message",
+    null
+  );
   const [fallback, setFallback] = useState<string | null>(null);
   const requested = useRef(false);
 

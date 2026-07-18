@@ -14,6 +14,9 @@ import type { GuideLocale } from "@/lib/guide-i18n";
 const LANGUAGES: { code: GuideLocale; flag: string; label: string }[] = [
   { code: "es", flag: "🇪🇸", label: "ES" },
   { code: "en", flag: "🇬🇧", label: "EN" },
+  { code: "fr", flag: "🇫🇷", label: "FR" },
+  { code: "it", flag: "🇮🇹", label: "IT" },
+  { code: "pt", flag: "🇵🇹", label: "PT" },
 ];
 
 export function LanguageSwitcher() {

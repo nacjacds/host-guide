@@ -1,28 +1,39 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import type { GuideLocale } from "./constants";
-import { translationKey, type PropertyTranslations } from "./lookup";
+import { translationKey, type PropertyTranslationsByLocale } from "./lookup";
 
-export type { PropertyTranslations } from "./lookup";
+export type { PropertyTranslations, PropertyTranslationsByLocale } from "./lookup";
 export { lookupTranslation } from "./lookup";
 
 // content_translations has RLS enabled with no policies (same pattern as
 // translations_cache) — only readable via the service-role client, same as
 // the profiles lookup already done elsewhere in the guide route tree for
 // anonymous/guest requests.
-export async function fetchPropertyTranslations(
+//
+// Fetches every target locale in one query rather than the single guessed
+// locale a server component could render — the guest's actual locale
+// choice only exists client-side (GuideLocaleProvider), so prefetching all
+// of them here is what makes switching languages instant with zero
+// client-side Claude call, regardless of which of the N-1 non-source
+// locales the guest picks.
+export async function fetchPropertyTranslationsForLocales(
   propertyId: string,
-  targetLocale: GuideLocale
-): Promise<PropertyTranslations> {
+  targetLocales: readonly GuideLocale[]
+): Promise<PropertyTranslationsByLocale> {
+  if (targetLocales.length === 0) return {};
+
   const supabase = createServiceRoleClient();
   const { data } = await supabase
     .from("content_translations")
-    .select("block_type, block_id, translated_content")
+    .select("block_type, block_id, target_locale, translated_content")
     .eq("property_id", propertyId)
-    .eq("target_locale", targetLocale);
+    .in("target_locale", targetLocales);
 
-  const translations: PropertyTranslations = {};
+  const translations: PropertyTranslationsByLocale = {};
   for (const row of data ?? []) {
-    translations[translationKey(row.block_type, row.block_id)] = row.translated_content;
+    const locale = row.target_locale as GuideLocale;
+    const bucket = translations[locale] ?? (translations[locale] = {});
+    bucket[translationKey(row.block_type, row.block_id)] = row.translated_content;
   }
   return translations;
 }

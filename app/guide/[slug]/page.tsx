@@ -6,8 +6,8 @@ import { TileGrid } from "@/components/guide/TileGrid";
 import { EmptyGuideState } from "@/components/guide/EmptyGuideState";
 import { GuideUnavailable } from "@/components/guide/GuideUnavailable";
 import { logAnalyticsEvent } from "@/lib/analytics";
-import { fetchPropertyTranslations, lookupTranslation } from "@/lib/translations/fetchTranslations";
-import { guideTargetLocaleFor, resolvePropertySourceLocale } from "@/lib/translations/constants";
+import { fetchPropertyTranslationsForLocales } from "@/lib/translations/fetchTranslations";
+import { guideTargetLocalesFor, resolvePropertySourceLocale } from "@/lib/translations/constants";
 import { classifyGuideAvailability } from "@/lib/properties";
 
 export default async function GuidePage({
@@ -78,17 +78,15 @@ export default async function GuidePage({
     !hasVisibleBlocks && !hasVisibleRecommendations && recommendationCategories.length === 0;
 
   // See app/guide/[slug]/[type]/page.tsx — locale is guest-selected
-  // client-side, so both the welcome message and (for custom blocks) tile
-  // titles are pre-fetched here regardless of which language ends up shown.
-  // Target is whichever locale ISN'T this property's own source language
-  // (properties.language) — only two guide locales exist today, so there's
-  // exactly one target to pre-fetch.
+  // client-side, so the server can't know in advance which language will
+  // be shown. Pre-fetches EVERY non-source locale (not just one guessed
+  // target) so switching languages client-side is always instant, with
+  // zero AI call on the guest's critical path regardless of which of the
+  // 4 non-source locales they end up picking.
   const sourceLocale = resolvePropertySourceLocale(property.language);
-  const translations = await fetchPropertyTranslations(property.id, guideTargetLocaleFor(sourceLocale));
-  const translatedWelcomeMessage = lookupTranslation<string>(
-    translations,
-    "welcome_message",
-    null
+  const translationsByLocale = await fetchPropertyTranslationsForLocales(
+    property.id,
+    guideTargetLocalesFor(sourceLocale)
   );
 
   return (
@@ -99,7 +97,7 @@ export default async function GuidePage({
           message={property.welcome_message}
           hostName={host?.full_name ?? null}
           hostAvatarUrl={host?.avatar_url ?? null}
-          translated={translatedWelcomeMessage}
+          translationsByLocale={translationsByLocale}
         />
       )}
       {isEmpty ? (
@@ -111,7 +109,7 @@ export default async function GuidePage({
           recommendations={recommendations ?? []}
           recommendationCategories={recommendationCategories}
           accentColor={property.accent_color}
-          translations={translations}
+          translationsByLocale={translationsByLocale}
         />
       )}
     </div>

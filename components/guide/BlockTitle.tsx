@@ -3,15 +3,15 @@
 import { getBlockTitle } from "@/lib/guide-i18n";
 import { useGuideLocale } from "./GuideLocaleProvider";
 import { useTranslatedBlock } from "./useTranslatedBlock";
-import type { TranslatablePayload } from "@/lib/translations/extract";
+import type { PropertyTranslationsByLocale } from "@/lib/translations/lookup";
 import type { GuideBlock } from "@/types";
 
 export function BlockTitle({
   block,
-  translated,
+  translationsByLocale,
 }: {
   block: Pick<GuideBlock, "id" | "type" | "title" | "content">;
-  translated: TranslatablePayload | null;
+  translationsByLocale: PropertyTranslationsByLocale;
 }) {
   const { t } = useGuideLocale();
   // Only "custom" block titles are AI-translated — every other type's title
@@ -22,7 +22,7 @@ export function BlockTitle({
     blockId: block.id,
     title: block.title,
     content: block.content,
-    translated,
+    translationsByLocale,
     skip: block.type !== "custom",
   });
 

@@ -1,8 +1,8 @@
 import type { GuideBlock } from "@/types";
 
-export type GuideLocale = "es" | "en";
+export type GuideLocale = "es" | "en" | "fr" | "it" | "pt";
 
-export const GUIDE_TRANSLATIONS = {
+const GUIDE_TRANSLATIONS_AUTHORED = {
   es: {
     back: "Volver",
     recommendations: "Recomendaciones",
@@ -115,7 +115,22 @@ export const GUIDE_TRANSLATIONS = {
   },
 } as const;
 
-export type GuideTranslationKey = keyof (typeof GUIDE_TRANSLATIONS)["es"];
+export type GuideTranslationKey = keyof (typeof GUIDE_TRANSLATIONS_AUTHORED)["es"];
+type GuideTranslationDict = Record<GuideTranslationKey, string>;
+
+// French/Italian/Portuguese dictionaries don't exist yet (i18n expansion
+// Fase 3) — until then, those locales fall back to the English UI chrome
+// (buttons, labels) rather than crashing GuideLocaleProvider.t() with a
+// missing key. This is separate from guest-facing CONTENT (guide_blocks,
+// welcome_message, recommendations), which Claude already translates for
+// real into all 5 locales via content_translations — only this static
+// dictionary of ~50 short chrome strings is still pending translation.
+export const GUIDE_TRANSLATIONS: Record<GuideLocale, GuideTranslationDict> = {
+  ...GUIDE_TRANSLATIONS_AUTHORED,
+  fr: GUIDE_TRANSLATIONS_AUTHORED.en,
+  it: GUIDE_TRANSLATIONS_AUTHORED.en,
+  pt: GUIDE_TRANSLATIONS_AUTHORED.en,
+};
 
 export function getBlockTitle(
   block: Pick<GuideBlock, "type" | "title">,

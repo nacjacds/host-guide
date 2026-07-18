@@ -5,7 +5,7 @@ import { ExternalLink, Star } from "lucide-react";
 import { useGuideLocale } from "./GuideLocaleProvider";
 import { useTranslatedRecommendations } from "./useTranslatedRecommendations";
 import { PhotoLightbox } from "./PhotoLightbox";
-import type { TranslatablePayload } from "@/lib/translations/extract";
+import type { PropertyTranslationsByLocale } from "@/lib/translations/lookup";
 import type { PropertyRecommendation } from "@/types";
 
 // Falls back to the single legacy photo_url for any row whose photo_urls
@@ -36,18 +36,18 @@ function formatDistance(
 export function RecommendationCategoryPanel({
   recommendations,
   category,
-  translated,
+  translationsByLocale,
 }: {
   recommendations: PropertyRecommendation[];
   category: string;
-  translated: TranslatablePayload | null;
+  translationsByLocale: PropertyTranslationsByLocale;
 }) {
   const { t } = useGuideLocale();
   const { descriptions: translatedDescriptions, isLoading: translationLoading } =
     useTranslatedRecommendations({
       category,
       recommendations,
-      translated,
+      translationsByLocale,
     });
   const [lightbox, setLightbox] = useState<{ recId: string; index: number } | null>(null);
   const lightboxRec = lightbox ? recommendations.find((r) => r.id === lightbox.recId) : null;

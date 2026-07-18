@@ -7,7 +7,6 @@ import {
   isGuideLocale,
   resolvePropertySourceLocale,
   RECOMMENDATIONS_SOURCE_LOCALE,
-  RECOMMENDATIONS_TARGET_LOCALE,
 } from "@/lib/translations/constants";
 import {
   BASE_RECOMMENDATION_CATEGORIES,
@@ -107,12 +106,14 @@ export async function POST(request: NextRequest) {
       // Recommendation descriptions are always Claude-written in Spanish
       // regardless of properties.language (see curateRecommendations in
       // lib/claude.ts) — this branch intentionally stays pinned to the
-      // fixed recommendations source/target, not the dynamic per-property
-      // one used just above and below.
+      // fixed recommendations source locale, not the dynamic per-property
+      // one used just above and below. targetLocale is already known to be
+      // a valid GuideLocale at this point (see the isGuideLocale check
+      // above), so any locale other than the source itself is translatable.
       if (
         typeof content !== "object" ||
         content === null ||
-        targetLocale !== RECOMMENDATIONS_TARGET_LOCALE
+        targetLocale === RECOMMENDATIONS_SOURCE_LOCALE
       ) {
         return NextResponse.json({ translated: null });
       }

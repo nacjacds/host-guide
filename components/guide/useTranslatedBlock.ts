@@ -3,31 +3,39 @@
 import { useEffect, useRef, useState } from "react";
 import { useGuideLocale } from "./GuideLocaleProvider";
 import { mergeTranslatedContent, type TranslatablePayload } from "@/lib/translations/extract";
+import { lookupTranslation, type PropertyTranslationsByLocale } from "@/lib/translations/lookup";
 import type { BlockType } from "@/types";
 
 // Guest-facing content is pre-translated at save time (see
 // lib/translations/trigger.ts) and read straight from content_translations
-// server-side — `translated` below is that pre-fetched value, passed down
-// as a prop, so the common case renders instantly with zero client fetch.
-// This hook only reaches the network for the rare case where the cache is
-// missing (e.g. content was saved seconds ago and the background job
-// hasn't finished) — see app/api/guide/translate-block.
+// server-side — `translationsByLocale` below is that pre-fetched map, for
+// EVERY non-source locale (see fetchPropertyTranslationsForLocales),
+// passed down as a prop so the common case renders instantly with zero
+// client fetch regardless of which locale the guest ends up on. This hook
+// only reaches the network for the rare case where the cache is missing
+// for the CURRENT locale (e.g. content was saved seconds ago and the
+// background job hasn't finished) — see app/api/guide/translate-block.
 export function useTranslatedBlock({
   blockType,
   blockId,
   title,
   content,
-  translated,
+  translationsByLocale,
   skip = false,
 }: {
   blockType: BlockType;
   blockId: string;
   title?: string | null;
   content: Record<string, unknown>;
-  translated: TranslatablePayload | null;
+  translationsByLocale: PropertyTranslationsByLocale;
   skip?: boolean;
 }): { title: string | null; content: Record<string, unknown> } {
   const { locale, propertyId, sourceLocale } = useGuideLocale();
+  const translated = lookupTranslation<TranslatablePayload>(
+    translationsByLocale[locale] ?? {},
+    blockType,
+    blockId
+  );
   const [fallback, setFallback] = useState<TranslatablePayload | null>(null);
   const requestedFor = useRef<string | null>(null);
 

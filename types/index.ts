@@ -268,7 +268,7 @@ export interface Database {
           place_id: string | null;
           name: string;
           description: string | null;
-          description_en_override: string | null;
+          description_overrides: Record<string, string>;
           address: string | null;
           lat: number | null;
           lng: number | null;
@@ -289,7 +289,7 @@ export interface Database {
           place_id?: string | null;
           name: string;
           description?: string | null;
-          description_en_override?: string | null;
+          description_overrides?: Record<string, string>;
           address?: string | null;
           lat?: number | null;
           lng?: number | null;
@@ -310,7 +310,7 @@ export interface Database {
           place_id?: string | null;
           name?: string;
           description?: string | null;
-          description_en_override?: string | null;
+          description_overrides?: Record<string, string>;
           address?: string | null;
           lat?: number | null;
           lng?: number | null;

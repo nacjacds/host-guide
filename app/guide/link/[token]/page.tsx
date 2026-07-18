@@ -6,8 +6,8 @@ import { TileGrid } from "@/components/guide/TileGrid";
 import { EmptyGuideState } from "@/components/guide/EmptyGuideState";
 import { GuideUnavailable } from "@/components/guide/GuideUnavailable";
 import { logAnalyticsEvent } from "@/lib/analytics";
-import { fetchPropertyTranslations, lookupTranslation } from "@/lib/translations/fetchTranslations";
-import { guideTargetLocaleFor, resolvePropertySourceLocale } from "@/lib/translations/constants";
+import { fetchPropertyTranslationsForLocales } from "@/lib/translations/fetchTranslations";
+import { guideTargetLocalesFor, resolvePropertySourceLocale } from "@/lib/translations/constants";
 import { resolveGuestLink } from "@/lib/guestLinks";
 
 // Mirrors app/guide/[slug]/page.tsx — same content, resolved via a
@@ -65,11 +65,9 @@ export default async function GuestLinkGuidePage({
     !hasVisibleBlocks && !hasVisibleRecommendations && recommendationCategories.length === 0;
 
   const sourceLocale = resolvePropertySourceLocale(property.language);
-  const translations = await fetchPropertyTranslations(property.id, guideTargetLocaleFor(sourceLocale));
-  const translatedWelcomeMessage = lookupTranslation<string>(
-    translations,
-    "welcome_message",
-    null
+  const translationsByLocale = await fetchPropertyTranslationsForLocales(
+    property.id,
+    guideTargetLocalesFor(sourceLocale)
   );
 
   return (
@@ -80,7 +78,7 @@ export default async function GuestLinkGuidePage({
           message={property.welcome_message}
           hostName={host?.full_name ?? null}
           hostAvatarUrl={host?.avatar_url ?? null}
-          translated={translatedWelcomeMessage}
+          translationsByLocale={translationsByLocale}
         />
       )}
       {isEmpty ? (
@@ -92,7 +90,7 @@ export default async function GuestLinkGuidePage({
           recommendations={recommendations ?? []}
           recommendationCategories={recommendationCategories}
           accentColor={property.accent_color}
-          translations={translations}
+          translationsByLocale={translationsByLocale}
         />
       )}
     </div>

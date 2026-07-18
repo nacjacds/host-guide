@@ -232,8 +232,8 @@ export function PropertyRecommendationsSection({
     // so there's no ambiguity between "never touched" and "host cleared a
     // pre-filled value on purpose".
     setEditMapsUrl("");
-    setEditEnOverrideEnabled(!!rec.description_en_override);
-    setEditDescriptionEn(rec.description_en_override ?? "");
+    setEditEnOverrideEnabled(!!rec.description_overrides?.en);
+    setEditDescriptionEn(rec.description_overrides?.en ?? "");
   }
 
   function cancelEdit() {
@@ -549,7 +549,7 @@ export function PropertyRecommendationsSection({
                               rec.rating != null ? `★ ${rec.rating}` : null,
                               rec.source === "manual" ? t("manualTag") : null,
                               rec.source === "ai_curated_edited" ? t("editedTag") : null,
-                              rec.description_en_override ? t("enManualTag") : null,
+                              rec.description_overrides?.en ? t("enManualTag") : null,
                             ]
                               .filter(Boolean)
                               .join(" · ")}

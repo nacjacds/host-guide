@@ -16,14 +16,13 @@ import { GuideUnavailable } from "@/components/guide/GuideUnavailable";
 import { BLOCK_ICONS } from "@/lib/guide-icons";
 import { RECOMMENDATION_CATEGORY_ICONS } from "@/lib/recommendations/constants";
 import { logAnalyticsEvent } from "@/lib/analytics";
-import { fetchPropertyTranslations, lookupTranslation } from "@/lib/translations/fetchTranslations";
+import { fetchPropertyTranslationsForLocales } from "@/lib/translations/fetchTranslations";
 import {
-  guideTargetLocaleFor,
+  guideTargetLocalesFor,
   resolvePropertySourceLocale,
-  RECOMMENDATIONS_TARGET_LOCALE,
+  RECOMMENDATIONS_TARGET_LOCALES,
 } from "@/lib/translations/constants";
 import { resolveGuestLink } from "@/lib/guestLinks";
-import type { TranslatablePayload } from "@/lib/translations/extract";
 import type { BlockType, PropertyRecommendationCategory } from "@/types";
 import type { PlaceListContent } from "@/components/editor/blocks/PlaceListBlock";
 
@@ -89,8 +88,10 @@ export default async function GuestLinkBlockPage({
 
     const Icon = RECOMMENDATION_CATEGORY_ICONS[category];
 
-    const translations = await fetchPropertyTranslations(property.id, RECOMMENDATIONS_TARGET_LOCALE);
-    const translated = lookupTranslation<TranslatablePayload>(translations, category, null);
+    const translationsByLocale = await fetchPropertyTranslationsForLocales(
+      property.id,
+      RECOMMENDATIONS_TARGET_LOCALES
+    );
 
     return (
       <div className="mx-auto max-w-2xl pb-24">
@@ -108,7 +109,7 @@ export default async function GuestLinkBlockPage({
             <RecommendationCategoryPanel
               recommendations={recommendations}
               category={category}
-              translated={translated}
+              translationsByLocale={translationsByLocale}
             />
           </div>
           <BackToGuideButton basePath={basePath} />
@@ -130,7 +131,10 @@ export default async function GuestLinkBlockPage({
   await logAnalyticsEvent(property.id, "section_viewed", type);
 
   const sourceLocale = resolvePropertySourceLocale(property.language);
-  const translations = await fetchPropertyTranslations(property.id, guideTargetLocaleFor(sourceLocale));
+  const translationsByLocale = await fetchPropertyTranslationsForLocales(
+    property.id,
+    guideTargetLocalesFor(sourceLocale)
+  );
 
   return (
     <div className="mx-auto max-w-2xl pb-24">
@@ -146,7 +150,6 @@ export default async function GuestLinkBlockPage({
           const isWifi = block.type === "wifi";
           const isCheckin = block.type === "checkin" || block.type === "checkout";
           const isPlaceList = PLACE_LIST_TYPES.includes(block.type);
-          const translated = lookupTranslation<TranslatablePayload>(translations, block.type, block.id);
           return (
             <div key={block.id}>
               <SectionHeading
@@ -154,12 +157,12 @@ export default async function GuestLinkBlockPage({
                 accentColor={property.accent_color}
                 isDestructive={isEmergency}
               >
-                <BlockTitle block={block} translated={translated} />
+                <BlockTitle block={block} translationsByLocale={translationsByLocale} />
               </SectionHeading>
               <div className="space-y-4">
                 <BlockImageCarousel images={block.images} />
                 {isEmergency ? (
-                  <EmergencyPanel block={block} translated={translated} />
+                  <EmergencyPanel block={block} translationsByLocale={translationsByLocale} />
                 ) : isWifi ? (
                   <WifiPanel
                     block={block}
@@ -167,16 +170,20 @@ export default async function GuestLinkBlockPage({
                     propertyId={property.id}
                   />
                 ) : isCheckin ? (
-                  <CheckinPanel block={block} translated={translated} />
+                  <CheckinPanel block={block} translationsByLocale={translationsByLocale} />
                 ) : isPlaceList ? (
                   <PlaceListPanel
                     block={block}
                     content={block.content as unknown as PlaceListContent}
                     accentColor={property.accent_color}
-                    translated={translated}
+                    translationsByLocale={translationsByLocale}
                   />
                 ) : (
-                  <TilePanel block={block} accentColor={property.accent_color} translated={translated} />
+                  <TilePanel
+                    block={block}
+                    accentColor={property.accent_color}
+                    translationsByLocale={translationsByLocale}
+                  />
                 )}
               </div>
             </div>

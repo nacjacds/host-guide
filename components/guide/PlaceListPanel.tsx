@@ -3,7 +3,7 @@
 import { ExternalLink } from "lucide-react";
 import { useGuideLocale } from "./GuideLocaleProvider";
 import { useTranslatedBlock } from "./useTranslatedBlock";
-import type { TranslatablePayload } from "@/lib/translations/extract";
+import type { PropertyTranslationsByLocale } from "@/lib/translations/lookup";
 import type { PlaceListContent } from "@/components/editor/blocks/PlaceListBlock";
 import type { GuideBlock, PlaceEntry } from "@/types";
 
@@ -53,18 +53,18 @@ export function PlaceListPanel({
   block,
   content,
   accentColor,
-  translated,
+  translationsByLocale,
 }: {
   block: GuideBlock;
   content: PlaceListContent;
   accentColor: string;
-  translated: TranslatablePayload | null;
+  translationsByLocale: PropertyTranslationsByLocale;
 }) {
   const { content: mergedContent } = useTranslatedBlock({
     blockType: block.type,
     blockId: block.id,
     content: content as unknown as Record<string, unknown>,
-    translated,
+    translationsByLocale,
   });
   const places = ((mergedContent as unknown as PlaceListContent).places ?? []) as PlaceEntry[];
 

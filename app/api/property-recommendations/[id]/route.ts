@@ -14,6 +14,9 @@ const editSchema = z.object({
   // that don't know about this field). Null = host turned the override off
   // (or left the text empty), revert to automatic translation. A non-empty
   // string = manual override, protected from future auto-translation.
+  // Stored server-side as description_overrides.en (a per-locale JSONB
+  // map) — the wire field name stays English-specific since the editor UI
+  // only exposes an English override today.
   description_en_override: z.string().trim().max(600).nullable().optional(),
   // Empty string or omitted = leave the existing maps_url (auto-generated
   // from Google Places for ai_curated rows, or a previous manual override)
@@ -59,7 +62,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   // rows on properties the caller hosts.
   const { data: existing } = await supabase
     .from("property_recommendations")
-    .select("source")
+    .select("source, description_overrides")
     .eq("id", id)
     .single();
 
@@ -74,6 +77,19 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   // rows whose source is still exactly "ai_curated").
   const nextSource = existing.source === "ai_curated" ? "ai_curated_edited" : existing.source;
 
+  // description_overrides is a per-locale JSONB map ({en, fr, it, pt}) —
+  // the editor UI only exposes an English override today, so this merges
+  // into just the "en" key rather than replacing the whole object, in case
+  // another locale's override is ever added by a future write path.
+  const nextOverrides = { ...(existing.description_overrides ?? {}) };
+  if (parsed.data.description_en_override !== undefined) {
+    if (parsed.data.description_en_override) {
+      nextOverrides.en = parsed.data.description_en_override;
+    } else {
+      delete nextOverrides.en;
+    }
+  }
+
   const { data: updated, error } = await supabase
     .from("property_recommendations")
     .update({
@@ -81,7 +97,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       description: parsed.data.description ?? null,
       // undefined -> field omitted entirely -> column left untouched.
       ...(parsed.data.description_en_override !== undefined
-        ? { description_en_override: parsed.data.description_en_override || null }
+        ? { description_overrides: nextOverrides }
         : {}),
       // Empty/omitted -> leave the existing maps_url untouched (see schema
       // comment above) — only ever overwritten by an explicit non-empty value.
@@ -96,14 +112,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Refresh the cached English translation for this whole category in the
-  // background — a category's descriptions are cached together (see
-  // triggerRecommendationsTranslation), so any edit invalidates the whole
-  // set, not just this one row. Rows with a manual EN override are excluded
-  // there, so this can never clobber one.
+  // Refresh the cached translations for this whole category, for every
+  // non-Spanish locale, in the background — a category's descriptions are
+  // cached together (see triggerRecommendationsTranslation), so any edit
+  // invalidates the whole set, not just this one row. Rows with a manual
+  // override for a given locale are excluded there, so this can never
+  // clobber one.
   const { data: categoryRows } = await supabase
     .from("property_recommendations")
-    .select("id, description, description_en_override")
+    .select("id, description, description_overrides")
     .eq("property_id", updated.property_id)
     .eq("category", updated.category);
   triggerRecommendationsTranslation(updated.property_id, updated.category, categoryRows ?? []);

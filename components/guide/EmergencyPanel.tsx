@@ -2,7 +2,7 @@
 
 import { useGuideLocale } from "./GuideLocaleProvider";
 import { useTranslatedBlock } from "./useTranslatedBlock";
-import type { TranslatablePayload } from "@/lib/translations/extract";
+import type { PropertyTranslationsByLocale } from "@/lib/translations/lookup";
 import type { GuideBlock } from "@/types";
 import type { GuideTranslationKey } from "@/lib/guide-i18n";
 
@@ -25,17 +25,17 @@ const FIELD_ORDER: Array<{ key: keyof EmergencyContent; labelKey: GuideTranslati
 
 export function EmergencyPanel({
   block,
-  translated,
+  translationsByLocale,
 }: {
   block: GuideBlock;
-  translated: TranslatablePayload | null;
+  translationsByLocale: PropertyTranslationsByLocale;
 }) {
   const { t } = useGuideLocale();
   const { content } = useTranslatedBlock({
     blockType: block.type,
     blockId: block.id,
     content: block.content,
-    translated,
+    translationsByLocale,
   });
   const emergencyContent = content as unknown as EmergencyContent;
 

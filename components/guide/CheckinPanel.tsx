@@ -3,23 +3,23 @@
 import { useGuideLocale } from "./GuideLocaleProvider";
 import { useTranslatedBlock } from "./useTranslatedBlock";
 import { formatLocalizedDate } from "@/lib/formatDate";
-import type { TranslatablePayload } from "@/lib/translations/extract";
+import type { PropertyTranslationsByLocale } from "@/lib/translations/lookup";
 import type { CheckinContent } from "@/components/editor/blocks/CheckinBlock";
 import type { GuideBlock } from "@/types";
 
 export function CheckinPanel({
   block,
-  translated,
+  translationsByLocale,
 }: {
   block: GuideBlock;
-  translated: TranslatablePayload | null;
+  translationsByLocale: PropertyTranslationsByLocale;
 }) {
   const { t, locale, stayDates } = useGuideLocale();
   const { content } = useTranslatedBlock({
     blockType: block.type,
     blockId: block.id,
     content: block.content,
-    translated,
+    translationsByLocale,
   });
   const checkinContent = content as unknown as CheckinContent;
   const isCheckout = block.type === "checkout";

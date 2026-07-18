@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { GUIDE_TRANSLATIONS, type GuideLocale, type GuideTranslationKey } from "@/lib/guide-i18n";
+import { isGuideLocale } from "@/lib/translations/constants";
 
 const STORAGE_KEY = "guide-locale";
 
@@ -44,7 +45,7 @@ export function GuideLocaleProvider({
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "es" || stored === "en") setLocaleState(stored);
+    if (stored && isGuideLocale(stored)) setLocaleState(stored);
   }, []);
 
   function setLocale(next: GuideLocale) {

@@ -70,7 +70,7 @@ export function WifiPanel({
 
   return (
     <div className="space-y-4">
-      <TilePanel block={block} accentColor={accentColor} translated={null} />
+      <TilePanel block={block} accentColor={accentColor} translationsByLocale={{}} />
 
       {qrDataUrl && (
         <div className="flex flex-col items-center gap-2">

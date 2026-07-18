@@ -2,23 +2,23 @@
 
 import { Check } from "lucide-react";
 import { useTranslatedBlock } from "./useTranslatedBlock";
-import type { TranslatablePayload } from "@/lib/translations/extract";
+import type { PropertyTranslationsByLocale } from "@/lib/translations/lookup";
 import type { GuideBlock } from "@/types";
 
 export function TilePanel({
   block,
   accentColor,
-  translated,
+  translationsByLocale,
 }: {
   block: GuideBlock;
   accentColor: string;
-  translated: TranslatablePayload | null;
+  translationsByLocale: PropertyTranslationsByLocale;
 }) {
   const { content } = useTranslatedBlock({
     blockType: block.type,
     blockId: block.id,
     content: block.content,
-    translated,
+    translationsByLocale,
     skip: block.type === "wifi",
   });
 
