@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { sendSupportTicketNotification } from "@/lib/email";
 import { notAuthenticatedResponse } from "@/lib/apiResponses";
 import { getApiLocale } from "@/lib/apiLocale";
-import { commonApiMessages, pick } from "@/lib/apiMessages";
+import { apiMessage, pick } from "@/lib/apiMessages";
 
 const MAX_SCREENSHOT_BYTES = 2 * 1024 * 1024;
 const ACCEPTED_SCREENSHOT_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
   if (!parsed.success) {
     const locale = await getApiLocale(request, supabase, user.id);
-    return NextResponse.json({ error: commonApiMessages.invalidData[locale] }, { status: 400 });
+    return NextResponse.json({ error: apiMessage("invalidData", locale) }, { status: 400 });
   }
 
   const screenshot = formData.get("screenshot");
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       await sharp(inputBuffer).metadata();
     } catch {
       const locale = await getApiLocale(request, supabase, user.id);
-      return NextResponse.json({ error: commonApiMessages.notValidImage[locale] }, { status: 400 });
+      return NextResponse.json({ error: apiMessage("notValidImage", locale) }, { status: 400 });
     }
 
     const extension = screenshot.type === "image/png" ? "png" : screenshot.type === "image/webp" ? "webp" : "jpg";

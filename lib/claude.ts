@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { HostTone } from "@/types";
+import type { AppLocale } from "@/lib/locale";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -19,6 +20,14 @@ export interface GuideContent {
   neighborhood_description: string;
 }
 
+const OUTPUT_LANGUAGE_NAMES: Record<AppLocale, string> = {
+  es: "español",
+  en: "inglés",
+  fr: "francés",
+  it: "italiano",
+  pt: "portugués",
+};
+
 export async function generateGuideContent(property: {
   name: string;
   address: string;
@@ -28,9 +37,9 @@ export async function generateGuideContent(property: {
   // afterward (see app/api/ai/generate-content/route.ts, which also
   // persists this as properties.language so the translation pipeline
   // knows the real source language of the resulting blocks).
-  locale: "es" | "en";
+  locale: AppLocale;
 }): Promise<GuideContent> {
-  const outputLanguage = property.locale === "en" ? "inglés" : "español";
+  const outputLanguage = OUTPUT_LANGUAGE_NAMES[property.locale];
   const prompt = `
 Eres un asistente que ayuda a propietarios de alojamientos turísticos a crear guías para sus huéspedes.
 

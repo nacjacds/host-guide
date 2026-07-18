@@ -4,11 +4,22 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import esMessages from "@/messages/es.json";
 import enMessages from "@/messages/en.json";
-import { type AppLocale, setLocaleCookie } from "@/lib/locale";
+import frMessages from "@/messages/fr.json";
+import itMessages from "@/messages/it.json";
+import ptMessages from "@/messages/pt.json";
+import { ALL_APP_LOCALES, type AppLocale, setLocaleCookie } from "@/lib/locale";
 
+// fr/it/pt.json are English-content placeholders for now (i18n Fase 4
+// hasn't translated them yet) — see messages/fr.json's own copy-from-en.json
+// history. Wiring them in already, rather than aliasing enMessages in code,
+// means Fase 4 can translate key-by-key directly in these files without any
+// further architecture change here.
 const MESSAGES: Record<AppLocale, typeof esMessages> = {
   es: esMessages,
   en: enMessages,
+  fr: frMessages,
+  it: itMessages,
+  pt: ptMessages,
 };
 
 interface LocaleContextValue {
@@ -38,17 +49,14 @@ export function LocaleProvider({
   useEffect(() => {
     if (initialLocale) return;
     // Defensive fallback only — see the comment on `initialLocale` above.
-    // Spanish is the explicit special case; everything else (English,
-    // French, German, ...) falls to English, matching
+    // Every recognized locale matches its own code; anything else (German,
+    // a browser reporting no language, ...) falls to English — matching
     // detectLocaleFromAcceptLanguage's rule in lib/locale.ts exactly, so
     // this and the middleware never disagree if both somehow ran.
     const browserLang = window.navigator.language.toLowerCase();
-    if (browserLang.startsWith("es")) {
-      setLocaleCookie("es");
-    } else {
-      setLocaleState("en");
-      setLocaleCookie("en");
-    }
+    const detected = ALL_APP_LOCALES.find((locale) => browserLang.startsWith(locale)) ?? "en";
+    setLocaleState(detected);
+    setLocaleCookie(detected);
   }, [initialLocale]);
 
   function setLocale(next: AppLocale) {

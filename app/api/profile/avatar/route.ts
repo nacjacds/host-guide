@@ -5,7 +5,7 @@ import { avatarStoragePath } from "@/lib/utils";
 import { notAuthenticatedResponse } from "@/lib/apiResponses";
 import { getApiLocale } from "@/lib/apiLocale";
 import {
-  commonApiMessages,
+  apiMessage,
   acceptedImageTypesMessage,
   imageTooLargeMessage,
   JPG_PNG_WEBP_LABEL,
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
   if (!(file instanceof File)) {
     const locale = await getApiLocale(request, supabase, user.id);
-    return NextResponse.json({ error: commonApiMessages.noFileReceived[locale] }, { status: 400 });
+    return NextResponse.json({ error: apiMessage("noFileReceived", locale) }, { status: 400 });
   }
 
   if (!ACCEPTED_TYPES.includes(file.type)) {
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       .toBuffer();
   } catch {
     const locale = await getApiLocale(request, supabase, user.id);
-    return NextResponse.json({ error: commonApiMessages.notValidImage[locale] }, { status: 400 });
+    return NextResponse.json({ error: apiMessage("notValidImage", locale) }, { status: 400 });
   }
 
   const path = `${user.id}/avatar.webp`;

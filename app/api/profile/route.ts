@@ -21,7 +21,7 @@ const updateProfileSchema = z.object({
     }),
   // Dashboard UI language — independent from properties.language/
   // content_translations, which control the guest-facing guide instead.
-  dashboard_locale: z.enum(["es", "en"]).optional(),
+  dashboard_locale: z.enum(["es", "en", "fr", "it", "pt"]).optional(),
 });
 
 export async function PATCH(request: NextRequest) {

@@ -5,7 +5,7 @@ import { coverImageStoragePath } from "@/lib/utils";
 import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
 import { getApiLocale } from "@/lib/apiLocale";
 import {
-  commonApiMessages,
+  apiMessage,
   acceptedImageTypesMessage,
   imageTooLargeMessage,
   JPG_ONLY_LABEL,
@@ -53,7 +53,7 @@ export async function POST(
 
   if (!(file instanceof File)) {
     const locale = await getApiLocale(request, supabase, user.id);
-    return NextResponse.json({ error: commonApiMessages.noFileReceived[locale] }, { status: 400 });
+    return NextResponse.json({ error: apiMessage("noFileReceived", locale) }, { status: 400 });
   }
 
   if (file.type !== "image/jpeg") {
@@ -80,7 +80,7 @@ export async function POST(
       .toBuffer();
   } catch {
     const locale = await getApiLocale(request, supabase, user.id);
-    return NextResponse.json({ error: commonApiMessages.notValidImage[locale] }, { status: 400 });
+    return NextResponse.json({ error: apiMessage("notValidImage", locale) }, { status: 400 });
   }
 
   const path = `${id}/cover.jpg`;

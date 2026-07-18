@@ -3,7 +3,7 @@ import { createServiceRoleClient } from "@/lib/supabase/server";
 import { generatePropertyRecommendations } from "@/lib/recommendations/generateRecommendations";
 import { REGENERATION_INTERVAL_DAYS } from "@/lib/recommendations/constants";
 import { parseLocale, LOCALE_COOKIE_NAME } from "@/lib/locale";
-import { commonApiMessages } from "@/lib/apiMessages";
+import { apiMessage } from "@/lib/apiMessages";
 
 // Vercel Cron target (see vercel.json) — regenerates local recommendations
 // for any published, paid-plan property whose data is missing or older
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     const locale = parseLocale(request.cookies.get(LOCALE_COOKIE_NAME)?.value);
-    return NextResponse.json({ error: commonApiMessages.notAuthorized[locale] }, { status: 401 });
+    return NextResponse.json({ error: apiMessage("notAuthorized", locale) }, { status: 401 });
   }
 
   const supabase = createServiceRoleClient();

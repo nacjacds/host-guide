@@ -5,7 +5,7 @@ import { isSuperAdmin } from "@/lib/admin";
 import { PLAN_ORDER } from "@/lib/plans";
 import { notAuthorizedResponse } from "@/lib/apiResponses";
 import { getApiLocale } from "@/lib/apiLocale";
-import { commonApiMessages, pick } from "@/lib/apiMessages";
+import { apiMessage, pick } from "@/lib/apiMessages";
 import type { Plan } from "@/types";
 
 const updatePlanSchema = z.object({
@@ -29,7 +29,7 @@ export async function PATCH(
   const parsed = updatePlanSchema.safeParse(await request.json());
   if (!parsed.success) {
     const locale = await getApiLocale(request, supabase, user!.id);
-    return NextResponse.json({ error: commonApiMessages.invalidPlan[locale] }, { status: 400 });
+    return NextResponse.json({ error: apiMessage("invalidPlan", locale) }, { status: 400 });
   }
 
   const serviceClient = createServiceRoleClient();

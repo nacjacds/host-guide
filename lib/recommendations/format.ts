@@ -7,8 +7,20 @@ import type { AppLocale } from "@/lib/locale";
 // runs. Kept in its own file (no server-only imports) so it can be called
 // both from server components (API error messages) and client components
 // (PropertyRecommendationsSection, reacting instantly to a locale switch).
+//
+// Only es/en connector text ("a las" / "at") exists — fr/it/pt fall back
+// to the English phrasing, same fallback direction as the rest of i18n
+// Fase 0/1 (real fr/it/pt copy is later-phase content work).
+const INTL_LOCALE_TAGS: Record<AppLocale, string> = {
+  es: "es-ES",
+  en: "en-GB",
+  fr: "fr-FR",
+  it: "it-IT",
+  pt: "pt-PT",
+};
+
 export function formatResetDate(date: Date, locale: AppLocale = "es"): string {
-  const intlLocale = locale === "en" ? "en-GB" : "es-ES";
+  const intlLocale = INTL_LOCALE_TAGS[locale];
   const datePart = date.toLocaleDateString(intlLocale, {
     day: "numeric",
     month: "long",
@@ -20,5 +32,5 @@ export function formatResetDate(date: Date, locale: AppLocale = "es"): string {
     hour12: false,
     timeZone: "UTC",
   });
-  return locale === "en" ? `${datePart} at ${timePart}` : `${datePart} a las ${timePart}`;
+  return locale === "es" ? `${datePart} a las ${timePart}` : `${datePart} at ${timePart}`;
 }

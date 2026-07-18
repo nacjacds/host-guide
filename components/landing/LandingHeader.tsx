@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "@/components/shared/LocaleProvider";
-import { LocalePillSwitcher } from "@/components/shared/LocalePillSwitcher";
+import { LocaleSwitcher } from "@/components/shared/LocaleSwitcher";
 
 export function LandingHeader() {
   const t = useTranslations("landing.nav");
@@ -25,7 +25,7 @@ export function LandingHeader() {
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <LocalePillSwitcher locale={locale} onChange={setLocale} />
+          <LocaleSwitcher locale={locale} onChange={setLocale} />
 
           <Button
             variant="ghost"

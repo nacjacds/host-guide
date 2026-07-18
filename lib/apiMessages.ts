@@ -4,6 +4,12 @@ import type { AppLocale } from "@/lib/locale";
 // (see the Fase-5 API-i18n inventory). Keep this file to genuinely
 // repeated messages only; one-off, route-specific strings are translated
 // inline at their call site with pick() instead of being forced in here.
+//
+// Only es/en variants exist (fr/it/pt copy is Fase 5's job, not this
+// architecture pass) — apiMessage()/pick() fall back to English for any
+// locale that isn't specifically Spanish, matching the fallback direction
+// chosen everywhere else in i18n Fase 0/1 (GUIDE_TRANSLATIONS, the
+// fr/it/pt.json message files).
 export const commonApiMessages = {
   notAuthenticated: { es: "No autenticado", en: "Not authenticated" },
   notAuthorized: { es: "No autorizado", en: "Not authorized" },
@@ -15,17 +21,18 @@ export const commonApiMessages = {
     es: "El archivo no es una imagen válida",
     en: "The file is not a valid image",
   },
-} satisfies Record<string, Record<AppLocale, string>>;
+} satisfies Record<string, Record<"es" | "en", string>>;
 
 export function apiMessage(key: keyof typeof commonApiMessages, locale: AppLocale): string {
-  return commonApiMessages[key][locale];
+  const messages = commonApiMessages[key];
+  return locale === "es" ? messages.es : messages.en;
 }
 
 // Terse inline helper for one-off, non-shared strings — keeps the
 // translation next to its single call site instead of growing an
 // unwieldy flat catalog of route-specific keys.
 export function pick(locale: AppLocale, es: string, en: string): string {
-  return locale === "en" ? en : es;
+  return locale === "es" ? es : en;
 }
 
 // Image-type acceptance varies by route (cover images only accept JPG,
@@ -71,6 +78,6 @@ const ENTITY_LABELS: Record<NotFoundEntity, { es: string; en: string; gender: "m
 
 export function notFoundMessage(entity: NotFoundEntity, locale: AppLocale): string {
   const label = ENTITY_LABELS[entity];
-  if (locale === "en") return `${label.en} not found`;
-  return `${label.es} no encontrad${label.gender === "f" ? "a" : "o"}`;
+  if (locale === "es") return `${label.es} no encontrad${label.gender === "f" ? "a" : "o"}`;
+  return `${label.en} not found`;
 }

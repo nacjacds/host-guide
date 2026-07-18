@@ -6,7 +6,7 @@ import { blockImageStoragePath } from "@/lib/utils";
 import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
 import { getApiLocale } from "@/lib/apiLocale";
 import {
-  commonApiMessages,
+  apiMessage,
   acceptedImageTypesMessage,
   imageTooLargeMessage,
   notFoundMessage,
@@ -105,7 +105,7 @@ export async function POST(
 
   if (!(file instanceof File)) {
     const locale = await getApiLocale(request, supabase, user.id);
-    return NextResponse.json({ error: commonApiMessages.noFileReceived[locale] }, { status: 400 });
+    return NextResponse.json({ error: apiMessage("noFileReceived", locale) }, { status: 400 });
   }
 
   if (!ACCEPTED_TYPES.includes(file.type)) {
@@ -137,7 +137,7 @@ export async function POST(
     height = metadata.height ?? 0;
   } catch {
     const locale = await getApiLocale(request, supabase, user.id);
-    return NextResponse.json({ error: commonApiMessages.notValidImage[locale] }, { status: 400 });
+    return NextResponse.json({ error: apiMessage("notValidImage", locale) }, { status: 400 });
   }
 
   const path = `${block.property_id}/${block.id}/places/${placeId}/${randomUUID()}.webp`;

@@ -5,7 +5,7 @@ import { getStripe, getPlanPriceId, type PaidPlanId } from "@/lib/stripe";
 import { getAppUrl } from "@/lib/env";
 import { notAuthenticatedResponse } from "@/lib/apiResponses";
 import { getApiLocale } from "@/lib/apiLocale";
-import { commonApiMessages, pick } from "@/lib/apiMessages";
+import { apiMessage, pick } from "@/lib/apiMessages";
 
 const createCheckoutSchema = z.object({
   plan: z.enum(["starter", "pro", "agency"]),
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   const parsed = createCheckoutSchema.safeParse(await request.json());
   if (!parsed.success) {
     const locale = await getApiLocale(request, supabase, user.id);
-    return NextResponse.json({ error: commonApiMessages.invalidPlan[locale] }, { status: 400 });
+    return NextResponse.json({ error: apiMessage("invalidPlan", locale) }, { status: 400 });
   }
   const plan: PaidPlanId = parsed.data.plan;
 

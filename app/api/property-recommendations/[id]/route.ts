@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { triggerRecommendationsTranslation } from "@/lib/translations/translateRecommendations";
 import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
 import { getApiLocale } from "@/lib/apiLocale";
-import { commonApiMessages, pick } from "@/lib/apiMessages";
+import { apiMessage, pick } from "@/lib/apiMessages";
 import { isValidMapsUrl } from "@/lib/mapsUrl";
 
 const editSchema = z.object({
@@ -52,7 +52,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       {
         error: isInvalidMapsUrl
           ? pick(locale, "El link de Google Maps no es una URL válida", "The Google Maps link isn't a valid URL")
-          : commonApiMessages.invalidData[locale],
+          : apiMessage("invalidData", locale),
       },
       { status: 400 }
     );

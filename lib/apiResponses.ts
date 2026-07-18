@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import type { createClient } from "@/lib/supabase/server";
 import { getApiLocale } from "@/lib/apiLocale";
-import { commonApiMessages, notFoundMessage, type NotFoundEntity } from "@/lib/apiMessages";
+import { apiMessage, notFoundMessage, type NotFoundEntity } from "@/lib/apiMessages";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -19,7 +19,7 @@ export async function notAuthenticatedResponse(
   supabase: SupabaseServerClient
 ) {
   const locale = await getApiLocale(request, supabase, null);
-  return NextResponse.json({ error: commonApiMessages.notAuthenticated[locale] }, { status: 401 });
+  return NextResponse.json({ error: apiMessage("notAuthenticated", locale) }, { status: 401 });
 }
 
 export async function notAuthorizedResponse(
@@ -29,7 +29,7 @@ export async function notAuthorizedResponse(
   status: 401 | 403 = 403
 ) {
   const locale = await getApiLocale(request, supabase, userId);
-  return NextResponse.json({ error: commonApiMessages.notAuthorized[locale] }, { status });
+  return NextResponse.json({ error: apiMessage("notAuthorized", locale) }, { status });
 }
 
 export async function notFoundResponse(

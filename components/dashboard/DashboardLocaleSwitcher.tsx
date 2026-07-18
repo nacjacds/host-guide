@@ -1,10 +1,10 @@
 "use client";
 
 import { useLocale } from "@/components/shared/LocaleProvider";
-import { LocalePillSwitcher } from "@/components/shared/LocalePillSwitcher";
+import { LocaleSwitcher } from "@/components/shared/LocaleSwitcher";
 import type { AppLocale } from "@/lib/locale";
 
-// Same pill as the landing header, but also persists the choice to
+// Same dropdown as the landing header, but also persists the choice to
 // profiles.dashboard_locale so it follows the host to any device/browser
 // they log into — independent of the guest-facing guide locale
 // (content_translations/properties.language), which this never touches.
@@ -24,5 +24,5 @@ export function DashboardLocaleSwitcher({ className }: { className?: string }) {
     }).catch(() => {});
   }
 
-  return <LocalePillSwitcher locale={locale} onChange={handleChange} className={className} />;
+  return <LocaleSwitcher locale={locale} onChange={handleChange} className={className} />;
 }

@@ -214,7 +214,7 @@ export async function POST(request: NextRequest) {
   const houseRules = Array.from(
     new Set(
       KNOWN_RULES.filter((rule) => rule.pattern.test(searchText)).map(
-        (rule) => rule.label[rulesLocale]
+        (rule) => rule.label[rulesLocale === "es" ? "es" : "en"]
       )
     )
   );
