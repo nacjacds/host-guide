@@ -2,6 +2,11 @@ import type { GuideBlock } from "@/types";
 
 export type GuideLocale = "es" | "en" | "fr" | "it" | "pt";
 
+// fr/it/pt use the same informal, direct address register as es (tuteo) —
+// matches the tone Claude already uses for AI-generated guide content in
+// those locales (see lib/claude.ts's OUTPUT_LANGUAGE_NAMES), so the static
+// UI chrome doesn't read more formal/distant than the surrounding content.
+// pt is European Portuguese ("tu"/"contacta"), not Brazilian ("você").
 const GUIDE_TRANSLATIONS_AUTHORED = {
   es: {
     back: "Volver",
@@ -113,24 +118,177 @@ const GUIDE_TRANSLATIONS_AUTHORED = {
     linkExpiredMessage:
       "The stay period tied to this link has already ended. If you need to access the guide, please contact your host.",
   },
+  fr: {
+    back: "Retour",
+    recommendations: "Recommandations",
+    recommendationsTile: "Recommandations",
+    recommendationsEmpty: "Pas encore de recommandations.",
+    viewOnMap: "Voir sur la carte",
+    directions: "Itinéraire",
+    contactHost: "Contacter l'hôte",
+    photoClose: "Fermer",
+    photoPrevious: "Photo précédente",
+    photoNext: "Photo suivante",
+    photoViewLarger: "Voir la photo en grand",
+    backToEditor: "Retour à l'éditeur",
+    backToAdminPanel: "Retour à l'admin",
+    hostIntroLabel: "Hôte",
+    category_supermarket: "Supermarchés",
+    category_pharmacy: "Pharmacies",
+    category_transport: "Transports",
+    emergency_general: "Urgences générales",
+    emergency_police: "Police",
+    emergency_ambulance: "Ambulance",
+    emergency_firefighters: "Pompiers",
+    emergency_hospital: "Hôpital le plus proche",
+    block_wifi: "WiFi",
+    block_checkin: "Check-in",
+    block_checkout: "Check-out",
+    block_rules: "Règlement intérieur",
+    block_parking: "Parking",
+    block_appliances: "Électroménager",
+    block_emergencias: "Urgences",
+    block_pool: "Piscine",
+    block_restaurants: "Où manger",
+    block_drinks: "Bars et boissons",
+    block_nightlife: "Vie nocturne",
+    block_attractions: "À voir",
+    block_beaches: "Plages",
+    block_nature: "Nature",
+    checkinFromLabel: "Arrivée à partir de",
+    checkoutFromLabel: "Départ avant",
+    wifiConnectButton: "Je suis connecté(e)",
+    wifiConnectedPrefix: "Connecté à",
+    wifiConnectedSuffix: "— tu peux maintenant naviguer dans le guide sans données",
+    wifiChangeNetwork: "Changer de réseau",
+    wifiScanToConnect: "Scanne pour te connecter automatiquement",
+    walkingMinutes: "min à pied",
+    emptyGuideTitle: "Ce guide est en cours de préparation",
+    emptyGuideMessage:
+      "Ton hôte est en train de préparer ce guide. Reviens bientôt ou contacte-le directement si tu as besoin de quelque chose.",
+    guideUnavailableTitle: "Ce guide n'est plus disponible",
+    guideUnavailableMessage:
+      "L'hôte a retiré ce guide. Si tu penses qu'il s'agit d'une erreur, contacte-le directement.",
+    linkExpiredTitle: "Ce lien n'est plus disponible",
+    linkExpiredMessage:
+      "La période de séjour associée à ce lien est déjà terminée. Si tu as besoin d'accéder au guide, contacte ton hôte.",
+  },
+  it: {
+    back: "Indietro",
+    recommendations: "Consigli",
+    recommendationsTile: "Consigli",
+    recommendationsEmpty: "Ancora nessun consiglio.",
+    viewOnMap: "Vedi sulla mappa",
+    directions: "Come arrivare",
+    contactHost: "Contatta l'host",
+    photoClose: "Chiudi",
+    photoPrevious: "Foto precedente",
+    photoNext: "Foto successiva",
+    photoViewLarger: "Visualizza foto ingrandita",
+    backToEditor: "Torna all'editor",
+    backToAdminPanel: "Torna all'area admin",
+    hostIntroLabel: "Host",
+    category_supermarket: "Supermercati",
+    category_pharmacy: "Farmacie",
+    category_transport: "Trasporti",
+    emergency_general: "Emergenza generale",
+    emergency_police: "Polizia",
+    emergency_ambulance: "Ambulanza",
+    emergency_firefighters: "Vigili del fuoco",
+    emergency_hospital: "Ospedale più vicino",
+    block_wifi: "WiFi",
+    block_checkin: "Check-in",
+    block_checkout: "Check-out",
+    block_rules: "Regole della casa",
+    block_parking: "Parcheggio",
+    block_appliances: "Elettrodomestici",
+    block_emergencias: "Emergenze",
+    block_pool: "Piscina",
+    block_restaurants: "Dove mangiare",
+    block_drinks: "Drink e bar",
+    block_nightlife: "Vita notturna",
+    block_attractions: "Cosa vedere",
+    block_beaches: "Spiagge",
+    block_nature: "Natura",
+    checkinFromLabel: "Check-in dalle",
+    checkoutFromLabel: "Check-out entro le",
+    wifiConnectButton: "Sono già connesso",
+    wifiConnectedPrefix: "Connesso a",
+    wifiConnectedSuffix: "— ora puoi consultare la guida senza usare dati",
+    wifiChangeNetwork: "Cambia rete",
+    wifiScanToConnect: "Scansiona per connetterti automaticamente",
+    walkingMinutes: "min a piedi",
+    emptyGuideTitle: "Questa guida è in fase di preparazione",
+    emptyGuideMessage:
+      "Il tuo host sta ancora preparando questa guida. Torna presto o contattalo direttamente se hai bisogno di qualcosa.",
+    guideUnavailableTitle: "Questa guida non è più disponibile",
+    guideUnavailableMessage:
+      "L'host ha rimosso questa guida. Se pensi si tratti di un errore, contattalo direttamente.",
+    linkExpiredTitle: "Questo link non è più disponibile",
+    linkExpiredMessage:
+      "Il periodo di soggiorno associato a questo link è già terminato. Se hai bisogno di accedere alla guida, contatta il tuo host.",
+  },
+  pt: {
+    back: "Voltar",
+    recommendations: "Recomendações",
+    recommendationsTile: "Recomendações",
+    recommendationsEmpty: "Ainda não há recomendações.",
+    viewOnMap: "Ver no mapa",
+    directions: "Como chegar",
+    contactHost: "Contactar anfitrião",
+    photoClose: "Fechar",
+    photoPrevious: "Foto anterior",
+    photoNext: "Foto seguinte",
+    photoViewLarger: "Ver foto ampliada",
+    backToEditor: "Voltar ao editor",
+    backToAdminPanel: "Voltar à administração",
+    hostIntroLabel: "Anfitrião",
+    category_supermarket: "Supermercados",
+    category_pharmacy: "Farmácias",
+    category_transport: "Transportes",
+    emergency_general: "Emergência geral",
+    emergency_police: "Polícia",
+    emergency_ambulance: "Ambulância",
+    emergency_firefighters: "Bombeiros",
+    emergency_hospital: "Hospital mais próximo",
+    block_wifi: "WiFi",
+    block_checkin: "Check-in",
+    block_checkout: "Check-out",
+    block_rules: "Regras da casa",
+    block_parking: "Estacionamento",
+    block_appliances: "Eletrodomésticos",
+    block_emergencias: "Emergências",
+    block_pool: "Piscina",
+    block_restaurants: "Onde comer",
+    block_drinks: "Bebidas e bares",
+    block_nightlife: "Vida noturna",
+    block_attractions: "O que visitar",
+    block_beaches: "Praias",
+    block_nature: "Natureza",
+    checkinFromLabel: "Check-in a partir das",
+    checkoutFromLabel: "Check-out antes das",
+    wifiConnectButton: "Já estou conectado",
+    wifiConnectedPrefix: "Conectado a",
+    wifiConnectedSuffix: "— já podes navegar no guia sem usar dados",
+    wifiChangeNetwork: "Mudar de rede",
+    wifiScanToConnect: "Digitaliza para te ligares automaticamente",
+    walkingMinutes: "min a pé",
+    emptyGuideTitle: "Este guia está a ser preparado",
+    emptyGuideMessage:
+      "O teu anfitrião está a preparar este guia. Volta em breve ou contacta-o diretamente se precisares de alguma coisa.",
+    guideUnavailableTitle: "Este guia já não está disponível",
+    guideUnavailableMessage:
+      "O anfitrião retirou este guia. Se achas que se trata de um erro, contacta-o diretamente.",
+    linkExpiredTitle: "Este link já não está disponível",
+    linkExpiredMessage:
+      "O período de estadia associado a este link já terminou. Se precisares de aceder ao guia, contacta o teu anfitrião.",
+  },
 } as const;
 
 export type GuideTranslationKey = keyof (typeof GUIDE_TRANSLATIONS_AUTHORED)["es"];
-type GuideTranslationDict = Record<GuideTranslationKey, string>;
 
-// French/Italian/Portuguese dictionaries don't exist yet (i18n expansion
-// Fase 3) — until then, those locales fall back to the English UI chrome
-// (buttons, labels) rather than crashing GuideLocaleProvider.t() with a
-// missing key. This is separate from guest-facing CONTENT (guide_blocks,
-// welcome_message, recommendations), which Claude already translates for
-// real into all 5 locales via content_translations — only this static
-// dictionary of ~50 short chrome strings is still pending translation.
-export const GUIDE_TRANSLATIONS: Record<GuideLocale, GuideTranslationDict> = {
-  ...GUIDE_TRANSLATIONS_AUTHORED,
-  fr: GUIDE_TRANSLATIONS_AUTHORED.en,
-  it: GUIDE_TRANSLATIONS_AUTHORED.en,
-  pt: GUIDE_TRANSLATIONS_AUTHORED.en,
-};
+export const GUIDE_TRANSLATIONS: Record<GuideLocale, Record<GuideTranslationKey, string>> =
+  GUIDE_TRANSLATIONS_AUTHORED;
 
 export function getBlockTitle(
   block: Pick<GuideBlock, "type" | "title">,
