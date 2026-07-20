@@ -31,20 +31,15 @@ export function LandingFooter() {
           </div>
         </div>
 
-        {/*
-          Fixed Spanish labels, not run through next-intl — these link to
-          legal pages that are themselves fixed-Spanish content (Spanish
-          legislation), not part of the i18n system yet.
-        */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-[#DDD8CC] pt-6 text-xs text-[#6B6B67] sm:justify-start">
           <Link href="/aviso-legal" className="hover:underline">
-            Aviso Legal
+            {t("legalNotice")}
           </Link>
           <Link href="/politica-de-privacidad" className="hover:underline">
-            Política de Privacidad
+            {t("privacyPolicy")}
           </Link>
           <Link href="/politica-de-cookies" className="hover:underline">
-            Política de Cookies
+            {t("cookiePolicy")}
           </Link>
         </div>
       </div>

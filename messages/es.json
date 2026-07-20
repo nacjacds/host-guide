@@ -134,6 +134,9 @@
       "tagline": "Todo lo que tus huéspedes necesitan saber, en un solo lugar",
       "login": "Iniciar sesión",
       "register": "Registrarse",
+      "legalNotice": "Aviso Legal",
+      "privacyPolicy": "Política de Privacidad",
+      "cookiePolicy": "Política de Cookies",
       "copyright": "© {year} WelcoKit. Todos los derechos reservados."
     }
   },

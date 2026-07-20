@@ -134,6 +134,9 @@
       "tagline": "Tout ce que tes voyageurs doivent savoir, au même endroit",
       "login": "Se connecter",
       "register": "S'inscrire",
+      "legalNotice": "Mentions légales",
+      "privacyPolicy": "Politique de confidentialité",
+      "cookiePolicy": "Politique de cookies",
       "copyright": "© {year} WelcoKit. Tous droits réservés."
     }
   },

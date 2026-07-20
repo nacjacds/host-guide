@@ -5,10 +5,11 @@ import { type AppLocale } from "@/lib/locale";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 
-// Legal pages are fixed Spanish content (Spanish legislation, not part of
-// the i18n system yet) — only the shared header/footer chrome around them
-// still follows the site's locale, same as every other page that reuses
-// these components.
+// Legal content is under Spanish jurisdiction regardless of the reader's
+// language (see each XContent.tsx dispatcher's own locale-to-component map),
+// so it's translated but not run through next-intl/messages — the header and
+// footer chrome around it already follows the site's locale via this same
+// LocaleProvider, same as every other page that reuses these components.
 export function LegalLayout({
   initialLocale,
   children,
