@@ -106,9 +106,18 @@ export async function POST(request: NextRequest) {
   const baseSlug = slugifyPropertyName(name);
   const slug = `${baseSlug}-${Math.random().toString(36).slice(2, 7)}`;
 
+  // Defaults the guide's content language to the host's own dashboard
+  // language at creation time — properties.language and dashboard_locale
+  // share the exact same 5-locale set (es/en/fr/it/pt), so this is a
+  // direct assignment, no mapping/fallback needed. PATCH /api/properties/[id]
+  // already accepts `language` to override it afterwards if the guide
+  // itself should be in a different language than the host's own
+  // dashboard — there's just no Settings UI control wired to it yet.
+  const language = await getApiLocale(request, supabase, user.id);
+
   const { data: property, error } = await supabase
     .from("properties")
-    .insert({ host_id: user.id, name, address, slug })
+    .insert({ host_id: user.id, name, address, slug, language })
     .select()
     .single();
 
