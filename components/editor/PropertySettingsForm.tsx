@@ -7,7 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { ALL_APP_LOCALES, parseLocale, type AppLocale } from "@/lib/locale";
 import type { Property } from "@/types";
 
 const WELCOME_MESSAGE_MAX = 500;
@@ -20,7 +22,16 @@ export function PropertySettingsForm({ property }: { property: Property }) {
   const [accentColor, setAccentColor] = useState(property.accent_color);
   const [whatsappNumber, setWhatsappNumber] = useState(property.whatsapp_number ?? "");
   const [welcomeMessage, setWelcomeMessage] = useState(property.welcome_message ?? "");
+  const [language, setLanguage] = useState<AppLocale>(parseLocale(property.language));
   const [saving, setSaving] = useState(false);
+
+  const contentLanguageNames: Record<AppLocale, string> = {
+    es: t("contentLanguageEs"),
+    en: t("contentLanguageEn"),
+    fr: t("contentLanguageFr"),
+    it: t("contentLanguageIt"),
+    pt: t("contentLanguagePt"),
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,6 +46,7 @@ export function PropertySettingsForm({ property }: { property: Property }) {
           accent_color: accentColor,
           whatsapp_number: whatsappNumber || null,
           welcome_message: welcomeMessage || null,
+          language,
         }),
       });
 
@@ -107,6 +119,30 @@ export function PropertySettingsForm({ property }: { property: Property }) {
             {welcomeMessage.length}/{WELCOME_MESSAGE_MAX}
           </p>
           <p className="text-xs text-muted-foreground">{t("welcomeMessageHint")}</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("contentLanguageTitle")}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div>
+            <Label htmlFor="content_language">{t("contentLanguageLabel")}</Label>
+            <Select value={language} onValueChange={(value) => setLanguage(value as AppLocale)}>
+              <SelectTrigger id="content_language" className="w-48">
+                <SelectValue>{(value: AppLocale) => contentLanguageNames[value]}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {ALL_APP_LOCALES.map((locale) => (
+                  <SelectItem key={locale} value={locale}>
+                    {contentLanguageNames[locale]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <p className="text-xs text-muted-foreground">{t("contentLanguageWarning")}</p>
         </CardContent>
       </Card>
 
