@@ -38,6 +38,10 @@ function HostRow({ host, isCurrentUser }: { host: AdminHostRow; isCurrentUser: b
   const [impersonating, setImpersonating] = useState(false);
   const impersonatingRef = useRef(false);
 
+  const planNames = Object.fromEntries(
+    PLAN_ORDER.map((planId) => [planId, tPlans(`${planId}.label`)])
+  ) as Record<PlanId, string>;
+
   async function handlePlanChange(value: string | null) {
     if (!value || value === plan) return;
     const previous = plan;
@@ -100,7 +104,7 @@ function HostRow({ host, isCurrentUser }: { host: AdminHostRow; isCurrentUser: b
         <div className="flex items-center gap-1.5">
           <Select value={plan} onValueChange={handlePlanChange} disabled={saving}>
             <SelectTrigger className="w-36" size="sm">
-              <SelectValue />
+              <SelectValue>{(value: PlanId) => planNames[value]}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               {PLAN_ORDER.map((planId) => (
