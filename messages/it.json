@@ -1,557 +1,558 @@
 {
   "common": {
-    "back": "Back",
-    "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "back": "Indietro",
+    "showPassword": "Mostra password",
+    "hidePassword": "Nascondi password"
   },
   "landing": {
     "nav": {
-      "login": "Log in"
+      "login": "Accedi"
     },
     "hero": {
-      "eyebrow": "Digital guides for short-term stays",
-      "headline": "Everything your guest needs to know, in one link",
-      "subhead": "Create your property's digital guide in minutes: WiFi, check-in, house rules, emergency info, and AI-curated local recommendations — with automatic translation into your guest's language.",
-      "ctaPrimary": "Create my first guide for free",
-      "ctaSecondary": "See how it works",
+      "eyebrow": "Guide digitali per affitti brevi",
+      "headline": "Tutto ciò che il tuo ospite deve sapere, in un unico link",
+      "subhead": "Crea la guida digitale del tuo alloggio in pochi minuti: WiFi, check-in, regole della casa, emergenze e consigli locali selezionati dall'IA — con traduzione automatica nella lingua del tuo ospite.",
+      "ctaPrimary": "Crea la mia prima guida gratis",
+      "ctaSecondary": "Scopri come funziona",
       "previewHost": "Carmen & Nacho",
-      "previewGreeting": "Welcome to Carihuela Cristal!"
+      "previewGreeting": "Benvenuto a Carihuela Cristal!"
     },
     "anyPlatform": {
-      "eyebrow": "Before arrival",
-      "title": "Share your property's information in one click",
-      "body": "Send the link to your guest before arrival — it works for bookings from any platform. You can also print the QR code and place it in your property. Your guest doesn't have to download anything: they open the link and have everything at hand, in one place. Host's WhatsApp, check-in, check-out, house rules, appliances, WiFi, local attractions, restaurants, nightlife, and AI-curated recommendations — all in one spot. That's the difference between an ordinary stay and a five-star one.",
+      "eyebrow": "Prima dell'arrivo",
+      "title": "Condividi in un clic le informazioni del tuo alloggio",
+      "body": "Invia il link al tuo ospite prima del suo arrivo — funziona per prenotazioni da qualsiasi piattaforma. Puoi anche stampare il codice QR e metterlo nel tuo alloggio. Il tuo ospite non deve scaricare nulla: apre il link e ha tutto a portata di mano, in un unico posto. WhatsApp dell'host, check-in, check-out, regole della casa, elettrodomestici, WiFi, luoghi di interesse, ristoranti, vita notturna e consigli selezionati dall'IA — tutto nello stesso posto. Questa è la differenza tra un soggiorno normale e uno a cinque stelle.",
       "steps": [
         {
-          "label": "The guest books"
+          "label": "L'ospite prenota"
         },
         {
-          "label": "You send the link"
+          "label": "Gli invii il link"
         },
         {
-          "label": "They access all the info on their phone"
+          "label": "Accede a tutte le info dal telefono"
         }
       ]
     },
     "problem": {
-      "eyebrow": "You know the routine",
-      "title": "Fewer repeated questions, happier guests",
-      "beforeLabel": "Without WelcoKit",
-      "afterLabel": "With WelcoKit",
+      "eyebrow": "Conosci già la routine",
+      "title": "Meno domande ripetute, ospiti più soddisfatti",
+      "beforeLabel": "Senza WelcoKit",
+      "afterLabel": "Con WelcoKit",
       "before": [
-        "Guests arrive from different platforms (Airbnb, Booking, VRBO...) and each one gives them different or incomplete information",
-        "They're not sure about house rules, or check-in and check-out times",
-        "They have to ask for the WiFi password — again",
-        "They don't know the area they're staying in, or where to eat, what to see, or where to go at night",
-        "They message you with questions at any hour, often the same ones over and over"
+        "L'ospite arriva da piattaforme diverse (Airbnb, Booking, VRBO...) e ognuna gli fornisce informazioni diverse o incomplete",
+        "Non ha chiare le regole della casa, né gli orari di check-in e check-out",
+        "Deve richiedere di nuovo la password del WiFi",
+        "Non conosce la zona in cui alloggia e non sa dove mangiare, cosa visitare o dove andare la sera",
+        "Ti scrive con dubbi a qualsiasi ora, spesso le stesse domande più e più volte"
       ],
       "after": [
-        "Build your stay's digital guide in minutes",
-        "Share it with a link or a QR code — no app to install",
-        "Everything in one place: house rules, check-in and check-out times, WiFi, emergency numbers, your WhatsApp, how the appliances work, photos",
-        "Automatically translated into each guest's language",
-        "Real restaurant, sightseeing, and nightlife recommendations, with distance and a map — generated automatically with AI or added by hand",
-        "You answer less, your guests enjoy more, and leave better reviews"
+        "Generi la guida digitale del tuo alloggio in pochi minuti",
+        "La condividi con un link o un codice QR — l'ospite non installa nulla",
+        "Tutte le informazioni in un unico posto: regole, orari, WiFi, numeri di emergenza, il tuo WhatsApp, come funzionano gli elettrodomestici, foto",
+        "Tradotta automaticamente nella lingua di ogni ospite",
+        "Consigli reali su ristoranti, cosa visitare e vita notturna, con distanza e mappa — generati automaticamente dall'IA o aggiunti a mano",
+        "Rispondi meno, i tuoi ospiti si divertono di più e lasciano recensioni migliori"
       ]
     },
     "features": {
-      "eyebrow": "What's included",
-      "title": "A complete guide, without the hassle",
+      "eyebrow": "Cosa include",
+      "title": "Una guida completa, senza complicazioni",
       "items": [
         {
-          "title": "A guide built around your stay",
-          "description": "WiFi, check-in, check-out, house rules — all in one link you send just once."
+          "title": "Una guida su misura per il tuo alloggio",
+          "description": "WiFi, check-in, check-out, regole della casa — tutto in un unico link che invii una sola volta."
         },
         {
-          "title": "Automatic translation",
-          "description": "Your guest reads the guide in their own language, without you writing an extra word."
+          "title": "Traduzione automatica",
+          "description": "Il tuo ospite legge la guida nella sua lingua, senza che tu debba scrivere una parola in più."
         },
         {
-          "title": "AI-curated local recommendations",
-          "description": "What to see, where to eat, nightlife — real places, real distances, and a Google Maps link."
+          "title": "Consigli locali con IA",
+          "description": "Cosa vedere, dove mangiare, vita notturna — luoghi reali, con distanza reale e link a Google Maps."
         },
         {
-          "title": "Print-ready QR code",
-          "description": "Stick it on the door or leave it on the table — your guest scans it and they're in."
+          "title": "Codice QR pronto da stampare",
+          "description": "Attaccalo alla porta o lascialo sul tavolo — il tuo ospite lo scansiona ed è già dentro."
         }
       ]
     },
     "howItWorks": {
-      "eyebrow": "Live in minutes",
-      "title": "Publish your guide in three steps",
+      "eyebrow": "Pronto in pochi minuti",
+      "title": "Pubblica la tua guida in tre passaggi",
       "steps": [
         {
-          "title": "Add your stay",
-          "description": "Name, address, the basics — two minutes."
+          "title": "Aggiungi il tuo alloggio",
+          "description": "Nome, indirizzo e le info di base — due minuti."
         },
         {
-          "title": "Generate recommendations with one click",
-          "description": "AI finds and ranks the best of your area using real Google data."
+          "title": "Genera consigli con un clic",
+          "description": "L'IA trova e ordina il meglio della tua zona con dati reali di Google."
         },
         {
-          "title": "Share the link or the QR",
-          "description": "Your guest already has everything they need to know."
+          "title": "Condividi il link o il QR",
+          "description": "Il tuo ospite ha già tutto ciò che deve sapere."
         }
       ]
     },
     "pricing": {
-      "eyebrow": "Plans",
-      "title": "A plan for every host",
-      "subtitle": "Start free. Grow when you need to.",
-      "mostPopular": "Most popular",
-      "perMonth": "/mo",
-      "cta": "Start for free",
-      "ctaPaid": "Start with {plan}",
+      "eyebrow": "Piani",
+      "title": "Un piano per ogni host",
+      "subtitle": "Inizia gratis. Cresci quando ne hai bisogno.",
+      "mostPopular": "Più popolare",
+      "perMonth": "/mese",
+      "cta": "Inizia gratis",
+      "ctaPaid": "Inizia con {plan}",
       "planFeatures": {
         "free": [
-          "1 property",
-          "Manual content blocks",
-          "Downloadable QR"
+          "1 alloggio",
+          "Blocchi di contenuto manuali",
+          "QR scaricabile"
         ],
         "starter": [
-          "3 properties",
-          "AI content & recommendations",
-          "Downloadable QR"
+          "3 alloggi",
+          "IA per contenuti e consigli",
+          "QR scaricabile"
         ],
         "pro": [
-          "10 properties",
-          "Everything in Starter + analytics",
-          "WhatsApp bot"
+          "10 alloggi",
+          "Tutto ciò che offre Starter + statistiche",
+          "Bot WhatsApp"
         ],
         "agency": [
-          "30 properties",
-          "Everything in Pro + white label",
-          "Priority support"
+          "30 alloggi",
+          "Tutto ciò che offre Pro + marchio bianco",
+          "Supporto prioritario"
         ]
       }
     },
     "finalCta": {
-      "title": "Ready to stop repeating your WiFi password?",
-      "subtitle": "Create your first guide for free, no credit card needed.",
-      "cta": "Start for free"
+      "title": "Pronto a smettere di ripetere la password del WiFi?",
+      "subtitle": "Crea la tua prima guida gratis, senza carta di credito.",
+      "cta": "Inizia gratis"
     },
     "footer": {
-      "tagline": "Everything your guests need to know, in one place",
-      "login": "Log in",
-      "register": "Sign up",
-      "copyright": "© {year} WelcoKit. All rights reserved."
+      "tagline": "Tutto ciò che i tuoi ospiti devono sapere, in un unico posto",
+      "login": "Accedi",
+      "register": "Registrati",
+      "copyright": "© {year} WelcoKit. Tutti i diritti riservati."
     }
   },
   "auth": {
     "login": {
-      "title": "Log in",
+      "title": "Accedi",
       "emailLabel": "Email",
       "passwordLabel": "Password",
-      "forgotPassword": "Forgot your password?",
-      "submit": "Log in",
-      "submitLoading": "Logging in...",
-      "noAccount": "Don't have an account?",
-      "registerLink": "Sign up"
+      "forgotPassword": "Hai dimenticato la password?",
+      "submit": "Entra",
+      "submitLoading": "Accesso...",
+      "noAccount": "Non hai un account?",
+      "registerLink": "Registrati"
     },
     "register": {
-      "title": "Create account",
-      "fullNameLabel": "Full name",
+      "title": "Crea account",
+      "fullNameLabel": "Nome completo",
       "emailLabel": "Email",
       "passwordLabel": "Password",
-      "submit": "Create account",
-      "submitLoading": "Creating account...",
-      "hasAccount": "Already have an account?",
-      "loginLink": "Log in",
-      "networkError": "Network error",
-      "checkEmailTitle": "Check your email",
-      "checkEmailBody": "We've sent a confirmation link to <strong>{email}</strong>. Open it to confirm your account before logging in.",
-      "checkEmailLoginLink": "Go to log in"
+      "submit": "Crea account",
+      "submitLoading": "Creazione account...",
+      "hasAccount": "Hai già un account?",
+      "loginLink": "Accedi",
+      "networkError": "Errore di rete",
+      "checkEmailTitle": "Controlla la tua email",
+      "checkEmailBody": "Ti abbiamo inviato un link di conferma a <strong>{email}</strong>. Aprilo per confermare il tuo account prima di accedere.",
+      "checkEmailLoginLink": "Vai al login"
     },
     "forgotPassword": {
-      "title": "Reset password",
-      "description": "Enter your email and we'll send you a link to reset your password.",
+      "title": "Reimposta password",
+      "description": "Inserisci la tua email e ti invieremo un link per reimpostare la password.",
       "emailLabel": "Email",
-      "submit": "Send link",
-      "submitLoading": "Sending...",
-      "networkError": "Network error",
-      "checkEmailTitle": "Check your email",
-      "checkEmailBody": "If an account exists for <strong>{email}</strong>, we've sent a link to reset your password.",
-      "backToLogin": "Back to log in"
+      "submit": "Invia link",
+      "submitLoading": "Invio...",
+      "networkError": "Errore di rete",
+      "checkEmailTitle": "Controlla la tua email",
+      "checkEmailBody": "Se esiste un account per <strong>{email}</strong>, ti abbiamo inviato un link per reimpostare la password.",
+      "backToLogin": "Torna al login"
     },
     "resetPassword": {
-      "invalidLinkTitle": "Invalid link",
-      "invalidLinkBody": "This reset link is invalid or has expired. Request a new one.",
-      "requestNewLink": "Request new link",
-      "title": "New password",
-      "newPasswordLabel": "New password",
-      "submit": "Save new password",
-      "submitLoading": "Saving...",
-      "success": "Password updated",
-      "networkError": "Network error"
+      "invalidLinkTitle": "Link non valido",
+      "invalidLinkBody": "Questo link di reimpostazione non è valido o è scaduto. Richiedine uno nuovo.",
+      "requestNewLink": "Richiedi nuovo link",
+      "title": "Nuova password",
+      "newPasswordLabel": "Nuova password",
+      "submit": "Salva nuova password",
+      "submitLoading": "Salvataggio...",
+      "success": "Password aggiornata",
+      "networkError": "Errore di rete"
     }
   },
   "dashboard": {
     "nav": {
-      "properties": "Properties",
+      "properties": "Alloggi",
       "admin": "Admin",
-      "myAccount": "My account",
-      "openMenu": "Open menu",
-      "menuTitle": "Navigation menu",
-      "logout": "Log out",
-      "loggingOut": "Logging out..."
+      "myAccount": "Il mio account",
+      "openMenu": "Apri il menu",
+      "menuTitle": "Menu di navigazione",
+      "logout": "Esci",
+      "loggingOut": "Uscita in corso..."
     },
     "layout": {
-      "emailNotConfirmed": "You haven't confirmed your email yet ({email}). Check your inbox and confirm your account to be able to publish your guide."
+      "emailNotConfirmed": "Non hai ancora confermato la tua email ({email}). Controlla la posta in arrivo e conferma il tuo account per poter pubblicare la tua guida."
     },
     "common": {
-      "cancel": "Cancel",
-      "delete": "Delete",
-      "deleting": "Deleting...",
-      "save": "Save",
-      "saving": "Saving...",
-      "networkError": "Network error",
-      "notSpecified": "Not specified",
-      "compressingImage": "Compressing image...",
-      "imageStillTooLargeAfterCompression": "The image is still too large even after compression. Try a smaller or lower-resolution image."
+      "cancel": "Annulla",
+      "delete": "Elimina",
+      "deleting": "Eliminazione...",
+      "save": "Salva",
+      "saving": "Salvataggio...",
+      "networkError": "Errore di rete",
+      "notSpecified": "Non specificato",
+      "compressingImage": "Compressione immagine...",
+      "imageStillTooLargeAfterCompression": "L'immagine è ancora troppo grande anche dopo la compressione. Prova con un'immagine più piccola o a risoluzione inferiore."
     },
     "account": {
-      "title": "My account",
-      "currentPlan": "Current plan:",
-      "perMonth": "/mo",
-      "profileTitle": "Profile",
-      "fullNameLabel": "Full name",
+      "title": "Il mio account",
+      "currentPlan": "Piano attuale:",
+      "perMonth": "/mese",
+      "profileTitle": "Profilo",
+      "fullNameLabel": "Nome completo",
       "emailLabel": "Email",
-      "phoneLabel": "Personal phone/WhatsApp",
-      "phoneHelp": "Used as a fallback for the contact button on your guides that don't have their own phone configured.",
-      "phoneInvalid": "Enter a valid phone number: country code + number (8-15 digits)",
-      "saveChanges": "Save changes",
-      "saving": "Saving...",
-      "editProfile": "Edit profile",
-      "profileSaved": "Profile saved",
-      "profileSaveError": "Couldn't save the profile",
+      "phoneLabel": "Telefono/WhatsApp personale",
+      "phoneHelp": "Usato come numero di riserva per il pulsante di contatto sulle tue guide che non hanno un telefono proprio configurato.",
+      "phoneInvalid": "Inserisci un numero di telefono valido: prefisso internazionale + numero (8-15 cifre)",
+      "saveChanges": "Salva modifiche",
+      "saving": "Salvataggio...",
+      "editProfile": "Modifica profilo",
+      "profileSaved": "Profilo salvato",
+      "profileSaveError": "Impossibile salvare il profilo",
       "avatar": {
-        "change": "Change",
-        "remove": "Remove",
-        "uploading": "Uploading...",
-        "invalidType": "Only JPG, PNG, or WebP images are accepted",
-        "tooLarge": "The image can't be larger than 1MB",
-        "uploadError": "Couldn't upload the photo",
-        "updated": "Profile photo updated",
-        "removeError": "Couldn't remove the photo",
-        "removed": "Profile photo removed",
-        "confirmDeleteTitle": "Remove profile photo?",
-        "confirmDeleteDescription": "This action can't be undone."
+        "change": "Cambia",
+        "remove": "Rimuovi",
+        "uploading": "Caricamento...",
+        "invalidType": "Sono accettate solo immagini JPG, PNG o WebP",
+        "tooLarge": "L'immagine non può superare 1MB",
+        "uploadError": "Impossibile caricare la foto",
+        "updated": "Foto profilo aggiornata",
+        "removeError": "Impossibile rimuovere la foto",
+        "removed": "Foto profilo rimossa",
+        "confirmDeleteTitle": "Rimuovere la foto profilo?",
+        "confirmDeleteDescription": "Questa azione non può essere annullata."
       },
       "dangerZone": {
-        "title": "Danger zone",
-        "description": "Deleting your account permanently removes your profile, all your properties, guides, content blocks, and recommendations.",
-        "deleteAccount": "Delete account",
-        "confirmTitle": "Delete your account?",
-        "confirmDescription": "This action can't be undone. Your profile, all your properties, guides, and recommendations will be permanently deleted.",
-        "deleteError": "Couldn't delete the account"
+        "title": "Zona pericolosa",
+        "description": "Eliminare il tuo account rimuove permanentemente il tuo profilo, tutti i tuoi alloggi, guide, blocchi di contenuto e consigli.",
+        "deleteAccount": "Elimina account",
+        "confirmTitle": "Eliminare il tuo account?",
+        "confirmDescription": "Questa azione non può essere annullata. Il tuo profilo, tutti i tuoi alloggi, guide e consigli verranno eliminati definitivamente.",
+        "deleteError": "Impossibile eliminare l'account"
       },
       "plan": {
-        "managePlan": "Manage subscription",
-        "opening": "Opening...",
-        "changePlan": "Change plan",
-        "choosePlan": "Choose your plan",
-        "currentPlanLabel": "Current plan",
-        "changeToFree": "Switch to Free",
-        "changing": "Switching...",
-        "update": "Upgrade",
-        "redirecting": "Redirecting...",
-        "checkoutError": "Couldn't start the payment",
-        "portalError": "Couldn't open the billing portal",
-        "downgradeError": "Couldn't switch to the Free plan",
-        "downgradeSuccess": "You've switched to the Free plan"
+        "managePlan": "Gestisci abbonamento",
+        "opening": "Apertura...",
+        "changePlan": "Cambia piano",
+        "choosePlan": "Scegli il tuo piano",
+        "currentPlanLabel": "Piano attuale",
+        "changeToFree": "Passa a Free",
+        "changing": "Cambio in corso...",
+        "update": "Aggiorna",
+        "redirecting": "Reindirizzamento...",
+        "checkoutError": "Impossibile avviare il pagamento",
+        "portalError": "Impossibile aprire il portale di fatturazione",
+        "downgradeError": "Impossibile passare al piano Free",
+        "downgradeSuccess": "Sei passato al piano Free",
+        "upgradedToast": "Piano aggiornato con successo!"
       },
       "security": {
-        "title": "Change password",
-        "currentPasswordLabel": "Current password",
-        "newPasswordLabel": "New password",
-        "confirmPasswordLabel": "Confirm new password",
-        "submit": "Change password",
-        "saving": "Saving...",
-        "success": "Password updated",
-        "tooShort": "The new password must be at least 8 characters",
-        "mismatch": "Passwords don't match",
-        "wrongCurrentPassword": "The current password is incorrect"
+        "title": "Cambia password",
+        "currentPasswordLabel": "Password attuale",
+        "newPasswordLabel": "Nuova password",
+        "confirmPasswordLabel": "Conferma nuova password",
+        "submit": "Cambia password",
+        "saving": "Salvataggio...",
+        "success": "Password aggiornata",
+        "tooShort": "La nuova password deve contenere almeno 8 caratteri",
+        "mismatch": "Le password non coincidono",
+        "wrongCurrentPassword": "La password attuale non è corretta"
       }
     },
     "editor": {
       "nav": {
         "editor": "Editor",
-        "settings": "Settings",
-        "stats": "Analytics"
+        "settings": "Impostazioni",
+        "stats": "Statistiche"
       },
       "toolbar": {
         "wifi": "WiFi",
         "checkin": "Check-in",
         "checkout": "Check-out",
-        "rules": "Rules",
-        "parking": "Parking",
-        "appliances": "Appliances",
-        "pool": "Pool",
-        "drinks": "Drinks & bars",
-        "custom": "Custom",
-        "emergencias": "Emergencies",
-        "adding": "Adding...",
-        "createError": "Couldn't create the block"
+        "rules": "Regole",
+        "parking": "Parcheggio",
+        "appliances": "Elettrodomestici",
+        "pool": "Piscina",
+        "drinks": "Drink e bar",
+        "custom": "Personalizzato",
+        "emergencias": "Emergenze",
+        "adding": "Aggiunta...",
+        "createError": "Impossibile creare il blocco"
       },
-      "emptyState": "Add your first block with the buttons above.",
+      "emptyState": "Aggiungi il tuo primo blocco con i pulsanti qui sopra.",
       "blockCard": {
-        "reorderLabel": "Reorder block",
-        "unsavedChanges": "Unsaved changes",
-        "visibleInGuide": "Visible in the guide",
-        "confirmDeleteTitle": "Delete this block?",
-        "confirmDeleteDescription": "This action can't be undone.",
+        "reorderLabel": "Riordina blocco",
+        "unsavedChanges": "Modifiche non salvate",
+        "visibleInGuide": "Visibile nella guida",
+        "confirmDeleteTitle": "Eliminare questo blocco?",
+        "confirmDeleteDescription": "Questa azione non può essere annullata.",
         "summary": {
-          "networkPrefix": "Network: {name}",
-          "notConfigured": "Not configured",
-          "atTime": "At {time}",
-          "noTimeSet": "No time set",
-          "noItems": "No items",
-          "itemCount": "{count, plural, one {# item} other {# items}}",
-          "noContent": "No content",
-          "emergencyPrefix": "Emergency: {value}",
-          "noPlaces": "No places",
-          "placeCount": "{count, plural, one {# place} other {# places}}"
+          "networkPrefix": "Rete: {name}",
+          "notConfigured": "Non configurato",
+          "atTime": "Alle {time}",
+          "noTimeSet": "Nessun orario impostato",
+          "noItems": "Nessun elemento",
+          "itemCount": "{count, plural, one {# elemento} other {# elementi}}",
+          "noContent": "Nessun contenuto",
+          "emergencyPrefix": "Emergenze: {value}",
+          "noPlaces": "Nessun luogo",
+          "placeCount": "{count, plural, one {# luogo} other {# luoghi}}"
         }
       },
       "saveAll": {
-        "save": "Save all",
-        "saveWithCount": "Save all ({count})",
-        "blockSaveError": "Couldn't save the block",
-        "blockSaved": "Block saved",
-        "reorderError": "Couldn't save the new order",
-        "savedCount": "{count} block(s) saved",
-        "failedCount": "{count} block(s) couldn't be saved"
+        "save": "Salva tutto",
+        "saveWithCount": "Salva tutto ({count})",
+        "blockSaveError": "Impossibile salvare il blocco",
+        "blockSaved": "Blocco salvato",
+        "reorderError": "Impossibile salvare il nuovo ordine",
+        "savedCount": "{count} blocco/chi salvato/i",
+        "failedCount": "{count} blocco/chi non salvato/i"
       },
       "publish": {
-        "title": "Publishing",
-        "published": "Published",
-        "draft": "Draft",
-        "publishHint": "Publish the guide so you can view and share it with your guests.",
-        "coverImage": "Cover image",
-        "coverAlt": "Guide cover photo",
-        "change": "Change",
-        "uploadJpg": "Upload JPG image",
-        "coverFormatHint": "JPG format, max 3MB.",
-        "onlyJpg": "Only JPG images are accepted",
-        "coverTooLarge": "The image can't be larger than 3MB",
-        "coverUploadError": "Couldn't upload the image",
-        "coverUpdated": "Cover image updated",
-        "coverDeleteError": "Couldn't delete the image",
-        "coverDeleted": "Cover image deleted",
-        "confirmCoverDeleteTitle": "Delete cover image?",
-        "confirmDeleteDescription": "This action can't be undone.",
-        "contactPhoneLabel": "Guest contact phone",
-        "phoneHint": "Country code + number, no spaces or +. E.g. 34612345678.",
-        "phoneWarning": "Without this number (or a personal phone in your profile), the contact button won't appear on your public guide.",
-        "phoneInvalid": "Enter a valid phone number: country code + number (8-15 digits)",
-        "whatsappSaveError": "Couldn't save the WhatsApp number",
-        "whatsappSaved": "WhatsApp number saved",
-        "publishToggleError": "Couldn't update the publish status",
-        "publishedToast": "Guide published",
-        "unpublishedToast": "Guide unpublished",
-        "viewQr": "View QR code",
-        "hideQr": "Hide QR",
-        "generatingQr": "Generating...",
-        "qrError": "Couldn't generate the QR code",
-        "printQr": "Print QR",
-        "qrAlt": "Guide QR code",
-        "downloadPng": "Download PNG"
+        "title": "Pubblicazione",
+        "published": "Pubblicata",
+        "draft": "Bozza",
+        "publishHint": "Pubblica la guida per poterla vedere e condividere con i tuoi ospiti.",
+        "coverImage": "Immagine di copertina",
+        "coverAlt": "Copertina della guida",
+        "change": "Cambia",
+        "uploadJpg": "Carica immagine JPG",
+        "coverFormatHint": "Formato JPG, massimo 3MB.",
+        "onlyJpg": "Sono accettate solo immagini JPG",
+        "coverTooLarge": "L'immagine non può superare 3MB",
+        "coverUploadError": "Impossibile caricare l'immagine",
+        "coverUpdated": "Immagine di copertina aggiornata",
+        "coverDeleteError": "Impossibile eliminare l'immagine",
+        "coverDeleted": "Immagine di copertina eliminata",
+        "confirmCoverDeleteTitle": "Eliminare l'immagine di copertina?",
+        "confirmDeleteDescription": "Questa azione non può essere annullata.",
+        "contactPhoneLabel": "Telefono di contatto per gli ospiti",
+        "phoneHint": "Prefisso internazionale + numero, senza spazi né +. Es.: 34612345678.",
+        "phoneWarning": "Senza questo numero (né un telefono personale nel tuo profilo), il pulsante di contatto non apparirà nella tua guida pubblica.",
+        "phoneInvalid": "Inserisci un numero di telefono valido: prefisso internazionale + numero (8-15 cifre)",
+        "whatsappSaveError": "Impossibile salvare il numero WhatsApp",
+        "whatsappSaved": "Numero WhatsApp salvato",
+        "publishToggleError": "Impossibile aggiornare lo stato di pubblicazione",
+        "publishedToast": "Guida pubblicata",
+        "unpublishedToast": "Guida rimossa dalla pubblicazione",
+        "viewQr": "Vedi codice QR",
+        "hideQr": "Nascondi QR",
+        "generatingQr": "Generazione...",
+        "qrError": "Impossibile generare il codice QR",
+        "printQr": "Stampa QR",
+        "qrAlt": "Codice QR della guida",
+        "downloadPng": "Scarica PNG"
       },
       "guestLinks": {
-        "generateLink": "Guest links",
-        "dialogTitle": "Guest links",
-        "dialogDescription": "Create a unique link for a guest's stay dates. It automatically stops working after check-out.",
-        "guestNameLabel": "Guest name (optional)",
-        "guestNamePlaceholder": "Jane Smith",
+        "generateLink": "Link per gli ospiti",
+        "dialogTitle": "Link per gli ospiti",
+        "dialogDescription": "Crea un link unico per le date di soggiorno di un ospite. Smette automaticamente di funzionare dopo il check-out.",
+        "guestNameLabel": "Nome dell'ospite (facoltativo)",
+        "guestNamePlaceholder": "Maria Rossi",
         "checkinLabel": "Check-in",
         "checkoutLabel": "Check-out",
-        "generate": "Generate link",
-        "generating": "Generating...",
-        "generateError": "Couldn't generate the link",
-        "dateOrderError": "The check-out date must be on or after the check-in date",
-        "linkCreated": "Link generated",
-        "activeLinks": "Generated links",
-        "noLinksYet": "You haven't generated any links yet.",
-        "copyLink": "Copy link",
-        "copied": "Copied!",
-        "copyError": "Couldn't copy the link",
-        "delete": "Delete",
-        "deleteError": "Couldn't delete the link",
-        "deleted": "Link deleted",
-        "confirmDeleteTitle": "Delete this link?",
-        "confirmDeleteDescription": "Any guest holding this link will no longer be able to access the guide with it. This can't be undone."
+        "generate": "Genera link",
+        "generating": "Generazione...",
+        "generateError": "Impossibile generare il link",
+        "dateOrderError": "La data di check-out deve essere uguale o successiva a quella di check-in",
+        "linkCreated": "Link generato",
+        "activeLinks": "Link generati",
+        "noLinksYet": "Non hai ancora generato nessun link.",
+        "copyLink": "Copia link",
+        "copied": "Copiato!",
+        "copyError": "Impossibile copiare il link",
+        "delete": "Elimina",
+        "deleteError": "Impossibile eliminare il link",
+        "deleted": "Link eliminato",
+        "confirmDeleteTitle": "Eliminare questo link?",
+        "confirmDeleteDescription": "L'ospite che lo possiede non potrà più accedere alla guida con questo link. Questa azione non può essere annullata."
       },
       "airbnbImport": {
-        "title": "Import from Airbnb",
-        "urlLabel": "Your Airbnb listing URL",
-        "importing": "Importing...",
-        "importData": "Import data",
-        "bestEffortHint": "Best-effort: if Airbnb blocks access or we can't find some data, you can fill it in manually in the blocks below.",
-        "importError": "Couldn't import the listing. Fill in the data manually.",
-        "networkError": "Network error while importing. Fill in the data manually.",
+        "title": "Importa da Airbnb",
+        "urlLabel": "URL del tuo annuncio Airbnb",
+        "importing": "Importazione...",
+        "importData": "Importa dati",
+        "bestEffortHint": "Tentativo automatico: se Airbnb blocca l'accesso o non troviamo alcuni dati, potrai inserirli manualmente nei blocchi qui sotto.",
+        "importError": "Impossibile importare l'annuncio. Inserisci i dati manualmente.",
+        "networkError": "Errore di rete durante l'importazione. Inserisci i dati manualmente.",
         "fields": {
-          "title": "Property name",
-          "description": "Description",
-          "address": "Address",
-          "max_guests": "Max guests",
-          "bedrooms": "Bedrooms",
-          "bathrooms": "Bathrooms",
-          "checkin_time": "Check-in time",
-          "checkout_time": "Check-out time",
-          "house_rules": "House rules"
+          "title": "Nome dell'alloggio",
+          "description": "Descrizione",
+          "address": "Indirizzo",
+          "max_guests": "Ospiti massimi",
+          "bedrooms": "Camere da letto",
+          "bathrooms": "Bagni",
+          "checkin_time": "Orario di check-in",
+          "checkout_time": "Orario di check-out",
+          "house_rules": "Regole della casa"
         },
-        "suspiciousWarning": "⚠ looks like generic Airbnb text, review before applying",
-        "extractedDataHint": "Extracted data — uncheck what you don't want to apply",
-        "discard": "Discard",
-        "confirmAndSave": "Confirm and save",
-        "importedSuspicious": "Data imported — review the name/address, they weren't preselected because they look like generic Airbnb text.",
-        "imported": "Data imported — review it and confirm what to apply.",
-        "basicSaveError": "Couldn't save the basic data",
-        "applied": "Data applied",
-        "applyNetworkError": "Network error while saving the imported data"
+        "suspiciousWarning": "⚠ sembra testo generico di Airbnb, controlla prima di applicare",
+        "extractedDataHint": "Dati estratti — deseleziona ciò che non vuoi applicare",
+        "discard": "Scarta",
+        "confirmAndSave": "Conferma e salva",
+        "importedSuspicious": "Dati importati — controlla nome/indirizzo, non sono stati preselezionati perché sembrano testo generico di Airbnb.",
+        "imported": "Dati importati — controllali e conferma cosa applicare.",
+        "basicSaveError": "Impossibile salvare i dati di base",
+        "applied": "Dati applicati",
+        "applyNetworkError": "Errore di rete durante il salvataggio dei dati importati"
       },
       "settings": {
-        "basicData": "Basic data",
-        "propertyName": "Property name",
-        "address": "Address",
-        "importHintPrefix": "Want to import this data from Airbnb? Do it from the",
+        "basicData": "Dati di base",
+        "propertyName": "Nome dell'alloggio",
+        "address": "Indirizzo",
+        "importHintPrefix": "Vuoi importare questi dati da Airbnb? Fallo dalla scheda",
         "importHintTab": "Editor",
-        "importHintSuffix": "tab — there you can review and confirm each piece of data before applying it, instead of overwriting it directly.",
-        "customization": "Customization",
-        "guideColor": "Guide color",
-        "welcomeMessage": "Welcome message",
-        "welcomeMessagePlaceholder": "Welcome to your home away from home. I hope you enjoy your stay...",
-        "welcomeMessageHint": "Appears right below the header in the public guide, before the content blocks.",
-        "whatsappTitle": "Host WhatsApp",
-        "whatsappNumberLabel": "Direct contact number",
-        "whatsappHint": "If you set this, a fixed \"Contact host\" button will appear in the public guide.",
-        "saveChanges": "Save changes",
-        "saveError": "Couldn't save the settings",
-        "saved": "Settings saved"
+        "importHintSuffix": "lì puoi controllare e confermare ogni dato prima di applicarlo, invece di sovrascriverlo direttamente.",
+        "customization": "Personalizzazione",
+        "guideColor": "Colore della guida",
+        "welcomeMessage": "Messaggio di benvenuto",
+        "welcomeMessagePlaceholder": "Benvenuto nella tua casa lontano da casa. Spero che ti goda il soggiorno...",
+        "welcomeMessageHint": "Appare subito sotto l'intestazione nella guida pubblica, prima dei blocchi di contenuto.",
+        "whatsappTitle": "WhatsApp dell'host",
+        "whatsappNumberLabel": "Numero di contatto diretto",
+        "whatsappHint": "Se lo configuri, apparirà un pulsante fisso \"Contatta l'host\" nella guida pubblica.",
+        "saveChanges": "Salva modifiche",
+        "saveError": "Impossibile salvare le impostazioni",
+        "saved": "Impostazioni salvate"
       },
       "deleteProperty": {
-        "dangerZoneTitle": "Danger zone",
-        "description": "Deleting \"{name}\" will make its guide unavailable to your guests immediately. You'll have 30 days to ask us to restore it before it's permanently deleted.",
-        "deleteProperty": "Delete property",
-        "confirmTitle": "Delete \"{name}\"?",
-        "confirmDescription": "Its guide will become unavailable immediately. To confirm, type the exact property name: {name}",
-        "propertyNameLabel": "Property name",
-        "deleteError": "Couldn't delete the property",
-        "deleted": "Property deleted"
+        "dangerZoneTitle": "Zona pericolosa",
+        "description": "Eliminando \"{name}\", la sua guida smetterà di essere disponibile per i tuoi ospiti immediatamente. Avrai 30 giorni per chiederci di ripristinarla prima che venga eliminata definitivamente.",
+        "deleteProperty": "Elimina alloggio",
+        "confirmTitle": "Eliminare \"{name}\"?",
+        "confirmDescription": "La sua guida smetterà di essere disponibile immediatamente. Per confermare, scrivi il nome esatto dell'alloggio: {name}",
+        "propertyNameLabel": "Nome dell'alloggio",
+        "deleteError": "Impossibile eliminare l'alloggio",
+        "deleted": "Alloggio eliminato"
       },
       "recommendations": {
-        "title": "Local recommendations",
-        "walkingMinutes": "{count} min walk",
-        "upgradePlan": "Upgrade plan",
-        "generateWithAi": "Generate with AI",
-        "generating": "Generating...",
-        "noPlacesYet": "No places yet.",
-        "addSection": "+ Add {category} section",
-        "searchPlaceholder": "Search for a place to add...",
-        "searching": "Searching...",
-        "addPlaceError": "Couldn't add the place",
-        "placeAdded": "Place added",
-        "nameEmpty": "The name can't be empty",
-        "saveError": "Couldn't save the change",
-        "saved": "Changes saved",
-        "deleteError": "Couldn't delete the place",
-        "generateError": "Couldn't generate recommendations",
-        "noRealPlacesFound": "No real places were found nearby for this category",
-        "placesGenerated": "{count, plural, one {# place generated} other {# places generated}}",
-        "nameLabel": "Name",
-        "descriptionLabel": "Description",
-        "manualEnToggleLabel": "Write the English translation by hand",
-        "descriptionEnLabel": "English description",
-        "descriptionEnPlaceholder": "Translated automatically — write here to override",
-        "manualTag": "Manual",
-        "editedTag": "Edited",
-        "enManualTag": "Manual EN",
-        "openLink": "Open link",
-        "edit": "Edit",
-        "remove": "Remove",
-        "confirmDeleteTitle": "Delete this place?",
-        "confirmDeleteDescription": "This action can't be undone.",
+        "title": "Consigli locali",
+        "walkingMinutes": "{count} min a piedi",
+        "upgradePlan": "Aggiorna piano",
+        "generateWithAi": "Genera con IA",
+        "generating": "Generazione...",
+        "noPlacesYet": "Ancora nessun luogo.",
+        "addSection": "+ Aggiungi sezione {category}",
+        "searchPlaceholder": "Cerca un luogo da aggiungere...",
+        "searching": "Ricerca...",
+        "addPlaceError": "Impossibile aggiungere il luogo",
+        "placeAdded": "Luogo aggiunto",
+        "nameEmpty": "Il nome non può essere vuoto",
+        "saveError": "Impossibile salvare la modifica",
+        "saved": "Modifiche salvate",
+        "deleteError": "Impossibile eliminare il luogo",
+        "generateError": "Impossibile generare consigli",
+        "noRealPlacesFound": "Nessun luogo reale trovato nelle vicinanze per questa categoria",
+        "placesGenerated": "{count, plural, one {# luogo generato} other {# luoghi generati}}",
+        "nameLabel": "Nome",
+        "descriptionLabel": "Descrizione",
+        "manualEnToggleLabel": "Scrivi la traduzione in inglese a mano",
+        "descriptionEnLabel": "Descrizione in inglese",
+        "descriptionEnPlaceholder": "Tradotto automaticamente — scrivi qui per sovrascrivere",
+        "manualTag": "Manuale",
+        "editedTag": "Modificato",
+        "enManualTag": "EN manuale",
+        "openLink": "Apri link",
+        "edit": "Modifica",
+        "remove": "Rimuovi",
+        "confirmDeleteTitle": "Eliminare questo luogo?",
+        "confirmDeleteDescription": "Questa azione non può essere annullata.",
         "categories": {
-          "attractions": "What to see",
-          "restaurants": "Where to eat",
-          "nightlife": "Nightlife",
-          "beaches": "Beaches",
-          "nature": "Nature"
+          "attractions": "Cosa vedere",
+          "restaurants": "Dove mangiare",
+          "nightlife": "Vita notturna",
+          "beaches": "Spiagge",
+          "nature": "Natura"
         },
-        "regenerationAvailable": "Available",
-        "regenerationRequiresPlan": "Regenerating requires a paid plan",
-        "regenerationFreeGenerationUsed": "You've already used your free AI generation for this category",
-        "regenerationPlanLockedOut": "The Free plan no longer includes AI generation",
-        "regenerationUsedThisMonth": "Already regenerated this month · available on {date}",
-        "mapsUrlLabel": "Google Maps link",
-        "mapsUrlPlaceholder": "Generated automatically — type here to override",
-        "mapsUrlInvalid": "Enter a valid URL"
+        "regenerationAvailable": "Disponibile",
+        "regenerationRequiresPlan": "La rigenerazione richiede un piano a pagamento",
+        "regenerationFreeGenerationUsed": "Hai già usato la tua generazione IA gratuita per questa categoria",
+        "regenerationPlanLockedOut": "Il piano Free non include più la generazione con IA",
+        "regenerationUsedThisMonth": "Già rigenerato questo mese · disponibile il {date}",
+        "mapsUrlLabel": "Link di Google Maps",
+        "mapsUrlPlaceholder": "Generato automaticamente — scrivi qui per sovrascrivere",
+        "mapsUrlInvalid": "Inserisci un URL valido"
       },
       "blocks": {
         "wifi": {
-          "networkName": "Network name",
+          "networkName": "Nome della rete",
           "password": "Password"
         },
         "checkin": {
-          "time": "Check-in time",
-          "instructions": "Instructions"
+          "time": "Orario di check-in",
+          "instructions": "Istruzioni"
         },
         "custom": {
-          "title": "Title",
-          "content": "Content"
+          "title": "Titolo",
+          "content": "Contenuto"
         },
         "emergency": {
-          "general": "General emergencies",
+          "general": "Emergenze generali",
           "generalPlaceholder": "112",
-          "police": "Police",
-          "ambulance": "Ambulance",
-          "firefighters": "Fire department",
-          "hospital": "Nearest hospital",
-          "hospitalPlaceholder": "Name and/or phone number",
-          "notes": "Notes"
+          "police": "Polizia",
+          "ambulance": "Ambulanza",
+          "firefighters": "Vigili del fuoco",
+          "hospital": "Ospedale più vicino",
+          "hospitalPlaceholder": "Nome e/o telefono",
+          "notes": "Note"
         },
         "rules": {
-          "addRule": "Add rule",
-          "distanceSuffix": ", {distance}m away"
+          "addRule": "Aggiungi regola",
+          "distanceSuffix": ", a {distance}m"
         },
         "placeList": {
-          "place": "Place {n}",
-          "name": "Name",
-          "description": "Description",
-          "descriptionPlaceholder": "2 sentences on what makes this place special",
-          "address": "Address",
-          "distance": "Distance (meters)",
-          "mapsLink": "Google Maps link",
-          "price": "Price",
-          "priceUndefined": "Not set",
-          "placeId": "Google Places ID (optional)",
-          "placeIdPlaceholder": "Will be filled in automatically in the future",
-          "skip": "Skip",
-          "addPlace": "+ Add place"
+          "place": "Luogo {n}",
+          "name": "Nome",
+          "description": "Descrizione",
+          "descriptionPlaceholder": "2 frasi su cosa rende speciale questo posto",
+          "address": "Indirizzo",
+          "distance": "Distanza (metri)",
+          "mapsLink": "Link di Google Maps",
+          "price": "Prezzo",
+          "priceUndefined": "Non definito",
+          "placeId": "ID di Google Places (facoltativo)",
+          "placeIdPlaceholder": "Verrà compilato automaticamente in futuro",
+          "skip": "Salta",
+          "addPlace": "+ Aggiungi luogo"
         },
         "aiGenerate": {
-          "generating": "Generating...",
-          "generate": "Generate with AI 🤖",
-          "error": "Couldn't generate a suggestion",
-          "suggested": "Place suggested — review it before saving",
-          "networkError": "Network error while generating with AI"
+          "generating": "Generazione...",
+          "generate": "Genera con IA 🤖",
+          "error": "Impossibile generare un suggerimento",
+          "suggested": "Luogo suggerito — controllalo prima di salvare",
+          "networkError": "Errore di rete durante la generazione con IA"
         },
         "imageUploader": {
-          "images": "Images ({count}/{max})",
-          "placeImages": "Place images ({count}/{max})",
-          "captionPlaceholder": "Caption (optional)",
-          "addImage": "+ Add image",
-          "addImages": "+ Add images",
-          "onlyJpgPngWebp": "Only JPG, PNG, or WebP images are accepted",
-          "tooLarge2mb": "The image can't be larger than 2MB",
-          "uploadError": "Couldn't upload the image",
-          "deleteError": "Couldn't delete the image",
-          "confirmDeleteTitle": "Delete image?",
-          "confirmDeleteDescription": "This action can't be undone."
+          "images": "Immagini ({count}/{max})",
+          "placeImages": "Immagini del luogo ({count}/{max})",
+          "captionPlaceholder": "Didascalia (facoltativo)",
+          "addImage": "+ Aggiungi immagine",
+          "addImages": "+ Aggiungi immagini",
+          "onlyJpgPngWebp": "Sono accettate solo immagini JPG, PNG o WebP",
+          "tooLarge2mb": "L'immagine non può superare 2MB",
+          "uploadError": "Impossibile caricare l'immagine",
+          "deleteError": "Impossibile eliminare l'immagine",
+          "confirmDeleteTitle": "Eliminare l'immagine?",
+          "confirmDeleteDescription": "Questa azione non può essere annullata."
         },
         "checkout": {
-          "time": "Check-out time",
-          "instructions": "Instructions"
+          "time": "Orario di check-out",
+          "instructions": "Istruzioni"
         }
       }
     },
@@ -559,243 +560,243 @@
       "free": {
         "label": "Free",
         "features": [
-          "1 property",
-          "Manual content blocks",
-          "Downloadable QR"
+          "1 alloggio",
+          "Blocchi di contenuto manuali",
+          "QR scaricabile"
         ]
       },
       "starter": {
         "label": "Starter",
         "features": [
-          "3 properties",
-          "AI content generation",
-          "AI recommendations",
-          "Downloadable QR"
+          "3 alloggi",
+          "Generazione di contenuti con IA",
+          "Consigli IA",
+          "QR scaricabile"
         ]
       },
       "pro": {
         "label": "Pro",
         "features": [
-          "10 properties",
-          "Everything in Starter",
-          "Visit statistics",
-          "WhatsApp bot"
+          "10 alloggi",
+          "Tutto ciò che offre Starter",
+          "Statistiche delle visite",
+          "Bot WhatsApp"
         ]
       },
       "agency": {
         "label": "Agency",
         "features": [
-          "30 properties",
-          "Everything in Pro",
-          "White label",
-          "Priority support"
+          "30 alloggi",
+          "Tutto ciò che offre Pro",
+          "Marchio bianco",
+          "Supporto prioritario"
         ]
       }
     },
     "properties": {
-      "title": "My properties",
-      "addNew": "Add new",
+      "title": "I miei alloggi",
+      "addNew": "Aggiungi nuovo",
       "card": {
-        "published": "Published",
-        "draft": "Draft",
-        "edit": "Edit"
+        "published": "Pubblicata",
+        "draft": "Bozza",
+        "edit": "Modifica"
       },
       "limitNotice": {
-        "message": "You've reached your {plan} plan's property limit ({count}/{max})",
-        "upgradePlan": "Upgrade plan",
-        "backToProperties": "Back to my properties"
+        "message": "Hai raggiunto il limite di alloggi del tuo piano {plan} ({count}/{max})",
+        "upgradePlan": "Aggiorna piano",
+        "backToProperties": "Torna ai miei alloggi"
       },
       "newForm": {
-        "title": "New property",
-        "nameLabel": "Property name",
-        "namePlaceholder": "Triana Apartment",
-        "addressLabel": "Address",
-        "create": "Create property",
-        "creating": "Creating...",
-        "createError": "Couldn't create the property",
-        "created": "Property created",
-        "limitReachedTitle": "Property limit reached",
-        "limitReachedDescription": "You've reached your plan's property limit. Upgrade your plan to create this property — your data hasn't been lost, it's still filled in the form.",
-        "keepEditing": "Keep editing",
-        "upgradePlan": "Upgrade plan"
+        "title": "Nuovo alloggio",
+        "nameLabel": "Nome dell'alloggio",
+        "namePlaceholder": "Appartamento Triana",
+        "addressLabel": "Indirizzo",
+        "create": "Crea alloggio",
+        "creating": "Creazione...",
+        "createError": "Impossibile creare l'alloggio",
+        "created": "Alloggio creato",
+        "limitReachedTitle": "Limite di alloggi raggiunto",
+        "limitReachedDescription": "Hai raggiunto il limite di alloggi del tuo piano. Aggiorna il tuo piano per creare questo alloggio — i tuoi dati non sono andati persi, sono ancora compilati nel modulo.",
+        "keepEditing": "Continua a modificare",
+        "upgradePlan": "Aggiorna piano"
       }
     },
     "onboarding": {
       "progressBar": {
-        "step": "Step {step} of 3"
+        "step": "Passaggio {step} di 3"
       },
       "emptyState": {
-        "message": "You don't have any properties yet. Create your first one to generate your digital guide.",
-        "createProperty": "Create property"
+        "message": "Non hai ancora alloggi. Crea il primo per generare la tua guida digitale.",
+        "createProperty": "Crea alloggio"
       },
       "step1": {
-        "title": "Tell us about your place",
-        "subtitle": "This is enough for us to draft your digital guide.",
-        "airbnbLabel": "Already have an Airbnb listing? (optional)",
+        "title": "Raccontaci del tuo alloggio",
+        "subtitle": "Questo basta per creare la bozza della tua guida digitale.",
+        "airbnbLabel": "Hai già un annuncio su Airbnb? (facoltativo)",
         "importing": "...",
-        "import": "Import",
-        "airbnbHint": "We'll fill in the name and address for you — you can edit them below.",
-        "importError": "Couldn't import. Fill in the details manually.",
-        "imported": "Data imported — review it before continuing.",
-        "importNetworkError": "Network error while importing. Fill in the details manually.",
-        "onlyJpg": "Only JPG images are accepted",
-        "tooLarge3mb": "The image can't be larger than 3MB",
-        "nameLabel": "Property name",
-        "namePlaceholder": "Triana Apartment",
-        "addressLabel": "Address",
-        "coverLabel": "Cover photo (optional)",
-        "coverAlt": "Cover",
-        "change": "Change",
-        "uploadJpg": "Upload JPG image",
-        "createError": "Couldn't create the property",
-        "continue": "Continue",
-        "creating": "Creating..."
+        "import": "Importa",
+        "airbnbHint": "Compiliamo noi il nome e l'indirizzo — puoi modificarli qui sotto.",
+        "importError": "Impossibile importare. Inserisci i dati manualmente.",
+        "imported": "Dati importati — controllali prima di continuare.",
+        "importNetworkError": "Errore di rete durante l'importazione. Inserisci i dati manualmente.",
+        "onlyJpg": "Sono accettate solo immagini JPG",
+        "tooLarge3mb": "L'immagine non può superare 3MB",
+        "nameLabel": "Nome dell'alloggio",
+        "namePlaceholder": "Appartamento Triana",
+        "addressLabel": "Indirizzo",
+        "coverLabel": "Foto di copertina (facoltativo)",
+        "coverAlt": "Copertina",
+        "change": "Cambia",
+        "uploadJpg": "Carica immagine JPG",
+        "createError": "Impossibile creare l'alloggio",
+        "continue": "Continua",
+        "creating": "Creazione..."
       },
       "step2": {
-        "title": "Add the essential information",
-        "subtitle": "Turn on what you need — you can edit it right here or later in the editor.",
-        "networkName": "Network name",
+        "title": "Aggiungi le informazioni essenziali",
+        "subtitle": "Attiva ciò di cui hai bisogno — puoi modificarlo qui stesso o più tardi nell'editor.",
+        "networkName": "Nome della rete",
         "password": "Password",
-        "time": "Time",
-        "instructions": "Instructions",
-        "checkinInstructionsPlaceholder": "How to pick up the keys, access code...",
-        "checkoutInstructionsPlaceholder": "Where to leave the keys, what to check before leaving...",
-        "rulesLabel": "House rules",
+        "time": "Orario",
+        "instructions": "Istruzioni",
+        "checkinInstructionsPlaceholder": "Come ritirare le chiavi, codice d'accesso...",
+        "checkoutInstructionsPlaceholder": "Dove lasciare le chiavi, cosa controllare prima di uscire...",
+        "rulesLabel": "Regole della casa",
         "defaultRules": [
-          "No parties or events",
-          "No smoking indoors",
-          "Please respect quiet hours from 10pm"
+          "Feste ed eventi non ammessi",
+          "Vietato fumare all'interno",
+          "Rispetta il silenzio dalle 22:00"
         ],
-        "continue": "Continue"
+        "continue": "Continua"
       },
       "step3": {
-        "title": "Ready to publish!",
-        "subtitle": "This is how your guide will look. You can publish it now or keep editing first.",
-        "noBlocksYet": "No blocks yet",
-        "publish": "Publish and generate a link",
-        "publishing": "Publishing...",
-        "publishError": "Couldn't publish the guide",
-        "keepEditing": "Keep editing"
+        "title": "Pronto per pubblicare!",
+        "subtitle": "Ecco come apparirà la tua guida. Puoi pubblicarla ora o continuare a modificarla prima.",
+        "noBlocksYet": "Ancora nessun blocco",
+        "publish": "Pubblica e genera link",
+        "publishing": "Pubblicazione...",
+        "publishError": "Impossibile pubblicare la guida",
+        "keepEditing": "Continua a modificare"
       }
     },
     "admin": {
-      "title": "Admin panel",
+      "title": "Pannello di amministrazione",
       "stats": {
-        "hosts": "Hosts",
-        "properties": "Properties",
-        "published": "Published guides",
-        "draft": "Draft"
+        "hosts": "Host",
+        "properties": "Alloggi",
+        "published": "Guide pubblicate",
+        "draft": "Bozza"
       },
       "hostsCard": {
-        "title": "Hosts",
-        "viewAllProperties": "View all properties →"
+        "title": "Host",
+        "viewAllProperties": "Vedi tutti gli alloggi →"
       },
       "supportCard": {
-        "title": "Support"
+        "title": "Supporto"
       },
       "hostsTable": {
-        "empty": "No hosts yet.",
+        "empty": "Ancora nessun host.",
         "email": "Email",
-        "plan": "Plan",
-        "properties": "Properties",
-        "registered": "Registered",
-        "actions": "Actions",
-        "planChangeError": "Couldn't change the plan",
-        "planUpdated": "Plan updated to {plan}",
-        "impersonateConfirm": "Log in as {email}? You'll see their dashboard exactly as they do, until you click \"Back to admin\".",
-        "impersonateError": "Couldn't impersonate this user",
-        "entering": "Entering...",
-        "enterAsUser": "Log in as this user",
-        "goToMyDashboard": "Go to my dashboard",
-        "planChangeDbOnlyWarning": "This changes the plan only in the database — it doesn't create, modify, or cancel any Stripe subscription"
+        "plan": "Piano",
+        "properties": "Alloggi",
+        "registered": "Registrazione",
+        "actions": "Azioni",
+        "planChangeError": "Impossibile cambiare il piano",
+        "planUpdated": "Piano aggiornato a {plan}",
+        "impersonateConfirm": "Accedere come {email}? Vedrai il suo pannello esattamente come lo vede lui, finché non clicchi su \"Torna all'admin\".",
+        "impersonateError": "Impossibile impersonare questo utente",
+        "entering": "Accesso in corso...",
+        "enterAsUser": "Accedi come questo utente",
+        "goToMyDashboard": "Vai alla mia dashboard",
+        "planChangeDbOnlyWarning": "Questo cambia il piano solo nel database — non crea, modifica o annulla alcun abbonamento Stripe"
       },
       "propertiesPage": {
-        "title": "Properties",
-        "backToPanel": "Back to panel",
-        "allProperties": "All properties ({count})",
-        "viewFlat": "Table",
-        "viewGrouped": "By host"
+        "title": "Alloggi",
+        "backToPanel": "Torna al pannello",
+        "allProperties": "Tutti gli alloggi ({count})",
+        "viewFlat": "Tabella",
+        "viewGrouped": "Per host"
       },
       "propertiesTable": {
-        "empty": "No properties.",
-        "property": "Property",
+        "empty": "Nessun alloggio.",
+        "property": "Alloggio",
         "host": "Host",
-        "status": "Status",
-        "deletedColumn": "Deleted",
-        "actions": "Actions",
-        "published": "Published",
-        "draft": "Draft",
-        "deletedByHostOn": "Deleted by host on {date}",
-        "hostPlanAtDeletion": "Host's plan when deleted: {plan}",
-        "eligibleForPurge": "Eligible for purge (>{days} days)",
-        "purgeableFrom": "Purgeable starting {date}",
-        "restoreConfirm": "Restore \"{name}\"? It will become visible to the host again.",
-        "restoreError": "Couldn't restore the property",
-        "restored": "\"{name}\" restored",
-        "restoring": "Restoring...",
-        "restore": "Restore",
-        "purge": "Purge",
-        "purgeDialogTitle": "Permanently purge \"{name}\"?",
-        "purgeDialogDescription": "This physically deletes the property and all its related data (recommendations, translations, guide, cover image). This can't be undone. To confirm, type:",
-        "purgeError": "Couldn't purge the property",
-        "purged": "\"{name}\" permanently purged",
-        "purging": "Purging...",
-        "purgePermanently": "Purge permanently",
-        "hostGroupCount": "{count, plural, one {# property} other {# properties}}",
-        "viewProperty": "View property"
+        "status": "Stato",
+        "deletedColumn": "Eliminato",
+        "actions": "Azioni",
+        "published": "Pubblicata",
+        "draft": "Bozza",
+        "deletedByHostOn": "Eliminato dall'host il {date}",
+        "hostPlanAtDeletion": "Piano dell'host al momento dell'eliminazione: {plan}",
+        "eligibleForPurge": "Idoneo per la purga (>{days} giorni)",
+        "purgeableFrom": "Purgabile a partire dal {date}",
+        "restoreConfirm": "Ripristinare \"{name}\"? Tornerà visibile all'host.",
+        "restoreError": "Impossibile ripristinare l'alloggio",
+        "restored": "\"{name}\" ripristinato",
+        "restoring": "Ripristino...",
+        "restore": "Ripristina",
+        "purge": "Purga",
+        "purgeDialogTitle": "Purgare definitivamente \"{name}\"?",
+        "purgeDialogDescription": "Questo elimina fisicamente l'alloggio e tutti i suoi dati correlati (consigli, traduzioni, guida, immagine di copertina). Non può essere annullato. Per confermare, scrivi:",
+        "purgeError": "Impossibile purgare l'alloggio",
+        "purged": "\"{name}\" purgato definitivamente",
+        "purging": "Purga in corso...",
+        "purgePermanently": "Purga definitivamente",
+        "hostGroupCount": "{count, plural, one {# alloggio} other {# alloggi}}",
+        "viewProperty": "Vedi alloggio"
       },
       "tickets": {
         "typeLabels": {
-          "bug": "Bug",
-          "feature_request": "Feature request",
-          "question": "Question"
+          "bug": "Problema",
+          "feature_request": "Miglioria",
+          "question": "Domanda"
         },
-        "statusOpen": "Open",
-        "statusResolved": "Resolved",
-        "viewScreenshot": "View screenshot",
-        "markResolved": "Mark as resolved",
-        "updateError": "Couldn't update the ticket",
-        "resolved": "Ticket marked as resolved",
-        "allTypes": "All types",
-        "allStatuses": "All statuses",
-        "openFilter": "Open",
-        "resolvedFilter": "Resolved",
-        "empty": "No tickets match these filters."
+        "statusOpen": "Aperto",
+        "statusResolved": "Risolto",
+        "viewScreenshot": "Vedi screenshot",
+        "markResolved": "Segna come risolto",
+        "updateError": "Impossibile aggiornare il ticket",
+        "resolved": "Ticket contrassegnato come risolto",
+        "allTypes": "Tutti i tipi",
+        "allStatuses": "Tutti gli stati",
+        "openFilter": "Aperti",
+        "resolvedFilter": "Risolti",
+        "empty": "Nessun ticket corrisponde a questi filtri."
       },
       "impersonation": {
-        "banner": "You're viewing the dashboard as {host} — impersonation mode",
-        "stopError": "Couldn't return to the admin account",
-        "returning": "Returning...",
-        "backToAdmin": "Back to admin"
+        "banner": "Stai visualizzando il pannello come {host} — modalità impersonazione",
+        "stopError": "Impossibile tornare all'account amministratore",
+        "returning": "Ritorno in corso...",
+        "backToAdmin": "Torna all'admin"
       }
     },
     "support": {
       "options": {
-        "bug": "Report a problem",
-        "feature_request": "Suggest an improvement",
-        "question": "I have a question"
+        "bug": "Segnala un problema",
+        "feature_request": "Suggerisci un miglioramento",
+        "question": "Ho una domanda"
       },
-      "howCanWeHelp": "How can we help?",
-      "subjectLabel": "Subject",
-      "descriptionLabel": "Description",
-      "screenshotLabel": "Screenshot (optional)",
-      "attachImage": "Attach image",
-      "onlyJpgPngWebp": "The screenshot must be JPG, PNG, or WebP",
-      "tooLarge2mb": "The screenshot can't be larger than 2MB",
-      "submitError": "Couldn't send the message",
-      "send": "Send",
-      "sending": "Sending...",
-      "sentMessage": "We've received your message, we'll reply within 24h.",
-      "close": "Close",
-      "openHelp": "Open help",
-      "closeHelp": "Close help"
+      "howCanWeHelp": "Come possiamo aiutarti?",
+      "subjectLabel": "Oggetto",
+      "descriptionLabel": "Descrizione",
+      "screenshotLabel": "Screenshot (facoltativo)",
+      "attachImage": "Allega immagine",
+      "onlyJpgPngWebp": "Lo screenshot deve essere JPG, PNG o WebP",
+      "tooLarge2mb": "Lo screenshot non può superare 2MB",
+      "submitError": "Impossibile inviare il messaggio",
+      "send": "Invia",
+      "sending": "Invio...",
+      "sentMessage": "Abbiamo ricevuto il tuo messaggio, ti risponderemo entro 24 ore.",
+      "close": "Chiudi",
+      "openHelp": "Apri assistenza",
+      "closeHelp": "Chiudi assistenza"
     },
     "stats": {
-      "visits30days": "Visits (last 30 days)",
-      "topSections": "Most viewed sections",
-      "topCountries": "Visitor countries",
-      "noDataYet": "No data yet.",
-      "noCountryDataYet": "No data yet (country is only detected in production)."
+      "visits30days": "Visite (ultimi 30 giorni)",
+      "topSections": "Sezioni più consultate",
+      "topCountries": "Paesi dei visitatori",
+      "noDataYet": "Ancora nessun dato.",
+      "noCountryDataYet": "Ancora nessun dato (il paese viene rilevato solo in produzione)."
     }
   }
 }

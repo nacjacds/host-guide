@@ -9,11 +9,6 @@ import itMessages from "@/messages/it.json";
 import ptMessages from "@/messages/pt.json";
 import { ALL_APP_LOCALES, type AppLocale, setLocaleCookie } from "@/lib/locale";
 
-// fr/it/pt.json are English-content placeholders for now (i18n Fase 4
-// hasn't translated them yet) — see messages/fr.json's own copy-from-en.json
-// history. Wiring them in already, rather than aliasing enMessages in code,
-// means Fase 4 can translate key-by-key directly in these files without any
-// further architecture change here.
 const MESSAGES: Record<AppLocale, typeof esMessages> = {
   es: esMessages,
   en: enMessages,

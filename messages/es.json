@@ -258,7 +258,8 @@
         "checkoutError": "No se pudo iniciar el pago",
         "portalError": "No se pudo abrir el portal de facturación",
         "downgradeError": "No se pudo cambiar al plan Free",
-        "downgradeSuccess": "Has cambiado al plan Free"
+        "downgradeSuccess": "Has cambiado al plan Free",
+        "upgradedToast": "¡Plan actualizado correctamente!"
       },
       "security": {
         "title": "Cambiar contraseña",

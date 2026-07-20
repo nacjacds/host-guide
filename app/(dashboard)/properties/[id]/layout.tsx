@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PropertyNav } from "@/components/editor/PropertyNav";
+import { PropertyBreadcrumbLink } from "@/components/editor/PropertyBreadcrumbLink";
 
 export default async function PropertyLayout({
   children,
@@ -34,9 +34,7 @@ export default async function PropertyLayout({
     <div className="space-y-6">
       <div>
         <nav className="mb-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-          <Link href="/dashboard" className="hover:text-foreground">
-            Propiedades
-          </Link>
+          <PropertyBreadcrumbLink />
           <span aria-hidden>&gt;</span>
           <span>{property.name}</span>
         </nav>

@@ -258,7 +258,8 @@
         "checkoutError": "Couldn't start the payment",
         "portalError": "Couldn't open the billing portal",
         "downgradeError": "Couldn't switch to the Free plan",
-        "downgradeSuccess": "You've switched to the Free plan"
+        "downgradeSuccess": "You've switched to the Free plan",
+        "upgradedToast": "Plan upgraded successfully!"
       },
       "security": {
         "title": "Change password",
