@@ -15,6 +15,7 @@ const updatePropertySchema = z.object({
   accent_color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
   host_tone: z.enum(["friendly", "formal"]).optional(),
   language: z.string().min(2).max(5).optional(),
+  destination_type: z.enum(["beach", "historic_city", "nature", "rural", "urban"]).optional(),
   // Guest-facing contact phone — gates the WhatsApp button in the public
   // guide (see WhatsAppFab.tsx: renders nothing at all if this, and the
   // profiles.phone fallback, are both empty).

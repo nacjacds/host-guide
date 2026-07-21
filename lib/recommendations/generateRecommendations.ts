@@ -13,7 +13,7 @@ import {
   OPTIONAL_RECOMMENDATION_CATEGORIES,
   MAX_PLACES_PER_CATEGORY,
 } from "./constants";
-import type { PropertyRecommendation, PropertyRecommendationCategory } from "@/types";
+import type { DestinationType, PropertyRecommendation, PropertyRecommendationCategory } from "@/types";
 
 const ALL_CATEGORIES = [...BASE_RECOMMENDATION_CATEGORIES, ...OPTIONAL_RECOMMENDATION_CATEGORIES];
 
@@ -34,7 +34,7 @@ export async function generatePropertyRecommendations(
 
   const { data: property } = await supabase
     .from("properties")
-    .select("id, name, address, lat, lng")
+    .select("id, name, address, lat, lng, destination_type")
     .eq("id", propertyId)
     .single();
 
@@ -76,7 +76,11 @@ export async function generatePropertyRecommendations(
   }> = [];
 
   for (const category of categoriesToProcess) {
-    const candidates = await searchRecommendationCandidates(center, category);
+    const candidates = await searchRecommendationCandidates(
+      center,
+      category,
+      property.destination_type as DestinationType
+    );
     if (candidates.length === 0) continue;
 
     const curated = await curateRecommendations({
@@ -91,6 +95,7 @@ export async function generatePropertyRecommendations(
         types: c.types,
       })),
       limit: MAX_PLACES_PER_CATEGORY,
+      destinationType: property.destination_type as DestinationType,
     });
 
     // TEMPORARY diagnostic logging — shows exactly what Claude was given

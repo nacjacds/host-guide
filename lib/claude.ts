@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import type { HostTone } from "@/types";
+import type { DestinationType, HostTone } from "@/types";
 import type { AppLocale } from "@/lib/locale";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -132,6 +132,25 @@ const CURATION_CATEGORY_GUIDANCE: Record<string, string> = {
   nature: "Prioriza parques y espacios naturales con buena valoración.",
 };
 
+// Extra framing based on what kind of destination the property is in (see
+// properties.destination_type) — empty for "urban" so that default case
+// stays byte-identical to the prompt before this existed. Lets Claude
+// weigh two otherwise-similar candidates by what actually matters for
+// this property's character (e.g. a restaurant with a sea-view terrace
+// over an identical inland one for a beach property), on top of the
+// per-category guidance above, not instead of it.
+const DESTINATION_TYPE_GUIDANCE: Record<DestinationType, string> = {
+  urban: "",
+  historic_city:
+    "Este alojamiento está en una ciudad histórica con patrimonio cultural relevante. Si un lugar tiene valor histórico, monumental o cultural, resáltalo en la descripción.",
+  beach:
+    "Este alojamiento está en una zona de playa/costa. Si un lugar tiene vistas al mar, terraza junto a la costa, o ambiente playero, resáltalo en la descripción por encima de un lugar equivalente sin esa cercanía al mar.",
+  nature:
+    "Este alojamiento está en un entorno natural/de montaña. Si un lugar tiene relación con senderismo, naturaleza o paisaje, resáltalo en la descripción.",
+  rural:
+    "Este alojamiento está en una zona rural/de pueblo. Si un lugar tiene un carácter auténtico, tradicional o típico del entorno rural, resáltalo en la descripción.",
+};
+
 export interface CuratedRecommendation {
   place_id: string;
   description: string;
@@ -158,9 +177,11 @@ export async function curateRecommendations(params: {
   category: string;
   candidates: RecommendationCandidate[];
   limit?: number;
+  destinationType?: DestinationType;
 }): Promise<CuratedRecommendation[]> {
   const limit = params.limit ?? 10;
   const guidance = CURATION_CATEGORY_GUIDANCE[params.category] ?? "";
+  const destinationGuidance = DESTINATION_TYPE_GUIDANCE[params.destinationType ?? "urban"];
 
   const prompt = `
 Eres el asistente de ${params.propertyName}, un alojamiento en ${params.address}.
@@ -170,7 +191,7 @@ Estos son los lugares candidatos de la categoría "${params.category}" cerca del
 ${JSON.stringify(params.candidates, null, 2)}
 
 Selecciona un máximo de ${limit} lugares y ordénalos de mejor a peor recomendación para un
-huésped turístico. ${guidance}
+huésped turístico. ${guidance} ${destinationGuidance}
 
 Para cada lugar seleccionado, escribe una descripción breve (máximo 1-2 frases) que explique
 qué lo hace destacar — tipo de lugar, ambiente, qué esperar — basándote únicamente en su
@@ -204,8 +225,10 @@ export async function describeManualPlace(params: {
   address: string;
   category: string;
   place: RecommendationCandidate;
+  destinationType?: DestinationType;
 }): Promise<string> {
   const guidance = CURATION_CATEGORY_GUIDANCE[params.category] ?? "";
+  const destinationGuidance = DESTINATION_TYPE_GUIDANCE[params.destinationType ?? "urban"];
 
   const prompt = `
 Eres el asistente de ${params.propertyName}, un alojamiento en ${params.address}.
@@ -216,6 +239,7 @@ ${JSON.stringify(params.place, null, 2)}
 
 Escribe una descripción breve (máximo 1-2 frases) que explique qué lo hace destacar — tipo de
 lugar, ambiente, qué esperar — basándote únicamente en su nombre, rating y tipos. ${guidance}
+${destinationGuidance}
 No inventes datos factuales (precios, platos concretos, horarios) que no estén en los datos
 proporcionados.
 

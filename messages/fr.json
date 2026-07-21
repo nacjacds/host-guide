@@ -604,6 +604,15 @@
         ]
       }
     },
+    "destinationTypes": {
+      "label": "Type de destination",
+      "hint": "Aide l'IA à mieux prioriser les recommandations locales de ce logement.",
+      "beach": "Plage / Littoral",
+      "historic_city": "Ville historique / Culturelle",
+      "nature": "Nature / Montagne",
+      "rural": "Rural / Village",
+      "urban": "Urbain général"
+    },
     "properties": {
       "title": "Mes logements",
       "addNew": "Ajouter",

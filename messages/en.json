@@ -604,6 +604,15 @@
         ]
       }
     },
+    "destinationTypes": {
+      "label": "Destination type",
+      "hint": "Helps the AI better prioritize local recommendations for this property.",
+      "beach": "Beach / Coastal",
+      "historic_city": "Historic city / Cultural",
+      "nature": "Nature / Mountain",
+      "rural": "Rural / Village",
+      "urban": "General urban"
+    },
     "properties": {
       "title": "My properties",
       "addNew": "Add new",

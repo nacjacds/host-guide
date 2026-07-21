@@ -604,6 +604,15 @@
         ]
       }
     },
+    "destinationTypes": {
+      "label": "Tipo de destino",
+      "hint": "Ayuda a la IA a priorizar mejor las recomendaciones locales de esta propiedad.",
+      "beach": "Playa / Costa",
+      "historic_city": "Ciudad histórica / Cultural",
+      "nature": "Naturaleza / Montaña",
+      "rural": "Rural / Pueblo",
+      "urban": "Urbano general"
+    },
     "properties": {
       "title": "Mis propiedades",
       "addNew": "Añadir nueva",

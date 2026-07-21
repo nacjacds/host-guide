@@ -10,15 +10,20 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ALL_APP_LOCALES, parseLocale, type AppLocale } from "@/lib/locale";
-import type { Property } from "@/types";
+import type { DestinationType, Property } from "@/types";
 
 const WELCOME_MESSAGE_MAX = 500;
+const DESTINATION_TYPES: DestinationType[] = ["urban", "historic_city", "beach", "nature", "rural"];
 
 export function PropertySettingsForm({ property }: { property: Property }) {
   const t = useTranslations("dashboard.editor.settings");
   const tCommon = useTranslations("dashboard.common");
+  const tDestinationTypes = useTranslations("dashboard.destinationTypes");
   const [name, setName] = useState(property.name);
   const [address, setAddress] = useState(property.address ?? "");
+  const [destinationType, setDestinationType] = useState<DestinationType>(
+    property.destination_type as DestinationType
+  );
   const [accentColor, setAccentColor] = useState(property.accent_color);
   const [whatsappNumber, setWhatsappNumber] = useState(property.whatsapp_number ?? "");
   const [welcomeMessage, setWelcomeMessage] = useState(property.welcome_message ?? "");
@@ -47,6 +52,7 @@ export function PropertySettingsForm({ property }: { property: Property }) {
           whatsapp_number: whatsappNumber || null,
           welcome_message: welcomeMessage || null,
           language,
+          destination_type: destinationType,
         }),
       });
 
@@ -82,6 +88,25 @@ export function PropertySettingsForm({ property }: { property: Property }) {
           <p className="text-xs text-muted-foreground">
             {t("importHintPrefix")} <strong>{t("importHintTab")}</strong> — {t("importHintSuffix")}
           </p>
+          <div>
+            <Label htmlFor="destination_type">{tDestinationTypes("label")}</Label>
+            <Select
+              value={destinationType}
+              onValueChange={(value) => setDestinationType(value as DestinationType)}
+            >
+              <SelectTrigger id="destination_type" className="w-full">
+                <SelectValue>{(value: DestinationType) => tDestinationTypes(value)}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {DESTINATION_TYPES.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {tDestinationTypes(type)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="mt-1 text-xs text-muted-foreground">{tDestinationTypes("hint")}</p>
+          </div>
         </CardContent>
       </Card>
 

@@ -7,6 +7,7 @@ import { triggerRecommendationsTranslation } from "@/lib/translations/translateR
 import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
 import { getApiLocale } from "@/lib/apiLocale";
 import { pick } from "@/lib/apiMessages";
+import type { DestinationType } from "@/types";
 
 const addPlaceSchema = z.object({
   category: z.enum(["attractions", "restaurants", "nightlife", "beaches", "nature"]),
@@ -34,7 +35,7 @@ export async function POST(
 
   const { data: property } = await supabase
     .from("properties")
-    .select("id, name, address, lat, lng")
+    .select("id, name, address, lat, lng, destination_type")
     .eq("id", propertyId)
     .eq("host_id", user.id)
     .single();
@@ -78,6 +79,7 @@ export async function POST(
       user_ratings_total: place.user_ratings_total,
       types: place.types,
     },
+    destinationType: property.destination_type as DestinationType,
   }).catch((err) => {
     console.error("[property-recommendations] describeManualPlace failed", err);
     return null;

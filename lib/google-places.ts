@@ -1,5 +1,5 @@
 import fs from "fs";
-import type { PropertyRecommendationCategory } from "@/types";
+import type { DestinationType, PropertyRecommendationCategory } from "@/types";
 
 // Every call in this file runs server-side only (this module has no
 // browser consumers — the manual-search/autocomplete UI hits our own API
@@ -49,6 +49,31 @@ export const RECOMMENDATION_CATEGORY_CONFIG: Record<
   nightlife: { query: "bares y vida nocturna", radiusMeters: 2000 },
   beaches: { query: "playas", radiusMeters: 15000 },
   nature: { query: "parques naturales y naturaleza", radiusMeters: 15000 },
+};
+
+// Extra Google Places (New) Table A types searched via Nearby Search — one
+// additional call, merged with the "attractions" category's existing text
+// search — when a property's destination_type isn't the "urban" default.
+// This is purely additive (see searchRecommendationCandidates): the
+// existing generic query always still runs too, so nothing is ever
+// excluded, only supplemented with candidates a broad text query alone
+// was letting well-known but out-competed landmarks (e.g. a cathedral
+// against restaurants with thousands of reviews) fall through.
+// "urban" and, deliberately, "rural"/"nature" combined (no differentiation
+// between them yet) map straight from the approved product proposal.
+export const DESTINATION_TYPE_ATTRACTION_TYPES: Record<DestinationType, string[]> = {
+  urban: [],
+  historic_city: ["historical_landmark", "museum", "church", "monument", "castle"],
+  beach: ["beach", "marina"],
+  nature: ["hiking_area", "scenic_spot"],
+  rural: ["hiking_area", "scenic_spot"],
+};
+
+// "Paseo marítimo" (seafront promenade) has no dedicated Google Places
+// type, so beach properties get one extra free-text search for it instead
+// of/alongside the Nearby Search type list above.
+const DESTINATION_TYPE_EXTRA_TEXT_QUERY: Partial<Record<DestinationType, string>> = {
+  beach: "paseo marítimo",
 };
 
 function buildPhotoUrl(photoName: string | undefined): string | null {
@@ -122,6 +147,98 @@ export async function searchNearbyPlaces(
   return mapPlacesResponse(data);
 }
 
+const PLACE_FIELD_MASK =
+  "places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.location,places.googleMapsUri,places.types,places.photos";
+
+// Best-effort supplemental search — used only to add destination_type-aware
+// candidates on top of the always-run generic query below, so a failure
+// here (network blip, API error) should never break generation outright.
+// Returns raw (unfiltered) places, same shape as Text Search's response.
+async function fetchNearbySearchRawPlaces(
+  center: { lat: number; lng: number },
+  radiusMeters: number,
+  includedTypes: string[]
+): Promise<RawPlaceWithId[]> {
+  try {
+    const response = await fetch(`${PLACES_API_BASE}:searchNearby`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": process.env.GOOGLE_MAPS_SERVER_KEY!,
+        "X-Goog-FieldMask": PLACE_FIELD_MASK,
+      },
+      body: JSON.stringify({
+        includedTypes,
+        maxResultCount: 20,
+        rankPreference: "POPULARITY",
+        locationRestriction: {
+          circle: {
+            center: { latitude: center.lat, longitude: center.lng },
+            radius: radiusMeters,
+          },
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const bodyText = await response.text().catch(() => "<no body>");
+      console.error("[fetchNearbySearchRawPlaces] HTTP error", {
+        httpStatus: response.status,
+        body: bodyText,
+        includedTypes,
+        center,
+      });
+      return [];
+    }
+
+    const data = await response.json();
+    return data.places ?? [];
+  } catch (err) {
+    console.error("[fetchNearbySearchRawPlaces] request failed", { err, includedTypes, center });
+    return [];
+  }
+}
+
+// Same best-effort reasoning as fetchNearbySearchRawPlaces above — used
+// for destination-type text queries with no matching Google Places type
+// (e.g. "paseo marítimo", which isn't a Table A type).
+async function fetchTextSearchRawPlaces(
+  query: string,
+  rectangle: ReturnType<typeof boundingRectangleFromCircle>
+): Promise<RawPlaceWithId[]> {
+  try {
+    const response = await fetch(`${PLACES_API_BASE}:searchText`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": process.env.GOOGLE_MAPS_SERVER_KEY!,
+        "X-Goog-FieldMask": PLACE_FIELD_MASK,
+      },
+      body: JSON.stringify({
+        textQuery: query,
+        languageCode: "es",
+        locationRestriction: { rectangle },
+      }),
+    });
+
+    if (!response.ok) {
+      const bodyText = await response.text().catch(() => "<no body>");
+      console.error("[fetchTextSearchRawPlaces] HTTP error", {
+        httpStatus: response.status,
+        body: bodyText,
+        query,
+      });
+      return [];
+    }
+
+    const data = await response.json();
+    return data.places ?? [];
+  } catch (err) {
+    console.error("[fetchTextSearchRawPlaces] request failed", { err, query });
+    return [];
+  }
+}
+
 // Searches a recommendation category (attractions/restaurants/nightlife/
 // beaches/nature) centered on real coordinates, hard-restricted to a
 // rectangle circumscribing the category's radius — locationBias (a weak
@@ -129,9 +246,18 @@ export async function searchNearbyPlaces(
 // letting results 90-140km away through for generic queries like
 // "atracciones turísticas", so this uses locationRestriction instead,
 // which Text Search (New) only supports as a rectangle, not a circle.
+//
+// For "attractions" on a non-"urban" destination_type, this generic query
+// always still runs (unchanged), and is then supplemented — never
+// replaced — with destination-type-aware candidates (see
+// DESTINATION_TYPE_ATTRACTION_TYPES/DESTINATION_TYPE_EXTRA_TEXT_QUERY
+// above), deduped by place_id before the rating/review filter runs. Every
+// other category, and "urban" (the default every existing property keeps
+// until reclassified), is byte-for-byte the same single call as before.
 export async function searchRecommendationCandidates(
   center: { lat: number; lng: number },
-  category: PropertyRecommendationCategory
+  category: PropertyRecommendationCategory,
+  destinationType: DestinationType = "urban"
 ): Promise<PlaceResult[]> {
   const config = RECOMMENDATION_CATEGORY_CONFIG[category];
   const rectangle = boundingRectangleFromCircle(center, config.radiusMeters);
@@ -141,8 +267,7 @@ export async function searchRecommendationCandidates(
     headers: {
       "Content-Type": "application/json",
       "X-Goog-Api-Key": process.env.GOOGLE_MAPS_SERVER_KEY!,
-      "X-Goog-FieldMask":
-        "places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.location,places.googleMapsUri,places.types,places.photos",
+      "X-Goog-FieldMask": PLACE_FIELD_MASK,
     },
     body: JSON.stringify({
       textQuery: config.query,
@@ -166,13 +291,36 @@ export async function searchRecommendationCandidates(
   }
 
   const data = await response.json();
+  const rawPlacesCombined: RawPlaceWithId[] = data.places ?? [];
+
+  // Additive destination-type candidates — "attractions" only, and only
+  // when this property was classified as something other than "urban".
+  if (category === "attractions" && destinationType !== "urban") {
+    const extraTypes = DESTINATION_TYPE_ATTRACTION_TYPES[destinationType];
+    const extraQuery = DESTINATION_TYPE_EXTRA_TEXT_QUERY[destinationType];
+
+    const [nearbyExtras, textExtras] = await Promise.all([
+      extraTypes.length > 0
+        ? fetchNearbySearchRawPlaces(center, config.radiusMeters, extraTypes)
+        : Promise.resolve([]),
+      extraQuery ? fetchTextSearchRawPlaces(extraQuery, rectangle) : Promise.resolve([]),
+    ]);
+
+    const seenIds = new Set(rawPlacesCombined.map((p) => p.id));
+    for (const extra of [...nearbyExtras, ...textExtras]) {
+      if (!seenIds.has(extra.id)) {
+        seenIds.add(extra.id);
+        rawPlacesCombined.push(extra);
+      }
+    }
+  }
 
   // TEMPORARY diagnostic logging — dumps every raw candidate Google Places
   // returned, before our own rating/review-count filter runs (see
   // mapPlacesResponse below), so we can tell whether well-known landmarks
   // are missing from Google's response itself vs. getting filtered out
   // downstream (by us or by Claude's curation).
-  const rawPlaces = (data.places ?? []).map((p: RawPlace) => ({
+  const rawPlaces = rawPlacesCombined.map((p: RawPlace) => ({
     name: p.displayName?.text,
     rating: p.rating,
     user_ratings_total: p.userRatingCount,
@@ -182,6 +330,7 @@ export async function searchRecommendationCandidates(
   const rawLog = {
     category,
     center,
+    destinationType,
     query: config.query,
     radiusMeters: config.radiusMeters,
     rectangle,
@@ -194,7 +343,7 @@ export async function searchRecommendationCandidates(
     `${new Date().toISOString()} - [searchRecommendationCandidates raw] ${JSON.stringify(rawLog)}\n`
   );
 
-  const filtered = mapPlacesResponse(data);
+  const filtered = mapPlacesResponse({ places: rawPlacesCombined });
 
   // TEMPORARY diagnostic logging — same candidates as above, after the
   // rating >= 4.0 / reviews >= 50 filter, so a diff between this and the
@@ -226,19 +375,22 @@ interface RawPlace {
   location?: { latitude: number; longitude: number };
 }
 
-function mapPlacesResponse(data: {
-  places?: Array<{
-    id: string;
-    displayName: { text: string };
-    formattedAddress: string;
-    rating?: number;
-    userRatingCount?: number;
-    location: { latitude: number; longitude: number };
-    googleMapsUri: string;
-    types?: string[];
-    photos?: Array<{ name: string }>;
-  }>;
-}): PlaceResult[] {
+// Same Place resource shape returned by both Text Search (New) and Nearby
+// Search (New) — both New Places API endpoints share this response format,
+// so one type/mapper covers results from either.
+interface RawPlaceWithId {
+  id: string;
+  displayName: { text: string };
+  formattedAddress: string;
+  rating?: number;
+  userRatingCount?: number;
+  location: { latitude: number; longitude: number };
+  googleMapsUri: string;
+  types?: string[];
+  photos?: Array<{ name: string }>;
+}
+
+function mapPlacesResponse(data: { places?: RawPlaceWithId[] }): PlaceResult[] {
   const places = data.places ?? [];
 
   return places

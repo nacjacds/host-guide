@@ -604,6 +604,15 @@
         ]
       }
     },
+    "destinationTypes": {
+      "label": "Tipo di destinazione",
+      "hint": "Aiuta l'IA a dare priorità migliore ai consigli locali per questo alloggio.",
+      "beach": "Spiaggia / Costa",
+      "historic_city": "Città storica / Culturale",
+      "nature": "Natura / Montagna",
+      "rural": "Rurale / Paese",
+      "urban": "Urbano generico"
+    },
     "properties": {
       "title": "I miei alloggi",
       "addNew": "Aggiungi nuovo",

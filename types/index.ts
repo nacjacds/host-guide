@@ -1,5 +1,11 @@
 export type Plan = "free" | "starter" | "pro" | "agency";
 export type HostTone = "friendly" | "formal";
+// What kind of destination this property is in — drives what Google Places
+// search prioritizes and what Claude's curation prompt emphasizes for each
+// recommendation category (see lib/google-places.ts, lib/claude.ts).
+// Defaults to "urban" (see migration 20260721090000) so existing behavior
+// is unchanged until a property is explicitly reclassified.
+export type DestinationType = "beach" | "historic_city" | "nature" | "rural" | "urban";
 export type AnalyticsEventType = "guide_opened" | "section_viewed" | "whatsapp_clicked";
 export type SupportTicketType = "bug" | "feature_request" | "question";
 export type SupportTicketStatus = "open" | "closed";
@@ -108,6 +114,7 @@ export interface Database {
           accent_color: string;
           host_tone: HostTone;
           language: string;
+          destination_type: DestinationType;
           whatsapp_number: string | null;
           welcome_message: string | null;
           airbnb_url: string | null;
@@ -132,6 +139,7 @@ export interface Database {
           accent_color?: string;
           host_tone?: HostTone;
           language?: string;
+          destination_type?: DestinationType;
           whatsapp_number?: string | null;
           welcome_message?: string | null;
           airbnb_url?: string | null;
@@ -156,6 +164,7 @@ export interface Database {
           accent_color?: string;
           host_tone?: HostTone;
           language?: string;
+          destination_type?: DestinationType;
           whatsapp_number?: string | null;
           welcome_message?: string | null;
           airbnb_url?: string | null;

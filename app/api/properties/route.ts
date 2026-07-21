@@ -11,6 +11,7 @@ import type { User } from "@supabase/supabase-js";
 const createPropertySchema = z.object({
   name: z.string().min(1).max(120),
   address: z.string().min(1).max(255),
+  destination_type: z.enum(["beach", "historic_city", "nature", "rural", "urban"]).optional(),
 });
 
 // Profiles are normally created by the on_auth_user_created DB trigger.
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { name, address } = parsed.data;
+  const { name, address, destination_type } = parsed.data;
   const baseSlug = slugifyPropertyName(name);
   const slug = `${baseSlug}-${Math.random().toString(36).slice(2, 7)}`;
 
@@ -117,7 +118,7 @@ export async function POST(request: NextRequest) {
 
   const { data: property, error } = await supabase
     .from("properties")
-    .insert({ host_id: user.id, name, address, slug, language })
+    .insert({ host_id: user.id, name, address, slug, language, destination_type })
     .select()
     .single();
 

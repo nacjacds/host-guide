@@ -5,12 +5,14 @@ import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { compressImageFile } from "@/lib/compressImage";
-import type { Property } from "@/types";
+import type { DestinationType, Property } from "@/types";
 
 const MAX_COVER_SIZE_BYTES = 3 * 1024 * 1024;
 const WELCOME_MESSAGE_MAX = 500;
+const DESTINATION_TYPES: DestinationType[] = ["urban", "historic_city", "beach", "nature", "rural"];
 
 export function OnboardingStep1({
   onCreated,
@@ -19,10 +21,12 @@ export function OnboardingStep1({
 }) {
   const t = useTranslations("dashboard.onboarding.step1");
   const tCommon = useTranslations("dashboard.common");
+  const tDestinationTypes = useTranslations("dashboard.destinationTypes");
   const [airbnbUrl, setAirbnbUrl] = useState("");
   const [importing, setImporting] = useState(false);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
+  const [destinationType, setDestinationType] = useState<DestinationType>("urban");
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
@@ -88,7 +92,7 @@ export function OnboardingStep1({
       const response = await fetch("/api/properties", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, address }),
+        body: JSON.stringify({ name, address, destination_type: destinationType }),
       });
 
       if (!response.ok) {
@@ -183,6 +187,25 @@ export function OnboardingStep1({
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
+          </div>
+          <div>
+            <Label htmlFor="onboarding-destination-type">{tDestinationTypes("label")}</Label>
+            <Select
+              value={destinationType}
+              onValueChange={(value) => setDestinationType(value as DestinationType)}
+            >
+              <SelectTrigger id="onboarding-destination-type" className="w-full">
+                <SelectValue>{(value: DestinationType) => tDestinationTypes(value)}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {DESTINATION_TYPES.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {tDestinationTypes(type)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="mt-1 text-xs text-muted-foreground">{tDestinationTypes("hint")}</p>
           </div>
           <div>
             <Label>{t("coverLabel")}</Label>
