@@ -9,9 +9,9 @@
       "login": "Log in"
     },
     "hero": {
-      "eyebrow": "Digital guides for short-term stays",
-      "headline": "Everything your guest needs to know, in one link",
-      "subhead": "Create your property's digital guide in minutes: WiFi, check-in, house rules, emergency info, and AI-curated local recommendations — with automatic translation into your guest's language.",
+      "eyebrow": "For vacation rental hosts",
+      "headline": "Create the digital guide for each of your properties",
+      "subhead": "Create your property's digital guide in minutes. It includes WiFi, check-in, house rules, emergency info, and AI-curated local recommendations, with automatic translation into your guest's language.",
       "ctaPrimary": "Create my first guide for free",
       "ctaSecondary": "See how it works",
       "previewHost": "Carmen & Nacho",
@@ -19,8 +19,8 @@
     },
     "anyPlatform": {
       "eyebrow": "Before arrival",
-      "title": "Share your property's information in one click",
-      "body": "Send the link to your guest before arrival — it works for bookings from any platform. You can also print the QR code and place it in your property. Your guest doesn't have to download anything: they open the link and have everything at hand, in one place. Host's WhatsApp, check-in, check-out, house rules, appliances, WiFi, local attractions, restaurants, nightlife, and AI-curated recommendations — all in one spot. That's the difference between an ordinary stay and a five-star one.",
+      "title": "Share your short-term rental information in one click",
+      "body": "Send the link to your guest before arrival. It works for bookings from any platform, and you can also print the QR code and place it in your property. Your guest doesn't have to download anything: they just open the link and have everything at hand, in one place. Host's WhatsApp, check-in, check-out, house rules, appliances, WiFi, local attractions, restaurants, nightlife, and AI-curated recommendations, all in one spot. That's the difference between an ordinary stay and a five-star one.",
       "steps": [
         {
           "label": "The guest books"
@@ -41,26 +41,26 @@
       "before": [
         "Guests arrive from different platforms (Airbnb, Booking, VRBO...) and each one gives them different or incomplete information",
         "They're not sure about house rules, or check-in and check-out times",
-        "They have to ask for the WiFi password — again",
+        "They have to ask for the WiFi password, again",
         "They don't know the area they're staying in, or where to eat, what to see, or where to go at night",
         "They message you with questions at any hour, often the same ones over and over"
       ],
       "after": [
         "Build your stay's digital guide in minutes",
-        "Share it with a link or a QR code — no app to install",
+        "Share it with a link or a QR code. No app to install",
         "Everything in one place: house rules, check-in and check-out times, WiFi, emergency numbers, your WhatsApp, how the appliances work, photos",
         "Automatically translated into each guest's language",
-        "Real restaurant, sightseeing, and nightlife recommendations, with distance and a map — generated automatically with AI or added by hand",
+        "Real restaurant, sightseeing, and nightlife recommendations, with distance and a map. Generated automatically with AI or added by hand",
         "You answer less, your guests enjoy more, and leave better reviews"
       ]
     },
     "features": {
       "eyebrow": "What's included",
-      "title": "A complete guide, without the hassle",
+      "title": "A complete guide for property management, no hassle",
       "items": [
         {
-          "title": "A guide built around your stay",
-          "description": "WiFi, check-in, check-out, house rules — all in one link you send just once."
+          "title": "Guest guide tailored to your property",
+          "description": "WiFi, check-in, check-out, and house rules. All in one link you send just once."
         },
         {
           "title": "Automatic translation",
@@ -68,11 +68,11 @@
         },
         {
           "title": "AI-curated local recommendations",
-          "description": "What to see, where to eat, nightlife — real places, real distances, and a Google Maps link."
+          "description": "What to see, where to eat, nightlife. Real places, real distances, and a Google Maps link."
         },
         {
           "title": "Print-ready QR code",
-          "description": "Stick it on the door or leave it on the table — your guest scans it and they're in."
+          "description": "Stick it on the door or leave it on the table. Your guest scans it and they're in."
         }
       ]
     },
@@ -82,7 +82,7 @@
       "steps": [
         {
           "title": "Add your stay",
-          "description": "Name, address, the basics — two minutes."
+          "description": "Name, address, and the basics. Two minutes."
         },
         {
           "title": "Generate recommendations with one click",
@@ -96,7 +96,7 @@
     },
     "pricing": {
       "eyebrow": "Plans",
-      "title": "A plan for every host",
+      "title": "A plan for every Airbnb, Booking, or Vrbo host",
       "subtitle": "Start free. Grow when you need to.",
       "mostPopular": "Most popular",
       "perMonth": "/mo",
@@ -127,7 +127,7 @@
     },
     "finalCta": {
       "title": "Ready to stop repeating your WiFi password?",
-      "subtitle": "Create your first guide for free, no credit card needed.",
+      "subtitle": "Create your vacation rental's guide for free, no credit card needed.",
       "cta": "Start for free"
     },
     "footer": {

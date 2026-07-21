@@ -9,9 +9,9 @@
       "login": "Iniciar sessão"
     },
     "hero": {
-      "eyebrow": "Guias digitais para alojamentos de curta duração",
-      "headline": "Tudo o que o teu hóspede precisa de saber, num único link",
-      "subhead": "Cria o guia digital do teu alojamento em minutos: WiFi, check-in, regras da casa, emergências e recomendações locais selecionadas por IA — com tradução automática para o idioma do teu hóspede.",
+      "eyebrow": "Para anfitriões de alojamento local",
+      "headline": "Cria o guia digital de cada um dos teus alojamentos",
+      "subhead": "Cria o guia digital do teu alojamento em minutos. Inclui WiFi, check-in, regras da casa, emergências e recomendações locais selecionadas por IA, com tradução automática para o idioma do teu hóspede.",
       "ctaPrimary": "Criar o meu primeiro guia grátis",
       "ctaSecondary": "Ver como funciona",
       "previewHost": "Carmen & Nacho",
@@ -19,8 +19,8 @@
     },
     "anyPlatform": {
       "eyebrow": "Antes da chegada",
-      "title": "Partilha num clique a informação do teu alojamento",
-      "body": "Envia o link ao teu hóspede antes da chegada — funciona para reservas de qualquer plataforma. Também podes imprimir o código QR e colocá-lo no teu alojamento. O hóspede não precisa de instalar nada: abre o link e tem tudo à mão, num só sítio. WhatsApp do anfitrião, check-in, check-out, regras da casa, eletrodomésticos, WiFi, locais de interesse, restaurantes, vida noturna, e recomendações selecionadas por IA — tudo no mesmo sítio. Essa é a diferença entre um alojamento normal e um de cinco estrelas.",
+      "title": "Partilha num clique a informação do teu arrendamento de curta duração",
+      "body": "Envia o link ao teu hóspede antes da chegada. Funciona para reservas de qualquer plataforma, e também podes imprimir o código QR e colocá-lo no teu alojamento. O hóspede não precisa de instalar nada: abre o link e tem logo tudo à mão, num só sítio. WhatsApp do anfitrião, check-in, check-out, regras da casa, eletrodomésticos, WiFi, locais de interesse, restaurantes, vida noturna, e recomendações selecionadas por IA, tudo no mesmo sítio. Essa é a diferença entre um alojamento normal e um de cinco estrelas.",
       "steps": [
         {
           "label": "O hóspede reserva"
@@ -47,20 +47,20 @@
       ],
       "after": [
         "Geras o guia digital do teu alojamento em minutos",
-        "Partilha-lo com um link ou um código QR — o hóspede não instala nada",
+        "Partilha-lo com um link ou um código QR. O hóspede não instala nada",
         "Toda a informação num só sítio: regras, horários, WiFi, números de emergência, o teu WhatsApp, como funcionam os eletrodomésticos, fotos",
         "Traduzido automaticamente para o idioma de cada hóspede",
-        "Recomendações reais de restaurantes, o que visitar e vida noturna, com distância e mapa — geradas automaticamente com IA ou adicionadas manualmente",
+        "Recomendações reais de restaurantes, o que visitar e vida noturna, com distância e mapa. Geradas automaticamente com IA ou adicionadas manualmente",
         "Respondes menos, os teus hóspedes desfrutam mais e deixam melhores avaliações"
       ]
     },
     "features": {
       "eyebrow": "O que inclui",
-      "title": "Um guia completo, sem complicações",
+      "title": "Um guia completo para a gestão de alojamentos, sem complicações",
       "items": [
         {
-          "title": "Um guia à medida do teu alojamento",
-          "description": "WiFi, check-in, check-out, regras da casa — tudo num único link que envias uma só vez."
+          "title": "Guia para hóspedes à medida do teu alojamento",
+          "description": "WiFi, check-in, check-out e regras da casa. Tudo num único link que envias uma só vez."
         },
         {
           "title": "Tradução automática",
@@ -68,11 +68,11 @@
         },
         {
           "title": "Recomendações locais com IA",
-          "description": "O que visitar, onde comer, vida noturna — locais reais, com distância real e link para o Google Maps."
+          "description": "O que visitar, onde comer, vida noturna. Locais reais, com distância real e link para o Google Maps."
         },
         {
           "title": "Código QR pronto a imprimir",
-          "description": "Cola-o na porta ou deixa-o na mesa — o teu hóspede digitaliza-o e já está dentro."
+          "description": "Cola-o na porta ou deixa-o na mesa. O teu hóspede digitaliza-o e já está dentro."
         }
       ]
     },
@@ -82,7 +82,7 @@
       "steps": [
         {
           "title": "Adiciona o teu alojamento",
-          "description": "Nome, morada e o essencial — dois minutos."
+          "description": "Nome, morada e o essencial. Dois minutos."
         },
         {
           "title": "Gera recomendações com um clique",
@@ -96,7 +96,7 @@
     },
     "pricing": {
       "eyebrow": "Planos",
-      "title": "Um plano para cada anfitrião",
+      "title": "Um plano para cada anfitrião Airbnb, Booking ou Vrbo",
       "subtitle": "Começa grátis. Cresce quando precisares.",
       "mostPopular": "Mais popular",
       "perMonth": "/mês",
@@ -127,7 +127,7 @@
     },
     "finalCta": {
       "title": "Pronto para deixar de repetir a palavra-passe do WiFi?",
-      "subtitle": "Cria o teu primeiro guia grátis, sem cartão de crédito.",
+      "subtitle": "Cria grátis o guia do teu alojamento local, sem cartão de crédito.",
       "cta": "Começar grátis"
     },
     "footer": {

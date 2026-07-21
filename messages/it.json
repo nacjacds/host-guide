@@ -9,9 +9,9 @@
       "login": "Accedi"
     },
     "hero": {
-      "eyebrow": "Guide digitali per affitti brevi",
-      "headline": "Tutto ciò che il tuo ospite deve sapere, in un unico link",
-      "subhead": "Crea la guida digitale del tuo alloggio in pochi minuti: WiFi, check-in, regole della casa, emergenze e consigli locali selezionati dall'IA — con traduzione automatica nella lingua del tuo ospite.",
+      "eyebrow": "Per host di affitti turistici",
+      "headline": "Crea la guida digitale di ognuno dei tuoi alloggi",
+      "subhead": "Crea la guida digitale del tuo alloggio in pochi minuti. Include WiFi, check-in, regole della casa, emergenze e consigli locali selezionati dall'IA, con traduzione automatica nella lingua del tuo ospite.",
       "ctaPrimary": "Crea la mia prima guida gratis",
       "ctaSecondary": "Scopri come funziona",
       "previewHost": "Carmen & Nacho",
@@ -19,8 +19,8 @@
     },
     "anyPlatform": {
       "eyebrow": "Prima dell'arrivo",
-      "title": "Condividi in un clic le informazioni del tuo alloggio",
-      "body": "Invia il link al tuo ospite prima del suo arrivo — funziona per prenotazioni da qualsiasi piattaforma. Puoi anche stampare il codice QR e metterlo nel tuo alloggio. Il tuo ospite non deve scaricare nulla: apre il link e ha tutto a portata di mano, in un unico posto. WhatsApp dell'host, check-in, check-out, regole della casa, elettrodomestici, WiFi, luoghi di interesse, ristoranti, vita notturna e consigli selezionati dall'IA — tutto nello stesso posto. Questa è la differenza tra un soggiorno normale e uno a cinque stelle.",
+      "title": "Condividi in un clic le informazioni della tua casa vacanze",
+      "body": "Invia il link al tuo ospite prima del suo arrivo. Funziona per prenotazioni da qualsiasi piattaforma, e puoi anche stampare il codice QR e metterlo nel tuo alloggio. Il tuo ospite non deve scaricare nulla: apre semplicemente il link e ha tutto a portata di mano, in un unico posto. WhatsApp dell'host, check-in, check-out, regole della casa, elettrodomestici, WiFi, luoghi di interesse, ristoranti, vita notturna e consigli selezionati dall'IA, tutto nello stesso posto. Questa è la differenza tra un soggiorno normale e uno a cinque stelle.",
       "steps": [
         {
           "label": "L'ospite prenota"
@@ -47,20 +47,20 @@
       ],
       "after": [
         "Generi la guida digitale del tuo alloggio in pochi minuti",
-        "La condividi con un link o un codice QR — l'ospite non installa nulla",
+        "La condividi con un link o un codice QR. L'ospite non installa nulla",
         "Tutte le informazioni in un unico posto: regole, orari, WiFi, numeri di emergenza, il tuo WhatsApp, come funzionano gli elettrodomestici, foto",
         "Tradotta automaticamente nella lingua di ogni ospite",
-        "Consigli reali su ristoranti, cosa visitare e vita notturna, con distanza e mappa — generati automaticamente dall'IA o aggiunti a mano",
+        "Consigli reali su ristoranti, cosa visitare e vita notturna, con distanza e mappa. Generati automaticamente dall'IA o aggiunti a mano",
         "Rispondi meno, i tuoi ospiti si divertono di più e lasciano recensioni migliori"
       ]
     },
     "features": {
       "eyebrow": "Cosa include",
-      "title": "Una guida completa, senza complicazioni",
+      "title": "Una guida completa per la gestione degli alloggi, senza complicazioni",
       "items": [
         {
-          "title": "Una guida su misura per il tuo alloggio",
-          "description": "WiFi, check-in, check-out, regole della casa — tutto in un unico link che invii una sola volta."
+          "title": "Guida per gli ospiti su misura per il tuo alloggio",
+          "description": "WiFi, check-in, check-out e regole della casa. Tutto in un unico link che invii una sola volta."
         },
         {
           "title": "Traduzione automatica",
@@ -68,11 +68,11 @@
         },
         {
           "title": "Consigli locali con IA",
-          "description": "Cosa vedere, dove mangiare, vita notturna — luoghi reali, con distanza reale e link a Google Maps."
+          "description": "Cosa vedere, dove mangiare, vita notturna. Luoghi reali, con distanza reale e link a Google Maps."
         },
         {
           "title": "Codice QR pronto da stampare",
-          "description": "Attaccalo alla porta o lascialo sul tavolo — il tuo ospite lo scansiona ed è già dentro."
+          "description": "Attaccalo alla porta o lascialo sul tavolo. Il tuo ospite lo scansiona ed è già dentro."
         }
       ]
     },
@@ -82,7 +82,7 @@
       "steps": [
         {
           "title": "Aggiungi il tuo alloggio",
-          "description": "Nome, indirizzo e le info di base — due minuti."
+          "description": "Nome, indirizzo e le info di base. Due minuti."
         },
         {
           "title": "Genera consigli con un clic",
@@ -96,7 +96,7 @@
     },
     "pricing": {
       "eyebrow": "Piani",
-      "title": "Un piano per ogni host",
+      "title": "Un piano per ogni host Airbnb, Booking o Vrbo",
       "subtitle": "Inizia gratis. Cresci quando ne hai bisogno.",
       "mostPopular": "Più popolare",
       "perMonth": "/mese",
@@ -127,7 +127,7 @@
     },
     "finalCta": {
       "title": "Pronto a smettere di ripetere la password del WiFi?",
-      "subtitle": "Crea la tua prima guida gratis, senza carta di credito.",
+      "subtitle": "Crea gratis la guida del tuo affitto turistico, senza carta di credito.",
       "cta": "Inizia gratis"
     },
     "footer": {

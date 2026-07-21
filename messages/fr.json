@@ -9,9 +9,9 @@
       "login": "Se connecter"
     },
     "hero": {
-      "eyebrow": "Guides numériques pour locations de courte durée",
-      "headline": "Tout ce que ton voyageur doit savoir, en un seul lien",
-      "subhead": "Crée le guide numérique de ton logement en quelques minutes : WiFi, arrivée, règlement intérieur, urgences et recommandations locales sélectionnées par IA — avec traduction automatique dans la langue de ton voyageur.",
+      "eyebrow": "Pour les hôtes en location saisonnière",
+      "headline": "Crée le guide numérique de chacun de tes logements",
+      "subhead": "Crée le guide numérique de ton logement en quelques minutes. Il comprend le WiFi, l'arrivée, le règlement intérieur, les urgences et des recommandations locales sélectionnées par IA, avec traduction automatique dans la langue de ton voyageur.",
       "ctaPrimary": "Créer mon premier guide gratuitement",
       "ctaSecondary": "Voir comment ça marche",
       "previewHost": "Carmen & Nacho",
@@ -19,8 +19,8 @@
     },
     "anyPlatform": {
       "eyebrow": "Avant l'arrivée",
-      "title": "Partage en un clic les informations de ton logement",
-      "body": "Envoie le lien à ton voyageur avant son arrivée — valable pour des réservations depuis n'importe quelle plateforme. Tu peux aussi imprimer le QR code et le placer dans ton logement. Ton voyageur n'a rien à télécharger : il ouvre le lien et a tout sous la main, au même endroit. WhatsApp de l'hôte, arrivée, départ, règlement intérieur, électroménager, WiFi, lieux d'intérêt, restaurants, vie nocturne, et recommandations sélectionnées par IA — tout au même endroit. C'est la différence entre un séjour ordinaire et un séjour cinq étoiles.",
+      "title": "Partage en un clic les informations de ton meublé de tourisme",
+      "body": "Envoie le lien à ton voyageur avant son arrivée. Cela fonctionne pour des réservations depuis n'importe quelle plateforme, et tu peux aussi imprimer le QR code et le placer dans ton logement. Ton voyageur n'a rien à télécharger : il ouvre simplement le lien et a tout sous la main, au même endroit. WhatsApp de l'hôte, arrivée, départ, règlement intérieur, électroménager, WiFi, lieux d'intérêt, restaurants, vie nocturne, et recommandations sélectionnées par IA, tout au même endroit. C'est la différence entre un séjour ordinaire et un séjour cinq étoiles.",
       "steps": [
         {
           "label": "Le voyageur réserve"
@@ -47,20 +47,20 @@
       ],
       "after": [
         "Tu génères le guide numérique de ton logement en quelques minutes",
-        "Tu le partages avec un lien ou un QR code — le voyageur n'installe rien",
+        "Tu le partages avec un lien ou un QR code. Le voyageur n'installe rien",
         "Toutes les informations au même endroit : règlement, horaires, WiFi, numéros d'urgence, ton WhatsApp, fonctionnement de l'électroménager, photos",
         "Traduit automatiquement dans la langue de chaque voyageur",
-        "De vraies recommandations de restaurants, de visites et de vie nocturne, avec distance et carte — générées automatiquement par IA ou ajoutées à la main",
+        "De vraies recommandations de restaurants, de visites et de vie nocturne, avec distance et carte. Générées automatiquement par IA ou ajoutées à la main",
         "Tu réponds moins, tes voyageurs profitent plus et laissent de meilleurs avis"
       ]
     },
     "features": {
       "eyebrow": "Ce qui est inclus",
-      "title": "Un guide complet, sans prise de tête",
+      "title": "Un guide complet pour la gestion locative, sans prise de tête",
       "items": [
         {
-          "title": "Un guide sur mesure pour ton logement",
-          "description": "WiFi, arrivée, départ, règlement intérieur — tout dans un seul lien que tu envoies une fois pour toutes."
+          "title": "Guide pour voyageurs sur mesure pour ton logement",
+          "description": "WiFi, arrivée, départ et règlement intérieur. Tout dans un seul lien que tu envoies une fois pour toutes."
         },
         {
           "title": "Traduction automatique",
@@ -68,11 +68,11 @@
         },
         {
           "title": "Recommandations locales par IA",
-          "description": "Quoi visiter, où manger, vie nocturne — de vrais lieux, avec la distance réelle et un lien Google Maps."
+          "description": "Quoi visiter, où manger, vie nocturne. De vrais lieux, avec la distance réelle et un lien Google Maps."
         },
         {
           "title": "QR code prêt à imprimer",
-          "description": "Colle-le sur la porte ou laisse-le sur la table — ton voyageur scanne et il est déjà dedans."
+          "description": "Colle-le sur la porte ou laisse-le sur la table. Ton voyageur le scanne et il est déjà dedans."
         }
       ]
     },
@@ -82,7 +82,7 @@
       "steps": [
         {
           "title": "Ajoute ton logement",
-          "description": "Nom, adresse et les infos de base — deux minutes."
+          "description": "Nom, adresse et les infos de base. Deux minutes."
         },
         {
           "title": "Génère des recommandations en un clic",
@@ -96,7 +96,7 @@
     },
     "pricing": {
       "eyebrow": "Offres",
-      "title": "Une offre pour chaque hôte",
+      "title": "Une offre pour chaque hôte Airbnb, Booking ou Vrbo",
       "subtitle": "Commence gratuitement. Évolue quand tu en as besoin.",
       "mostPopular": "Le plus populaire",
       "perMonth": "/mois",
@@ -127,7 +127,7 @@
     },
     "finalCta": {
       "title": "Prêt à arrêter de répéter ton mot de passe WiFi ?",
-      "subtitle": "Crée ton premier guide gratuitement, sans carte bancaire.",
+      "subtitle": "Crée gratuitement le guide de ta location saisonnière, sans carte bancaire.",
       "cta": "Commencer gratuitement"
     },
     "footer": {
