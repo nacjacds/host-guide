@@ -528,6 +528,7 @@ export interface Database {
           event_type: AnalyticsEventType;
           section: string | null;
           country: string | null;
+          city: string | null;
           created_at: string;
         };
         Insert: {
@@ -536,6 +537,7 @@ export interface Database {
           event_type: AnalyticsEventType;
           section?: string | null;
           country?: string | null;
+          city?: string | null;
           created_at?: string;
         };
         Update: {
@@ -544,6 +546,28 @@ export interface Database {
           event_type?: AnalyticsEventType;
           section?: string | null;
           country?: string | null;
+          city?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      analytics_excluded_ips: {
+        Row: {
+          id: string;
+          ip_address: string;
+          label: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          ip_address: string;
+          label?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          ip_address?: string;
+          label?: string | null;
           created_at?: string;
         };
         Relationships: [];
@@ -610,4 +634,5 @@ export type PropertyRecommendationMeta = Database["public"]["Tables"]["property_
 export type RecommendationRegenerationUsage = Database["public"]["Tables"]["recommendation_regeneration_usage"]["Row"];
 export type BotConversation = Database["public"]["Tables"]["bot_conversations"]["Row"];
 export type AnalyticsEvent = Database["public"]["Tables"]["analytics_events"]["Row"];
+export type AnalyticsExcludedIp = Database["public"]["Tables"]["analytics_excluded_ips"]["Row"];
 export type SupportTicket = Database["public"]["Tables"]["support_tickets"]["Row"];

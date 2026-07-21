@@ -109,6 +109,23 @@ export function AdminOverviewContent({
           <AdminTicketsSection tickets={ticketRows} />
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            {t("analyticsCard.title")}
+            <Link
+              href="/admin/analytics-ips"
+              className="text-sm font-normal text-primary underline-offset-2 hover:underline"
+            >
+              {t("analyticsCard.manageExcludedIps")}
+            </Link>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">{t("analyticsCard.description")}</p>
+        </CardContent>
+      </Card>
     </>
   );
 }

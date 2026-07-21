@@ -47,6 +47,11 @@ export function PoliticaPrivacidadPt() {
         <li>Gerir os pedidos recebidos através de formulários de contacto ou suporte.</li>
         <li>Realizar comunicações comerciais relacionadas com os serviços oferecidos.</li>
         <li>Gerir a faturação e o pagamento de subscrições.</li>
+        <li>
+          Gerar estatísticas de visitas aos guias digitais publicados (cidade e país
+          aproximados dos visitantes, derivados do seu endereço IP sem o armazenar), com fins
+          puramente estatísticos para o anfitrião.
+        </li>
         <li>Cumprir as obrigações legais aplicáveis.</li>
       </LegalList>
 
@@ -69,7 +74,10 @@ export function PoliticaPrivacidadPt() {
         Não serão cedidos dados pessoais a terceiros, salvo obrigação legal ou quando tal seja
         necessário para a prestação dos serviços contratados (fornecedores tecnológicos como
         alojamento em servidores, processamento de pagamentos, ou serviços de inteligência
-        artificial utilizados para gerar o conteúdo dos guias).
+        artificial utilizados para gerar o conteúdo dos guias). Para as estatísticas de
+        visitas aos guias, o endereço IP do visitante é enviado de forma efémera a um serviço
+        externo de geolocalização (ip-api.com) apenas para obter a cidade e o país
+        aproximados; o endereço IP nunca é armazenado.
       </LegalParagraph>
 
       <LegalHeading>6. Direitos do utilizador</LegalHeading>

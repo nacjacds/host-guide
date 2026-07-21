@@ -48,6 +48,11 @@ export function PoliticaPrivacidadFr() {
         <li>Traiter les demandes reçues via les formulaires de contact ou d&rsquo;assistance.</li>
         <li>Réaliser des communications commerciales liées aux services proposés.</li>
         <li>Gérer la facturation et le paiement des abonnements.</li>
+        <li>
+          Générer des statistiques de visites des guides numériques publiés (ville et pays
+          approximatifs des visiteurs, dérivés de leur adresse IP sans la conserver), à des
+          fins purement statistiques pour l&rsquo;hôte.
+        </li>
         <li>Respecter les obligations légales applicables.</li>
       </LegalList>
 
@@ -71,7 +76,10 @@ export function PoliticaPrivacidadFr() {
         lorsque cela est nécessaire à la fourniture des services souscrits (prestataires
         technologiques tels que l&rsquo;hébergement de serveurs, le traitement des paiements, ou
         les services d&rsquo;intelligence artificielle utilisés pour générer le contenu des
-        guides).
+        guides). Pour les statistiques de visites des guides, l&rsquo;adresse IP du visiteur est
+        envoyée de manière éphémère à un service externe de géolocalisation (ip-api.com)
+        uniquement pour obtenir sa ville et son pays approximatifs ; l&rsquo;adresse IP n&rsquo;est
+        jamais conservée.
       </LegalParagraph>
 
       <LegalHeading>6. Droits de l&rsquo;utilisateur</LegalHeading>

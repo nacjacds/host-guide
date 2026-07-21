@@ -714,6 +714,11 @@
       "supportCard": {
         "title": "Support"
       },
+      "analyticsCard": {
+        "title": "Statistiques",
+        "manageExcludedIps": "Gérer les IP exclues →",
+        "description": "Ajoute tes propres IP (domicile, bureau...) pour que tes visites ne comptent pas dans les statistiques de tes hôtes."
+      },
       "hostsTable": {
         "empty": "Pas encore d'hôtes.",
         "email": "Email",
@@ -764,6 +769,24 @@
         "purgePermanently": "Purger définitivement",
         "hostGroupCount": "{count, plural, one {# logement} other {# logements}}",
         "viewProperty": "Voir le logement"
+      },
+      "excludedIpsPage": {
+        "title": "IP exclues de l'analytique",
+        "backToPanel": "Retour au panneau",
+        "listTitle": "IP exclues ({count})"
+      },
+      "excludedIps": {
+        "description": "Les visites depuis ces IP ne sont jamais enregistrées dans les statistiques d'aucun logement — ni comme visite, ni comme donnée de pays/ville.",
+        "ipAddressLabel": "Adresse IP",
+        "labelLabel": "Étiquette (facultatif)",
+        "labelPlaceholder": "Domicile, bureau...",
+        "add": "Ajouter",
+        "added": "IP ajoutée",
+        "addError": "Impossible d'ajouter l'IP",
+        "deleted": "IP supprimée",
+        "deleteError": "Impossible de supprimer l'IP",
+        "empty": "Tu n'as encore exclu aucune IP.",
+        "remove": "Supprimer"
       },
       "tickets": {
         "typeLabels": {
@@ -816,7 +839,9 @@
       "topSections": "Sections les plus consultées",
       "topCountries": "Pays des visiteurs",
       "noDataYet": "Pas encore de données.",
-      "noCountryDataYet": "Pas encore de données (le pays n'est détecté qu'en production)."
+      "noCountryDataYet": "Pas encore de données.",
+      "topCities": "Villes des visiteurs",
+      "noCityDataYet": "Pas encore de données."
     }
   }
 }

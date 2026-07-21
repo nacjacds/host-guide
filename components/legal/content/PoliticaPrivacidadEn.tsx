@@ -47,6 +47,11 @@ export function PoliticaPrivacidadEn() {
         <li>Handling inquiries received through contact or support forms.</li>
         <li>Sending commercial communications related to the services offered.</li>
         <li>Managing billing and subscription payments.</li>
+        <li>
+          Generating visit statistics for published digital guides (visitors&rsquo;
+          approximate city and country, derived from their IP address without storing it),
+          for statistical purposes for the host only.
+        </li>
         <li>Complying with applicable legal obligations.</li>
       </LegalList>
 
@@ -68,7 +73,9 @@ export function PoliticaPrivacidadEn() {
         Personal data will not be disclosed to third parties, except where legally required or
         where necessary to provide the contracted services (technology providers such as
         server hosting, payment processing, or artificial intelligence services used to
-        generate guide content).
+        generate guide content). For guide visit statistics, the visitor&rsquo;s IP address is
+        sent ephemerally to an external geolocation service (ip-api.com) solely to obtain
+        their approximate city and country; the IP address is never stored.
       </LegalParagraph>
 
       <LegalHeading>6. User rights</LegalHeading>

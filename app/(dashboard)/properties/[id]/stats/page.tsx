@@ -15,7 +15,7 @@ export default async function PropertyStatsPage({
   const since = new Date(Date.now() - THIRTY_DAYS_MS).toISOString();
   const { data: events } = await supabase
     .from("analytics_events")
-    .select("event_type, section, country")
+    .select("event_type, section, country, city")
     .eq("property_id", id)
     .gte("created_at", since);
 
@@ -24,6 +24,7 @@ export default async function PropertyStatsPage({
 
   const sectionCounts = new Map<string, number>();
   const countryCounts = new Map<string, number>();
+  const cityCounts = new Map<string, number>();
 
   for (const e of rows) {
     if (e.event_type === "section_viewed" && e.section) {
@@ -31,6 +32,9 @@ export default async function PropertyStatsPage({
     }
     if (e.country) {
       countryCounts.set(e.country, (countryCounts.get(e.country) ?? 0) + 1);
+    }
+    if (e.city) {
+      cityCounts.set(e.city, (cityCounts.get(e.city) ?? 0) + 1);
     }
   }
 
@@ -40,12 +44,16 @@ export default async function PropertyStatsPage({
   const topCountries = Array.from(countryCounts.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
+  const topCities = Array.from(cityCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
 
   return (
     <PropertyStatsView
       totalVisits={totalVisits}
       topSections={topSections}
       topCountries={topCountries}
+      topCities={topCities}
     />
   );
 }

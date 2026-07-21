@@ -47,6 +47,11 @@ export function PoliticaPrivacidadIt() {
         <li>Gestire le richieste ricevute tramite moduli di contatto o assistenza.</li>
         <li>Effettuare comunicazioni commerciali relative ai servizi offerti.</li>
         <li>Gestire la fatturazione e il pagamento degli abbonamenti.</li>
+        <li>
+          Generare statistiche di visita delle guide digitali pubblicate (città e paese
+          approssimativi dei visitatori, derivati dal loro indirizzo IP senza memorizzarlo),
+          per finalità puramente statistiche a beneficio dell&rsquo;host.
+        </li>
         <li>Adempiere agli obblighi legali applicabili.</li>
       </LegalList>
 
@@ -69,7 +74,10 @@ export function PoliticaPrivacidadIt() {
         I dati personali non saranno ceduti a terzi, salvo obbligo di legge o quando ciò sia
         necessario per l&rsquo;erogazione dei servizi contrattati (fornitori tecnologici come
         l&rsquo;hosting dei server, l&rsquo;elaborazione dei pagamenti, o servizi di intelligenza
-        artificiale utilizzati per generare i contenuti delle guide).
+        artificiale utilizzati per generare i contenuti delle guide). Per le statistiche di
+        visita delle guide, l&rsquo;indirizzo IP del visitatore viene inviato in modo effimero a
+        un servizio esterno di geolocalizzazione (ip-api.com) unicamente per ottenere città e
+        paese approssimativi; l&rsquo;indirizzo IP non viene mai memorizzato.
       </LegalParagraph>
 
       <LegalHeading>6. Diritti dell&rsquo;utente</LegalHeading>

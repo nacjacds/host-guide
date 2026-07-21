@@ -39,10 +39,12 @@ export function PropertyStatsView({
   totalVisits,
   topSections,
   topCountries,
+  topCities,
 }: {
   totalVisits: number;
   topSections: [string, number][];
   topCountries: [string, number][];
+  topCities: [string, number][];
 }) {
   const t = useTranslations("dashboard.stats");
 
@@ -61,6 +63,11 @@ export function PropertyStatsView({
       <div className="space-y-3 rounded-lg border border-border p-4">
         <h2 className="text-sm font-medium text-muted-foreground">{t("topCountries")}</h2>
         <BarList entries={topCountries} emptyLabel={t("noCountryDataYet")} />
+      </div>
+
+      <div className="space-y-3 rounded-lg border border-border p-4">
+        <h2 className="text-sm font-medium text-muted-foreground">{t("topCities")}</h2>
+        <BarList entries={topCities} emptyLabel={t("noCityDataYet")} />
       </div>
     </div>
   );
