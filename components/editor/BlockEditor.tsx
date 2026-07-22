@@ -20,9 +20,27 @@ import { EmergencyBlock, type EmergencyContent } from "./blocks/EmergencyBlock";
 import { PlaceListBlock, type PlaceListContent } from "./blocks/PlaceListBlock";
 import { AIPlaceGenerateButton } from "./blocks/AIPlaceGenerateButton";
 import { BlockImageUploader } from "./blocks/BlockImageUploader";
-import type { BlockImage, GuideBlock } from "@/types";
+import type { BlockImage, BlockType, GuideBlock } from "@/types";
 
 const PLACE_LIST_TYPES = ["drinks"] as const;
+
+// Types whose card title is always derived live from the current dashboard
+// locale (dashboard.editor.toolbar.{type}) instead of the block's own
+// `title` column — that column gets written once at creation time (see
+// app/api/properties/[id]/blocks/route.ts) and would otherwise stay frozen
+// in whatever locale the host had active back then. custom/drinks are
+// deliberately excluded: their title is genuine host-authored content, not
+// a type label, so it keeps reading from `block.title` as before.
+const DYNAMIC_TITLE_TYPES = new Set<BlockType>([
+  "wifi",
+  "checkin",
+  "checkout",
+  "rules",
+  "parking",
+  "appliances",
+  "pool",
+  "emergencias",
+]);
 
 // Takes the "dashboard.editor.blockCard.summary" translator as a param
 // rather than calling useTranslations() itself — this is a plain helper
@@ -85,6 +103,7 @@ export function BlockEditor({
 }) {
   const t = useTranslations("dashboard.editor.blockCard");
   const tSummary = useTranslations("dashboard.editor.blockCard.summary");
+  const tToolbar = useTranslations("dashboard.editor.toolbar");
   const tBlocksCustom = useTranslations("dashboard.editor.blocks.custom");
   const tBlocksRules = useTranslations("dashboard.editor.blocks.rules");
   const tCommon = useTranslations("dashboard.common");
@@ -116,6 +135,10 @@ export function BlockEditor({
     onDeleted(block.id);
   }
 
+  const displayTitle = DYNAMIC_TITLE_TYPES.has(block.type)
+    ? tToolbar(block.type)
+    : (block.title ?? block.type);
+
   return (
     <div ref={setNodeRef} style={sortableStyle} className={cn(isDragging && "relative z-10")}>
       <Card className={cn("group overflow-hidden py-0 gap-0", isDragging && "shadow-lg")}>
@@ -140,7 +163,7 @@ export function BlockEditor({
             <span className="text-xl leading-none">{block.icon}</span>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-sm">{block.title ?? block.type}</span>
+                <span className="font-medium text-sm">{displayTitle}</span>
                 {dirty && (
                   <span
                     className="size-1.5 shrink-0 animate-pulse rounded-full bg-primary"

@@ -2,14 +2,28 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { notAuthenticatedResponse, notFoundResponse } from "@/lib/apiResponses";
+import { ALL_APP_LOCALES, type AppLocale } from "@/lib/locale";
 import esMessages from "@/messages/es.json";
 import enMessages from "@/messages/en.json";
+import frMessages from "@/messages/fr.json";
+import itMessages from "@/messages/it.json";
+import ptMessages from "@/messages/pt.json";
 import type { BlockType } from "@/types";
 
-// Title comes from dashboard.editor.toolbar (messages/{es,en}.json) — same
+// Title comes from dashboard.editor.toolbar (messages/{locale}.json) — same
 // labels shown in the block-creation toolbar — so a new block's initial
 // title matches the host's active dashboard locale instead of always
-// seeding Spanish. Icon and content shape never vary by locale.
+// seeding Spanish. Icon and content shape never vary by locale. (Standard
+// block types no longer actually read this stored title back — see
+// BlockEditor.tsx, which derives it dynamically instead — but it's kept
+// here for custom/drinks, whose title is genuine host-authored content.)
+const MESSAGES_BY_LOCALE: Record<AppLocale, typeof esMessages> = {
+  es: esMessages,
+  en: enMessages,
+  fr: frMessages,
+  it: itMessages,
+  pt: ptMessages,
+};
 const BLOCK_DEFAULTS: Record<BlockType, { icon: string; content: Record<string, unknown> }> = {
   wifi: { icon: "📶", content: { network_name: "", password: "" } },
   checkin: { icon: "🔑", content: { time: "", instructions: "" } },
@@ -46,7 +60,7 @@ const createBlockSchema = z.object({
     "pool",
     "drinks",
   ]),
-  locale: z.enum(["es", "en"]).optional(),
+  locale: z.enum(ALL_APP_LOCALES as [AppLocale, ...AppLocale[]]).optional(),
 });
 
 export async function POST(
@@ -86,7 +100,7 @@ export async function POST(
 
   const { type, locale } = parsed.data;
   const defaults = BLOCK_DEFAULTS[type];
-  const messages = locale === "en" ? enMessages : esMessages;
+  const messages = MESSAGES_BY_LOCALE[locale ?? "es"];
   const title = messages.dashboard.editor.toolbar[type];
 
   const { data: block, error } = await supabase
